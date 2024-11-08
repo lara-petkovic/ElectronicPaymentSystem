@@ -5,7 +5,8 @@
     align-items: center;     /* Centriraj vertikalno */
     height: 30vh; 
     width: 50%;
-    margin-left: 30%;          /* Prilagodi visinu na visinu ekrana */
+    margin-left: 25%;          /* Prilagodi visinu na visinu ekrana */
+    margin-bottom: 35%;
   }
 .psp-header{
     display: flex;
@@ -28,6 +29,7 @@ h1{
   }
   
   tr {
+    text-align: center;
     cursor: pointer;
     transition: transform 0.3s ease;
   }
@@ -35,4 +37,3 @@ h1{
   tr:hover {
     transform: scale(1.05);
   }
-  
