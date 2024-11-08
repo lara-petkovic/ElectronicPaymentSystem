@@ -11,7 +11,7 @@ export class WebsocketService {
 
   connect() {
     const stompClient = new Client({
-      brokerURL: 'http://localhost:8085/ws',
+      brokerURL: 'ws://localhost:8085/ws',
       reconnectDelay: 5000, 
       debug: (str) => {
         console.log(str);

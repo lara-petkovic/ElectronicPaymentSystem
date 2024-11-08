@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -7,15 +7,15 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'psp-front';
-  stock: any = {};
 
   private webSocket: WebSocket;
 
-  constructor() {
+  constructor(router:Router) {
     this.webSocket = new WebSocket('ws://localhost:8085/transactions');
     this.webSocket.onmessage = (event) => {
-      this.stock = event.data
-      console.log(this.stock)
+      console.log(event.data)
+      router.navigate(['/payment-options', event.data]);
+
     };
   } 
 }

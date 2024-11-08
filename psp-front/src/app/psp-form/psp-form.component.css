@@ -1,0 +1,38 @@
+.card-container {
+    display: flex;
+    text-align: center;
+    justify-content: center; /* Centriraj horizontalno */
+    align-items: center;     /* Centriraj vertikalno */
+    height: 30vh; 
+    width: 50%;
+    margin-left: 30%;          /* Prilagodi visinu na visinu ekrana */
+  }
+.psp-header{
+    display: flex;
+    text-align: center;
+    justify-content: center; /* Centriraj horizontalno */
+    align-items: center;     /* Centriraj vertikalno */
+    height: 30vh; 
+}
+h1{
+    text-align: center;
+    align-content: center;
+}
+  .centered-table {
+    width: 50%;              /* Postavi širinu tabele na 50% ekrana */
+  }
+  
+  table {
+    width: 50%;
+    max-width: 400px;
+  }
+  
+  tr {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  
+  tr:hover {
+    transform: scale(1.05);
+  }
+  

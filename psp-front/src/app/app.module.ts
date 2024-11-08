@@ -4,6 +4,9 @@ import { WebsocketModule } from 'src/websocket/websocket.module';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { PspFormComponent } from './psp-form/psp-form.component';
+import { MatTableModule } from '@angular/material/table';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 
 @NgModule({
   declarations: [
@@ -13,7 +16,9 @@ import { PspFormComponent } from './psp-form/psp-form.component';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    WebsocketModule
+    WebsocketModule,
+    MatTableModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
