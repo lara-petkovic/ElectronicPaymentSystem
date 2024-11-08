@@ -1,7 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; overflow:auto}
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; overflow:auto;   background-image: url('/assets/banka.jpeg');
+  background-size: cover;           /* Cover the entire viewport */
+  background-position: center;      /* Center the image */
+  background-repeat: no-repeat;     /* Prevent the image from repeating */
+  background-attachment: fixed; }
 *::-webkit-scrollbar {
     width: 0px !important;
     background-color: white !important;

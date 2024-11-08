@@ -2,15 +2,15 @@ package com.example.sep.models;
 
 import jakarta.persistence.*;
 
-//@Entity
+@Entity
 public class Transaction {
 
-   // @Id
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
-    //@Column(name = "transactionId", unique = true, nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "transactionId", unique = true, nullable = false)
     private Long transactionId;
 
-   // @Column(name = "value")
+    @Column(name = "value")
     private Double value;
 
     public Long getTransactionId() {

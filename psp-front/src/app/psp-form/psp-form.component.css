@@ -1,26 +1,30 @@
 .card-container {
     display: flex;
     text-align: center;
-    justify-content: center; /* Centriraj horizontalno */
-    align-items: center;     /* Centriraj vertikalno */
-    height: 30vh; 
+    justify-content: center;
+    align-items: center;
+    height: 30vh;
     width: 50%;
-    margin-left: 25%;          /* Prilagodi visinu na visinu ekrana */
+    margin-left: 25%;
     margin-bottom: 35%;
   }
-.psp-header{
+  
+  .psp-header {
     display: flex;
     text-align: center;
-    justify-content: center; /* Centriraj horizontalno */
-    align-items: center;     /* Centriraj vertikalno */
-    height: 30vh; 
-}
-h1{
+    justify-content: center;
+    align-items: center;
+    height: 30vh;
+  }
+  
+  h1 {
+    color: white;
     text-align: center;
     align-content: center;
-}
+  }
+  
   .centered-table {
-    width: 50%;              /* Postavi širinu tabele na 50% ekrana */
+    width: 50%;
   }
   
   table {
@@ -32,8 +36,20 @@ h1{
     text-align: center;
     cursor: pointer;
     transition: transform 0.3s ease;
+    background-color: lightblue;
   }
   
   tr:hover {
     transform: scale(1.05);
   }
+  
+
+  .selected-row {
+    background-color: #2196f3; 
+    color: white;
+    cursor: default;
+  }
+  tr.selected:hover {
+    transform: none;  
+  }
+  
