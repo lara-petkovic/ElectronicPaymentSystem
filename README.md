@@ -21,15 +21,15 @@
 |                |                       | **Database**: `postgres`                                                |
 |                |                       | **Username**: `postgres`                                               |
 |                |                       | **Password**: `super`                                                  |
-| **PaymentServiceProvider**   | **Backend**           | Node.js API                                                            |
-|                | **Backend Port**      | `http://localhost:3000`                                                 |
-|                | **Frontend**          | React                                                                  |
-|                | **Frontend Port**     | `http://localhost:8080`                                                 |
-|                | **Database**          | MySQL                                                                  |
+| **PaymentServiceProvider**   | **Backend**           | Spring                                                            |
+|                | **Backend Port**      | `http://localhost:8085`                                                 |
+|                | **Frontend**          | Angular                                                                  |
+|                | **Frontend Port**     | `http://localhost:4201`                                                 |
+|                | **Database**          | PostgreSQL                                                                  |
 |                | **Database Config**   | **Host**: `localhost`                                                   |
-|                |                       | **Database**: `shopifydb`                                              |
-|                |                       | **Username**: `root`                                                   |
-|                |                       | **Password**: `password123`                                            |
+|                |                       | **Database**: `psp`                                              |
+|                |                       | **Username**: `postgres`                                                   |
+|                |                       | **Password**: `super`                                            |
 | **Bank**   | **Backend**           | Spring Boot API                                                        |
 |                | **Backend Port**      | `http://localhost:8081`                                                 |
 |                | **Frontend**          | Vue.js                                                                  |
