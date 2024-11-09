@@ -5,7 +5,7 @@ import { PspClientRegComponent } from './psp-client-reg/psp-client-reg.component
 
 const routes: Routes = [
   { path: 'payment-options/:id', component: PspFormComponent }, 
-  { path: 'client-reg', component: PspClientRegComponent }, 
+  { path: 'app-psp-client-reg', component: PspClientRegComponent }, 
 
 ];
 

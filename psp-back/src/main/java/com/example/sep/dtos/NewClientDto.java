@@ -2,7 +2,7 @@ package com.example.sep.dtos;
 
 public class NewClientDto {
     public String apiKey;
-
+    public NewClientDto(){}
     public NewClientDto(String apiKey) {
         this.apiKey = apiKey;
     }

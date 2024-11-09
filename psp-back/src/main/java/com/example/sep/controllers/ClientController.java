@@ -5,9 +5,12 @@ import com.example.sep.dtos.NewClientDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping(path="api/subscription")
+
 public class ClientController {
     private final ClientSubscriptionWebSocketHandler clientSubscriptionWebSocketHandler;
 
@@ -17,7 +20,7 @@ public class ClientController {
     }
     @PostMapping
     public NewClientDto CreateClient(@RequestBody NewClientDto newClient) throws Exception {
-        clientSubscriptionWebSocketHandler.broadcastMessage("Client registration: " + newClient);
+        clientSubscriptionWebSocketHandler.broadcastMessage("Client registration: " + newClient.apiKey);
         return  newClient;
     }
 }

@@ -1,8 +1,17 @@
 
 
+<div [ngClass]="{ 'hidden': !showClientReg }">
+<app-psp-client-reg 
+(optionsSelected)="handleOptionSelected($event)"></app-psp-client-reg>
+</div>
 
-
-<app-psp-form (paymentMethodSelected)="sendPaymentMethod($event)"></app-psp-form>
-
+<div [ngClass]="{ 'hidden': !showPaymentForm }">
+<app-psp-form   
+(paymentMethodSelected)="sendPaymentMethod($event)"></app-psp-form>
+</div>
 
 <router-outlet></router-outlet>
+<br>
+<br>
+<br>
+

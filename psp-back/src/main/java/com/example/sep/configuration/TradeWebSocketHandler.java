@@ -26,7 +26,7 @@ public class TradeWebSocketHandler extends TextWebSocketHandler {
         try {
             Map<String, Object> data = objectMapper.readValue(message.getPayload(), Map.class);
             String name = (String) data.get("name");
-            String id = (String) data.get("id");
+            String id = (String) data.get("clientId");
 
             System.out.println("Received payment opotion: " + name + ", ID: " + id);
 

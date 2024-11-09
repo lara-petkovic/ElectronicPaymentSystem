@@ -1,0 +1,56 @@
+.options-table {
+    border-collapse: collapse;
+    width: 50%;
+    max-width: 400vh;
+  }
+  
+  .card-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 30vh;
+    width: 50%;
+    margin-left: 25%;
+    margin-bottom: 35%;
+  }
+  
+  .options-table tr {
+    cursor: pointer;
+    background-color: lightblue; /* Beli redovi kao podrazumevana boja */
+    transition: background-color 0.3s, transform 0.2s;
+  }
+  
+  .options-table tr.hover {
+    transform: scale(1.05);
+  }
+  
+  .options-table tr.selected {
+    background-color: blue; /* Plava boja za selektovane redove */
+  }
+  
+  .options-table td, .options-table th {
+    padding: 10px;
+    text-align: left;
+  }
+  
+  .psp-header {
+    color: white;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    height: 30vh;
+  }
+  
+  .confirm-button {
+    margin-left: 70%;
+    height: 5vh;
+    width: 10vh;
+    font-weight: 600;
+    background-color: lightskyblue;
+    cursor: pointer;
+  }
+  .confirm-button:hover{
+    transform: scale(1.01);
+    background-color: lightsteelblue;
+  }
