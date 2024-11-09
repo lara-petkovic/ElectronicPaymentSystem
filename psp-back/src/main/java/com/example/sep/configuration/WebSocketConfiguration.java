@@ -13,8 +13,13 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(tradeWebSocketHandler(), "/transactions").setAllowedOrigins("*");
-    }
+        registry.addHandler(clientSubscriptionWebSocketHandler(), "/clients").setAllowedOrigins("*");
 
+    }
+    @Bean
+    public ClientSubscriptionWebSocketHandler clientSubscriptionWebSocketHandler() {
+        return new ClientSubscriptionWebSocketHandler();
+    }
     @Bean
     public TradeWebSocketHandler tradeWebSocketHandler() {
         return new TradeWebSocketHandler();

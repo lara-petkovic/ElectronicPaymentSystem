@@ -6,12 +6,14 @@ import { AppComponent } from './app.component';
 import { PspFormComponent } from './psp-form/psp-form.component';
 import { MatTableModule } from '@angular/material/table';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { PspClientRegComponent } from './psp-client-reg/psp-client-reg.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    PspFormComponent
+    PspFormComponent,
+    PspClientRegComponent
   ],
   imports: [
     BrowserModule,
