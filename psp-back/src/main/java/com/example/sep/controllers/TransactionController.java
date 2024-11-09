@@ -29,7 +29,7 @@ public class TransactionController {
     public NewTransactionDto CreateTransaction(@RequestBody NewTransactionDto transaction) throws Exception {
         ClientSubscriptionDto clientSubscriptionDto=clientService.getSubscription(transaction);
         if(clientSubscriptionDto!=null) {
-            tradeWebSocketHandler.broadcastMessage("New transaction created: " + clientSubscriptionDto.toString());
+            tradeWebSocketHandler.broadcastMessage(clientSubscriptionDto.toString());
             this.transactionService.SaveTransaction(new Transaction(transaction));
         }
         return  transaction;

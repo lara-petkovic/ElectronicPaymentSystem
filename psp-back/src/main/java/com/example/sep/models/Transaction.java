@@ -20,11 +20,14 @@ public class Transaction {
     @Column(name = "orderId")
     private Long orderId;
     @Column(name = "timestamp")
-    private String timestamp;
+    private Long timestamp;
 
     public Transaction(NewTransactionDto newTransactionDto){
         this.amount=newTransactionDto.getAmount();
         this.orderId=newTransactionDto.getMerchantOrderId();
+        this.merchantId= newTransactionDto.getMerchantId();
+        this.merchantPass= newTransactionDto.getMerchantPass();
+        this.timestamp=newTransactionDto.getMerchantTimestamp();
 
     }
     public Long getTransactionId() {
@@ -67,16 +70,16 @@ public class Transaction {
         this.orderId = orderId;
     }
 
-    public String getTimestamp() {
+    public Long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
 
     public Transaction(){}
-    public Transaction(Long transactionId, Double amount, String merchantId, String merchantPass, Long orderId, String timestamp) {
+    public Transaction(Long transactionId, Double amount, String merchantId, String merchantPass, Long orderId, Long timestamp) {
         this.transactionId = transactionId;
         this.amount = amount;
         this.merchantId = merchantId;

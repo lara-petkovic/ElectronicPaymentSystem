@@ -11,7 +11,7 @@ interface Card {
   styleUrls: ['./psp-form.component.css']
 })
 export class PspFormComponent {
-  @Output() paymentMethodSelected = new EventEmitter<{ name: string; id: string | null }>();
+  @Output() paymentMethodSelected = new EventEmitter<{ name: string; orderid: string | null; merchantid: string | null }>();
 
   selectedRow: any = null;
   header: string = "Choose one payment method";
@@ -19,11 +19,10 @@ export class PspFormComponent {
 
   private _paymentOptions: string = '';
 
-  // Setter za @Input paymentOptions koji ažurira listu kartica
   @Input()
   set paymentOptions(value: string) {
     this._paymentOptions = value;
-    this.updateCards(); // Ažuriraj listu kartica kada se promeni paymentOptions
+    this.updateCards(); 
   }
 
   get paymentOptions(): string {
@@ -38,11 +37,15 @@ export class PspFormComponent {
     }
     this.selectedRow = card;
     this.header = "Chosen payment method - " + card.name;
-    this.paymentMethodSelected.emit({ name: card.name, id: card.id });
+    const jsonString = this._paymentOptions
+    .replace(/'/g, '"')
+    .replace(/(\w+)=/g, '"$1":');
+    const data = JSON.parse(jsonString);
+    this.paymentMethodSelected.emit({ name: card.name, orderid: data.orderId, merchantid: data.merchantId });
   }
 
   private updateCards() {
-    this.cards = []; // Očisti postojeće kartice
+    this.cards = []; 
     if (this.paymentOptions.includes("Card")) this.cards.push({ name: 'Card', id: '1' });
     if (this.paymentOptions.includes("QR Code")) this.cards.push({ name: 'QR Code', id: '2' });
     if (this.paymentOptions.includes("PayPal")) this.cards.push({ name: 'PayPal', id: '3' });

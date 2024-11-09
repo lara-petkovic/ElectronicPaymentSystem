@@ -38,9 +38,8 @@ export class AppComponent {
     };
   }
 
-  sendPaymentMethod(selectedOption: { name: string; id: string | null }) {
+  sendPaymentMethod(selectedOption: { name: string; orderid: string | null; merchantid: string|null }) {
     console.log("hhhhhhhhhhhhh")
-    selectedOption.id=this.id
     const message = JSON.stringify(selectedOption);
     this.webSocket.send(message);
     console.log('Sent option:', message);

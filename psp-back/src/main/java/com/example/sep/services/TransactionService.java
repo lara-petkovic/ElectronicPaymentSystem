@@ -9,8 +9,17 @@ import org.springframework.stereotype.Service;
 public class TransactionService implements ITransactionService{
     @Autowired
     private TransactionRepository transactionRepository;
+    public TransactionService(TransactionRepository transactionRepository){
+        this.transactionRepository=transactionRepository;
+    }
     @Override
     public Transaction SaveTransaction(Transaction transaction) {
-        return this.transactionRepository.save(transaction);
+        Transaction t= this.transactionRepository.save(transaction);
+        return t;
+    }
+
+    @Override
+    public Transaction GetTransactionByMerchantIdAndMerchantOrderId(String merchantId, Integer merchantOdrderId) {
+        return this.transactionRepository.getTransactionByMerchantIdAndOrderId(merchantId, Long.valueOf(merchantOdrderId));
     }
 }
