@@ -1,6 +1,7 @@
 package com.example.sep.controllers;
 
 import com.example.sep.configuration.ClientSubscriptionWebSocketHandler;
+import com.example.sep.dtos.ClientAuthenticationDataDto;
 import com.example.sep.dtos.NewClientDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +21,7 @@ public class ClientController {
     }
     @PostMapping
     public NewClientDto CreateClient(@RequestBody NewClientDto newClient) throws Exception {
-        clientSubscriptionWebSocketHandler.broadcastMessage("Client registration: " + newClient.apiKey);
+        clientSubscriptionWebSocketHandler.broadcastMessage("Client: " + newClient.apiKey);
         return  newClient;
     }
 }
