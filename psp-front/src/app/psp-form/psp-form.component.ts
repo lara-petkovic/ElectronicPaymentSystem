@@ -1,40 +1,52 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+
+interface Card {
+  name: string;
+  id: string;
+}
 
 @Component({
   selector: 'app-psp-form',
   templateUrl: './psp-form.component.html',
   styleUrls: ['./psp-form.component.css']
 })
-export class PspFormComponent implements OnInit{
+export class PspFormComponent {
   @Output() paymentMethodSelected = new EventEmitter<{ name: string; id: string | null }>();
 
   selectedRow: any = null;
-  constructor(private route: ActivatedRoute) {}
-  id: string | null = null;
-  header: string="Choose one payment method"
+  header: string = "Choose one payment method";
+  cards: Card[] = [];
 
-  ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
-    this.id = params.get('id'); 
-   })
+  private _paymentOptions: string = '';
+
+  // Setter za @Input paymentOptions koji ažurira listu kartica
+  @Input()
+  set paymentOptions(value: string) {
+    this._paymentOptions = value;
+    this.updateCards(); // Ažuriraj listu kartica kada se promeni paymentOptions
   }
-  cards = [
-    { name: 'Cart', id: '1' },
-    { name: 'QR Code', id: '2' },
-    { name: 'PayPal', id: '3' },
-    { name: 'Bitcoin', id: '4' }
-  ];
+
+  get paymentOptions(): string {
+    return this._paymentOptions;
+  }
 
   displayedColumns: string[] = ['name'];
 
   selectCard(card: any) {
-      if (this.selectedRow === card) {
-        return; 
-      }
+    if (this.selectedRow === card) {
+      return;
+    }
     this.selectedRow = card;
-    this.header="Choosen payment method - "+ card.name;
-    this.paymentMethodSelected.emit({ name: card.name, id: this.id}); 
+    this.header = "Chosen payment method - " + card.name;
+    this.paymentMethodSelected.emit({ name: card.name, id: card.id });
+  }
+
+  private updateCards() {
+    this.cards = []; // Očisti postojeće kartice
+    if (this.paymentOptions.includes("Card")) this.cards.push({ name: 'Card', id: '1' });
+    if (this.paymentOptions.includes("QR Code")) this.cards.push({ name: 'QR Code', id: '2' });
+    if (this.paymentOptions.includes("PayPal")) this.cards.push({ name: 'PayPal', id: '3' });
+    if (this.paymentOptions.includes("Bitcoin")) this.cards.push({ name: 'Bitcoin', id: '4' });
   }
 
   getFilteredCards() {

@@ -34,10 +34,10 @@ public class ClientSubscriptionWebSocketHandler extends TextWebSocketHandler {
         try {
             Map<String, Object> data = objectMapper.readValue(message.getPayload(), Map.class);
             String id = (String) data.get("clientId");
-            String name = (String) data.get("name");
-            createClient(name,id);
+            String subscription = (String) data.get("name");
+            createClient(subscription,id);
 
-            System.out.println("Received subscription: " +  ", ID: " + id+name);
+            System.out.println("Received subscription: " +  ", ID: " + id+subscription);
 
         } catch (Exception e) {
             System.out.println("Parrsing error: " + e.getMessage());
@@ -45,12 +45,9 @@ public class ClientSubscriptionWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private void createClient(String name, String id){
+    private void createClient(String subscription, String id){
         Client client=new Client();
-        client.setActiveCard(name.contains("Card"));
-        client.setActiveQR(name.contains("QR Code"));
-        client.setActivePayPal(name.contains("PayPal"));
-        client.setActiveBitcoin(name.contains("Bitcoin"));
+        client.setSubscription(subscription);
         client.setMerchantId(id+"+");
         ClientService clientService=new ClientService(clientRepository);
         clientService.create(client);

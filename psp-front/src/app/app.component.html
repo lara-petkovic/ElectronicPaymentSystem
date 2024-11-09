@@ -6,7 +6,7 @@
 </div>
 
 <div [ngClass]="{ 'hidden': !showPaymentForm }">
-<app-psp-form   
+<app-psp-form   [paymentOptions]="paymentOptions"
 (paymentMethodSelected)="sendPaymentMethod($event)"></app-psp-form>
 </div>
 

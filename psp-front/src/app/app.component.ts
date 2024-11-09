@@ -14,6 +14,7 @@ export class AppComponent {
   showPaymentForm = false;
   private webSocket: WebSocket;
   private webSocketClient: WebSocket;
+  paymentOptions: string = ''; // Dodaj paymentOptions string
 
   constructor(private router: Router) {
     this.webSocket = new WebSocket('ws://localhost:8085/transactions');
@@ -24,6 +25,7 @@ export class AppComponent {
       this.showPaymentForm = true;
       this.showClientReg = false;
       this.id=event.data
+      this.paymentOptions = event.data; // Ažuriraj paymentOptions sa event.data
       this.router.navigate(['/payment-options', event.data]);
     };
 
