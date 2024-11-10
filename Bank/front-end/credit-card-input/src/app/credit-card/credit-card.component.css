@@ -1,0 +1,179 @@
+
+  
+  h1 {
+    font-family: "Poppins", sans-serif;
+    font-size: 30px;
+    font-weight: 300;
+    padding-bottom: 20px;
+    color: #ffffff;
+    width: 420px;
+    line-height: 1.5em;
+    text-align: center;
+  }
+  
+  textarea:focus,
+  input:focus {
+    outline: none;
+  }
+  body {
+    display: flex;
+    height: 500px;
+    width: 620px;
+    font-family: "Space Mono", monospace;
+    background: linear-gradient(-70deg, #202020, #310141);
+    position: relative;
+  }
+  
+  .circle {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(120deg, #1d976c, #2c3e50);
+    opacity: 0.8;
+  }
+  
+  .circle-1 {
+    height: 300px;
+    width: 300px;
+    bottom: 0;
+    left: 0;
+    margin-left: 20px;
+    margin-bottom: 60px;
+  }
+  
+  .circle-2 {
+    height: 240px;
+    width: 240px;
+    right: 0; 
+    bottom: 0;
+    margin-bottom: 200px;
+    margin-right: 20px;
+  }
+  
+  .card {
+    display: flex;
+    flex-direction: column;
+    height: 280px;
+    width: 420px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(35px);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 80px rgba(0, 0, 0, 0.25);
+    padding: 20px 30px 30px 30px;
+    overflow: hidden;
+  }
+  
+  .logo {
+    height: 80px;
+    width: 100px;
+    margin-bottom: 20px;
+  }
+  
+  .card-number {
+    font-size: 30px;
+    font-family: "Space Mono", monospace;
+    width: 100%;
+    height: 50px;
+    margin-bottom: 40px;
+  }
+  
+  .card-number::placeholder {
+    color: #b5b5b5;
+    font-size: 30px;
+    font-family: "Space Mono", monospace;
+  }
+  
+  input::placeholder {
+    color: #b5b5b5;
+    font-family: "Space Mono", monospace;
+  }
+  
+  .name {
+    font-family: "Space Mono", monospace;
+    padding: 0px 80px 0px 0px;
+    margin-right: 40px;
+    width: 100px;
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+  }
+  
+  .expiration-date {
+    font-family: "Space Mono", monospace;
+    padding: 0px 0px 0px 0px;
+    margin-right: 60px;
+    width: 80px;
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+  }
+  
+  .ccv {
+    font-family: "Space Mono", monospace;
+    padding: 0px 0px 0px 0px;
+    margin-right: 0px;
+    width: 60px;
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+  }
+  
+  input {
+    font-family: "Space Mono", monospace;
+    border: none;
+    font-size: 16px;
+    height: 26px;
+    color: #ffffff;
+    background: 0;
+    padding: 0;
+    width: 0;
+    border-bottom: 1px solid white;
+    color: white;
+  }
+  
+  label {
+    color: white;
+    font-size: 12px;
+    font-weight: normal;
+    font-family: "Space Mono", monospace;
+    pointer-events: none;
+    display: block;
+    padding-bottom: 2px;
+  }
+  
+  .card-name {
+    color: white;
+    font-size: 16px;
+    height: 26px;
+    width: 160px;
+    border-bottom: 1px solid white;
+    color: white;
+  }
+  
+  .container2 {
+    display: flex;
+  }
+  
+  .container {
+    display: flex;
+    position: relative;
+    z-index: 1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+  }
+
+  .submitButton{
+    height: 35px;
+    width: 120px;
+    text-align: center;
+    color: white;
+    background-color: #310141;
+    border-radius: 8px;
+    border-color: #3d0450;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    cursor: pointer;
+  }

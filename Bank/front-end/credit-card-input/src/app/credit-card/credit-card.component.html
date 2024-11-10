@@ -1,0 +1,68 @@
+<body>
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    <div class="container">
+      <h1>Enter Your Card Details</h1>
+
+      <!-- Card -->
+      <div class="card">
+        <img class="logo" src="https://pngimg.com/uploads/visa/visa_PNG31.png" />
+
+        <!-- Card Number -->
+        <label>Card Number</label>
+        <input
+            class="card-number"
+            placeholder="1234 1234 1234 1234"
+            type="text"
+            maxlength="19"
+            (keydown.enter)="submit()"
+            required
+            [(ngModel)]="cardDetails.number"
+            (input)="formatCardNumber($event)"
+            (keydown)="handleBackspace($event)"
+        />
+
+        <div class="container2">
+          <!-- Card Holder -->
+          <div class="name">
+            <label>Card Holder</label>
+            <input
+              class="card-name"
+              placeholder="NAME SURNAME"
+              [(ngModel)]="cardDetails.holder"
+              (keydown.enter)="submit()"
+              type="text"
+              required />
+          </div>
+
+          <!-- Date -->
+          <div class="expiration-date">
+            <label>Exp. Date</label>
+            <input
+              class="card-name"
+              placeholder="MM/YY"
+              type="text"
+              maxlength="5"
+              [(ngModel)]="cardDetails.expiry"
+              (keydown.enter)="submit()"
+              required
+              (input)="formatExpiryDate($event)" />
+          </div>
+
+          <!-- Cvv -->
+          <div class="ccv">
+            <label>CCV</label>
+            <input
+              class="card-name"
+              placeholder="123"
+              type="text"
+              [(ngModel)]="cardDetails.ccv"
+              maxlength="3"
+              (keydown.enter)="submit()"
+              required />
+          </div>
+        </div>
+      </div>
+      <button class="submitButton" (click)="submit()">Submit</button>
+    </div>
+  </body>
