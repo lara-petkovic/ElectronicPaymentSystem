@@ -11,6 +11,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("WebApiDatabase")));
 
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<PspSubscriptionService>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
