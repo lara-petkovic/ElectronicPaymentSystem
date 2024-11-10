@@ -1,5 +1,6 @@
 ﻿using back_end.Models;
 using back_end.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace back_end.Controllers
@@ -9,12 +10,31 @@ namespace back_end.Controllers
     public class UsersController : ControllerBase
     {
         private readonly UserService _userService;
+        private readonly IConfiguration _configuration;
 
-        public UsersController(UserService userService)
+        public UsersController(UserService userService, IConfiguration configuration)
         {
             _userService = userService;
+            _configuration = configuration;
         }
 
+        [HttpPost("login")]
+        public async Task<ActionResult> Login([FromBody] LoginRequest loginRequest)
+        {
+            var user = await _userService.GetUsersAsync();
+            var validUser = user.FirstOrDefault(u => u.Username == loginRequest.Username && u.Password == loginRequest.Password);
+
+            if (validUser == null)
+            {
+                return Unauthorized("Invalid credentials");
+            }
+
+            var tokenService = new TokenService(_configuration);
+            var token = tokenService.GenerateToken(validUser, validUser.Id);
+            return Ok(token);
+        }
+
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<List<User>>> GetUsers()
         {
@@ -33,6 +53,7 @@ namespace back_end.Controllers
             return Ok(user);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<User>> CreateUser([FromBody] User user)
         {
@@ -40,6 +61,7 @@ namespace back_end.Controllers
             return CreatedAtAction(nameof(GetUserById), new { id = createdUser.Id }, createdUser);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult<User>> UpdateUser(int id, [FromBody] User user)
         {
@@ -52,6 +74,7 @@ namespace back_end.Controllers
             return Ok(updatedUser);
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
