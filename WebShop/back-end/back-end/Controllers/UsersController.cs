@@ -35,6 +35,29 @@ namespace back_end.Controllers
         }
 
         [Authorize]
+        [HttpGet("loggedInUser")]
+        public async Task<ActionResult<User>> GetCurrentUser()
+        {
+            // Get the user ID from the JWT claims
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User ID not found in token");
+            }
+
+            var user = await _userService.GetUserByIdAsync(int.Parse(userId));
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            return Ok(user);
+        }
+
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<List<User>>> GetUsers()
         {
