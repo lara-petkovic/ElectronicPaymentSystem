@@ -38,9 +38,7 @@ namespace back_end.Controllers
         [HttpGet("loggedInUser")]
         public async Task<ActionResult<User>> GetCurrentUser()
         {
-            // Get the user ID from the JWT claims
             var userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
-
 
             if (string.IsNullOrEmpty(userId))
             {

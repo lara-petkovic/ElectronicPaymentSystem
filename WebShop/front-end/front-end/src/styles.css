@@ -1,0 +1,27 @@
+/* You can add global styles to this file, and also import other style files */
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+
+:root {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    font-family: 'Poppins', sans-serif;
+  }
+
+html, body { height: 100%; }
+
+body { margin: 0; font-family: 'Poppins', sans-serif; }
+::-webkit-scrollbar {
+  width: 15px;
+}
+
+/* Handle (thumb) of the scrollbar */
+::-webkit-scrollbar-thumb {
+  background-color: #E67840; /* Color of the thumb */
+  border-radius: 10px; /* Rounded corners */
+}
+
+/* Track (the area on which the thumb moves) of the scrollbar */
+::-webkit-scrollbar-track {
+  background-color: #B6D4AF; /* Color of the track */
+  border-radius: 10px;
+}

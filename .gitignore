@@ -1,34 +1,80 @@
+# Editor backups
 *.swp
+*.swo
 *.*~
-project.lock.json
+
+# OS-specific files
 .DS_Store
+
+# Python cache files
 *.pyc
 
 # Visual Studio Code
-.vscode
+.vscode/
+modules/.vscode/
+!.devcontainer/README.md
+!.devcontainer/recommended-devcontainer.json
+!.devcontainer/recommended-Dockerfile
 
 # User-specific files
 *.suo
 *.user
 *.userosscache
-*.sln.docstates
+.sln.docstates
+.idea/
+.settings/
+modules/.settings/
+.c9
+.devcontainer/*
+.vimrc
+.nvimrc
 
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
-x64/
-x86/
-build/
-bld/
 [Bb]in/
 [Oo]bj/
+build/
+bld/
+x64/
+x86/
 msbuild.log
 msbuild.err
 msbuild.wrn
 
+# Visual Studio specific
 .vs/
 
-# Ignore the Migrations folder in the WebShop back-end
+# WebShop back-end - Migrations
 /WebShop/back-end/back-end/Migrations/
+
+# Node and Angular
+node_modules/
+.DS_Store
+.dist/
+.bazel-out
+.integration/bazel/bazel-*
+.angular/
+aio/node_modules/
+aio/out-tsc
+
+# Logs and temporary files
+npm-debug.log
+yarn-error.log
+*.log
+month.txt
+
+# Secret and sensitive files
+*secret.js
+
+# Miscellaneous
+build-analytics/
+.modules/rollup-test/dist/
+bazelrc.user
+ng-dev.user*
+notes.md
+baseline.json
+.history/
+.husky/_
