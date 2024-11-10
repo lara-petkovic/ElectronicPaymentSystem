@@ -12,7 +12,6 @@ export class LoginComponent {
   constructor(private router: Router) {}
 
   login_submit() {
-    //this.router.navigate(['register']);
-    this.router.navigate(['/register']);
+    this.router.navigate(['register']);
   }
 }
