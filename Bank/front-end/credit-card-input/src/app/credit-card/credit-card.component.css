@@ -1,14 +1,14 @@
 
   
   h1 {
-    font-family: "Poppins", sans-serif;
     font-size: 30px;
     font-weight: 300;
-    padding-bottom: 20px;
+    margin-top: 40px;
     color: #ffffff;
     width: 420px;
     line-height: 1.5em;
     text-align: center;
+    font-family: "Space Mono", monospace;
   }
   
   textarea:focus,
@@ -176,4 +176,19 @@
     margin-top: 30px;
     margin-bottom: 30px;
     cursor: pointer;
+    align-self: center;
+    font-family: "Space Mono", monospace;
   }
+  form{
+    display: flex;
+    justify-content: center; 
+    flex-direction: column;
+  }
+  .invalid {
+    border-bottom: 2px solid red;
+  }
+  
+  input.ng-touched.ng-invalid {
+    border-bottom: 2px solid red;
+  }
+  

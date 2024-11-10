@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-credit-card',
@@ -60,16 +61,15 @@ export class CreditCardComponent {
     }
   }
 
-  submit(): void{
+  submit(form:NgForm): void {
     this.cardDetailsDto.number = this.cardDetails.number.replace(/\s+/g, '');
     this.cardDetailsDto.ccv = this.cardDetails.ccv;
     this.cardDetailsDto.holder = this.cardDetails.holder;
     this.cardDetailsDto.expiry = this.cardDetails.expiry;
-    if(!this.isValidCardNumber(this.cardDetailsDto.number)){
-      alert('Card number not valid');
-    }
-    else{
+    if (form.valid) {
       alert(this.cardDetailsDto.number);
+    } else {
+      form.form.markAllAsTouched();
     }
   }
   isValidCardNumber(cardNumber: string): boolean {
