@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-credit-card',
@@ -7,6 +8,19 @@ import { NgForm } from '@angular/forms';
   styleUrls: ['./credit-card.component.css']
 })
 export class CreditCardComponent {
+  paymentId: number | undefined;
+
+  constructor(private route: ActivatedRoute) {}
+
+  ngOnInit() {
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('paymentId');
+      if (id) {
+        this.paymentId = Number(id); // Convert string to number
+        console.log('Path parameter paymentId as number:', this.paymentId);
+      }
+    });
+  }
   cardDetails = {
     number: '',
     holder: '',
@@ -88,6 +102,9 @@ export class CreditCardComponent {
       shouldDouble = !shouldDouble;
     }
     return sum % 10 === 0;
+  }
+  isValidExpirationDate(date: string): boolean{
+    return date.startsWith("12") || date.startsWith("11") || date.startsWith("10") || date.startsWith("09") || date.startsWith("08") || date.startsWith("07") || date.startsWith("06") || date.startsWith("05") || date.startsWith("04") || date.startsWith("03") || date.startsWith("02") || date.startsWith("01")
   }
   
 }

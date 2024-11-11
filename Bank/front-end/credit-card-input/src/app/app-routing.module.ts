@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { CreditCardComponent } from './credit-card/credit-card.component';
 
 const routes: Routes = [
-  { path: '', component: CreditCardComponent } // Default route
+  { path: 'credit-card-input/:paymentId', component: CreditCardComponent } // Default route
 ];
 
 @NgModule({

@@ -59,7 +59,7 @@
                 required
                 (input)="formatExpiryDate($event)"
                 (keydown.enter)="submit(cardForm)"
-                [ngClass]="{'invalid': expiry.invalid && expiry.touched}"
+                [ngClass]="{'invalid': (expiry.invalid || !isValidExpirationDate(cardDetails.expiry)) && expiry.touched}"
                 pattern="[0-9]{2}[/]{1}[0-9]{2}"
               />
             </div>
