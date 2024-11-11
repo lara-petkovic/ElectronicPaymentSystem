@@ -33,11 +33,11 @@ public class ClientSubscriptionWebSocketHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         try {
             Map<String, Object> data = objectMapper.readValue(message.getPayload(), Map.class);
-            String id = (String) data.get("clientId");
+            String address = (String) data.get("clientId");
             String subscription = (String) data.get("name");
-            createClient(subscription,id);
+            createClient(subscription,address);
 
-            System.out.println("Received subscription: " +  ", ID: " + id+subscription);
+            System.out.println("Received subscription: " +  ", ID: " + address+subscription);
 
         } catch (Exception e) {
             System.out.println("Parrsing error: " + e.getMessage());
@@ -45,12 +45,11 @@ public class ClientSubscriptionWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private void createClient(String subscription, String id){
+    private void createClient(String subscription, String address){
         Client client=new Client();
         client.setSubscription(subscription);
-        client.setMerchantId(id+"+");
         ClientService clientService=new ClientService(clientRepository);
-        clientService.create(client);
+        clientService.create(client, address);
 
     }
 }
