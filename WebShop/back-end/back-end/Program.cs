@@ -14,6 +14,8 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ServiceService>();
 builder.Services.AddScoped<PackageService>();
 builder.Services.AddScoped<PspSubscriptionService>();
+builder.Services.AddScoped<MerchantCredentialsService>();
+builder.Services.AddScoped<TokenService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

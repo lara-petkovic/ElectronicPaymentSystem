@@ -21,6 +21,7 @@ namespace back_end.Data
         public DbSet<Service> Services { get; set; }
         public DbSet<Package> Packages { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
+        public DbSet<MerchantCredentials> MerchantCredentials { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
