@@ -6,8 +6,6 @@
         public string Name { get; set; }
         public decimal Price { get; set; }
         public bool IsBusinessPackage { get; set; }
-
-        public ICollection<Service> Services { get; set; }
+        public ICollection<PackageService> PackageServices { get; set; }
     }
-
 }

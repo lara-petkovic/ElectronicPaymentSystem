@@ -11,5 +11,4 @@
         public User? User { get; set; }
         public Package? Package { get; set; }
     }
-
 }

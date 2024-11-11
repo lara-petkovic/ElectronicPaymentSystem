@@ -26,9 +26,18 @@ namespace back_end.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Package>()
-                .HasMany(p => p.Services)
-                .WithMany(s => s.Packages);
+            modelBuilder.Entity<PackageService>()
+                .HasKey(ps => new { ps.PackageId, ps.ServiceId });
+
+            modelBuilder.Entity<PackageService>()
+                .HasOne(ps => ps.Package)
+                .WithMany(p => p.PackageServices)
+                .HasForeignKey(ps => ps.PackageId);
+
+            modelBuilder.Entity<PackageService>()
+                .HasOne(ps => ps.Service)
+                .WithMany(s => s.PackageServices)
+                .HasForeignKey(ps => ps.ServiceId);
 
             modelBuilder.Entity<User>()
                 .HasMany(u => u.Subscriptions)
@@ -47,7 +56,8 @@ namespace back_end.Data
         {
             modelBuilder.Entity<User>().HasData(
                 new User { Id = -1, Username = "larapetkovic", FirstName = "Lara", LastName = "Petkovic", Password = "password", Email = "lara@gmail.com" },
-                new User { Id = -2, Username = "jelisavetaletic", FirstName = "Jelisaveta", LastName = "Letic", Password = "password", Email = "jelly@hotmail.com" }
+                new User { Id = -2, Username = "jelisavetaletic", FirstName = "Jelisaveta", LastName = "Letic", Password = "password", Email = "jelly@hotmail.com" },
+                new User { Id = -3, Username = "aaa", FirstName = "aaa", LastName = "aaa", Password = "aaa", Email = "aaa@aaa.com" }
             );
 
             modelBuilder.Entity<Service>().HasData(
@@ -71,6 +81,14 @@ namespace back_end.Data
                    DurationInYears = 1
                }
            );
+
+            modelBuilder.Entity<PackageService>().HasData(
+                new PackageService { PackageId = -1, ServiceId = -1 }, // Basic Package includes Mobile Plan
+                new PackageService { PackageId = -1, ServiceId = -2 }, // Basic Package includes Internet Plan
+                new PackageService { PackageId = -2, ServiceId = -1 }, // Business Package includes Mobile Plan
+                new PackageService { PackageId = -2, ServiceId = -2 }, // Business Package includes Internet Plan
+                new PackageService { PackageId = -2, ServiceId = -3 }  // Business Package includes Digital TV Plan
+            );
         }
     }
 }

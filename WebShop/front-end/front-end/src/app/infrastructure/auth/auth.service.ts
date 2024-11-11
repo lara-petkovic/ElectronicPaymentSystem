@@ -8,7 +8,6 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { Login } from './model/login.model';
 import { AuthenticationResponse } from './model/authentication-response.model';
 import { User } from './model/user.model';
-import { Registration } from './model/registration.model';
 import { SecureToken } from './model/secure-token.model';
 
 @Injectable({

@@ -7,8 +7,6 @@
         public string Description { get; set; }
         public ServiceType Type { get; set; }
         public decimal Price { get; set; }
-
-        public ICollection<Package> Packages { get; set; }
+        public ICollection<PackageService> PackageServices { get; set; }
     }
-
 }

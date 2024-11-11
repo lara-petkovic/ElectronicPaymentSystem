@@ -1,0 +1,51 @@
+.service-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  width: 200px;
+  box-sizing: border-box;
+}
+
+.package-cards {
+  display: flex;
+  flex-wrap: wrap;   /* Allow the cards to wrap onto a new row */
+  gap: 20px;         /* Space between the package cards */
+}
+
+.package-card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  width: 20%;         /* Each package takes 48% of the width, leaving space for two per row */
+  box-sizing: border-box;
+  margin-bottom: 20px; /* Ensure there’s some space below each card */
+}
+
+.service-list {
+  max-height: 300px;
+  overflow-y: auto;   /* Allows scrolling if the list is too long */
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.service-card {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+h3, h4 {
+  margin: 10px 0;
+}
+
+p {
+  margin: 5px 0;
+}

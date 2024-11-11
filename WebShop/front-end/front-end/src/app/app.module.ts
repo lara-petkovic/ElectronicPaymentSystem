@@ -10,13 +10,17 @@ import { MatInputModule } from '@angular/material/input';
 import { SharedModule } from './shared/shared.module';
 import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HomeComponent } from './feature-modules/home/home.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,
+    CommonModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     MaterialModule,
@@ -24,7 +28,7 @@ import { NgModule } from '@angular/core';
     AuthModule,
     HttpClientModule,
     MatInputModule,
-    FormsModule,
+    FormsModule
   ],
   providers: [
     {
