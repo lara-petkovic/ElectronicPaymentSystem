@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'] // Ovdje ispravite putanju ako je potrebno
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'psp-front';
   id: string = '';
   clientId: string = '';
@@ -38,22 +38,7 @@ export class AppComponent implements OnInit {
     };
   }
 
-  ngOnInit() {
-    // Ovdje dodajete interval za automatsko osvežavanje svakih 1 sekund
-    setInterval(() => {
-      this.refreshPage();
-    }, 1000); // 1000 ms = 1 sekunda
-  }
-
-  // Funkcija koja se poziva svakih 1s
-  refreshPage() {
-    console.log("Stranica je osvežena");
-    // Ovdje možete dodati logiku koju želite da se ponovo izvršava
-    // npr. ponovno pozivanje podataka putem WebSocket-a
-  }
-
   sendPaymentMethod(selectedOption: { name: string; orderid: string | null; merchantid: string | null }) {
-    console.log("hhhhhhhhhhhhh");
     const message = JSON.stringify(selectedOption);
     this.webSocket.send(message);
     console.log('Sent option:', message);
@@ -62,7 +47,6 @@ export class AppComponent implements OnInit {
   handleOptionSelected(option: { name: string; clientId: string | null }) {
     option.clientId = this.clientId;
     const message = JSON.stringify(option);
-    console.log("usao je ovde" + option.name);
     this.webSocketClient.send(message);
     console.log('Sent options:', message);
   }

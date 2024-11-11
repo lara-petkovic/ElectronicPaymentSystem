@@ -15,10 +15,16 @@ namespace back_end.Controllers
             _pspSubscriptionService = pspSubscriptionService;
             _configuration = configuration;
         }
-        [HttpPost]
+        [HttpPost("subscribe")]
         public void CreateConfiguration()
         {
             this._pspSubscriptionService.CreateSubscription();
+        }
+        [HttpPost("credentials")]
+        public void CreateMerchantAuthCredentials()
+        {
+            //sacuvati merchant id i pass i slati uz svaku transakciju
+            Console.WriteLine("AAA");
         }
     }
 }

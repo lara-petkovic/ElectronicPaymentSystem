@@ -7,7 +7,12 @@ import com.example.sep.models.Client;
 import com.example.sep.repositories.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import java.security.SecureRandom;
 
 @Service
@@ -19,15 +24,32 @@ public class ClientService implements IClientService{
         this.clientRepository=clientRepository;
     }
     @Override
-    public ClientAuthenticationDataDto create(Client client) {
+    public ClientAuthenticationDataDto create(Client client, String address) {
         String merchantId=generateRandomString();
-        ///KAD SE BUDE VRACALO ONDA client.getMerchantId+ovaj izgenerisan iovde vec mora da mu salje
         client.setMerchantId(merchantId);
         client.setMerchantPass(generateRandomString());
         this.clientRepository.save(client);
+        SendCredentials(client,address);
         return new ClientAuthenticationDataDto(client.getMerchantId(),client.getMerchantPass());
     }
 
+    private void SendCredentials(Client client, String address){
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:8086/api/psp-subscription/credentials";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Location", address);
+
+        // Create the JSON body
+        String body = "{ \"merchantId\" : \"" + client.getMerchantId() + "\", \"merchantPass\" : \"" + client.getMerchantPass() + "\" }";
+
+        // Set up the HTTP entity with headers and body
+        HttpEntity<String> entity = new HttpEntity<>(body, headers);
+
+        // Send the POST request
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+    }
     @Override
     public ClientSubscriptionDto getSubscription(NewTransactionDto newTransactionDto) {
         Client client=clientRepository.getClientByMerchantId(newTransactionDto.merchantId);

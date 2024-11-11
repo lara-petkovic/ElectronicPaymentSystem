@@ -8,9 +8,9 @@ namespace back_end.Services
         private static readonly HttpClient httpClient = new HttpClient();
 
         public async void CreateSubscription() {
-            var jsonData = "{\"apiKey\":\"7098\"}";
+            var jsonData = "{\"apiKey\": \"7098\"}";
             var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-            string url = "http://localhost:8086";
+            string url = "http://localhost:8086/api/subscription";
             try
             {
                 HttpResponseMessage response = await httpClient.PostAsync(url, content);
