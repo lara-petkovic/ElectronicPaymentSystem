@@ -1,0 +1,89 @@
+<body>
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    <div class="container">
+      <h1>Enter Your Card Details</h1>
+
+      <!-- Card -->
+      <form #cardForm="ngForm" (ngSubmit)="submit(cardForm)">
+        <div class="card">
+          <img class="logo" src="https://pngimg.com/uploads/visa/visa_PNG31.png" />
+
+          <!-- Card Number -->
+          <label>Card Number</label>
+          <input
+            class="card-number"
+            placeholder="1234 1234 1234 1234"
+            type="text"
+            maxlength="19"
+            required
+            [(ngModel)]="cardDetails.number"
+            name="cardNumber"
+            #cardNumber="ngModel"
+            (input)="formatCardNumber($event)"
+            (keydown)="handleBackspace($event)"
+            (keydown.enter)="submit(cardForm)"
+            [ngClass]="{'invalid': (cardNumber.invalid || !isValidCardNumber(cardDetails.number))&& cardNumber.touched}"
+            pattern="(\d{4} \d{4} \d{4} \d{4})"
+          />
+
+          <div class="container2">
+            <!-- Card Holder -->
+            <div class="name">
+              <label>Card Holder</label>
+              <input
+                class="card-name"
+                placeholder="NAME SURNAME"
+                [(ngModel)]="cardDetails.holder"
+                name="holder"
+                #holder="ngModel"
+                type="text"
+                required
+                (keydown.enter)="submit(cardForm)"
+                [ngClass]="{'invalid': holder.invalid && holder.touched}"
+                
+              />
+            </div>
+
+            <!-- Expiry Date -->
+            <div class="expiration-date">
+              <label>Exp. Date</label>
+              <input
+                class="card-name"
+                placeholder="MM/YY"
+                type="text"
+                maxlength="5"
+                [(ngModel)]="cardDetails.expiry"
+                name="expiry"
+                #expiry="ngModel"
+                required
+                (input)="formatExpiryDate($event)"
+                (keydown.enter)="submit(cardForm)"
+                [ngClass]="{'invalid': (expiry.invalid || !isValidExpirationDate(cardDetails.expiry)) && expiry.touched}"
+                pattern="[0-9]{2}[/]{1}[0-9]{2}"
+              />
+            </div>
+
+            <!-- CCV -->
+            <div class="ccv">
+              <label>CCV</label>
+              <input
+                class="card-name"
+                placeholder="123"
+                type="text"
+                [(ngModel)]="cardDetails.ccv"
+                name="ccv"
+                #ccv="ngModel"
+                maxlength="3"
+                required
+                (keydown.enter)="submit(cardForm)"
+                [ngClass]="{'invalid': ccv.invalid && ccv.touched}"
+                pattern="[0-9]{3}"
+              />
+            </div>
+          </div>
+        </div>
+        <button class="submitButton" type="submit">Submit</button>
+      </form>
+    </div>
+</body>
