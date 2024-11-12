@@ -23,4 +23,7 @@ public class PaymentRequestService {
         );
         return repo.save(newPaymentRequest);
     }
+    public PaymentRequest getPaymentRequest(int id){
+        return repo.findById(id).orElse(null);
+    }
 }

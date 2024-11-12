@@ -1,8 +1,10 @@
 package com.example.bank.controllers;
 
+import com.example.bank.domain.model.Account;
 import com.example.bank.domain.model.PaymentRequest;
 import com.example.bank.service.AccountService;
 import com.example.bank.service.PaymentRequestService;
+import com.example.bank.service.dto.PaymentDto;
 import com.example.bank.service.dto.PaymentRequestDto;
 import com.example.bank.service.dto.PaymentResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,32 @@ public class PaymentController {
         }
         else
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    }
+    @PostMapping(path = "/pay-with-credit-card")
+    public ResponseEntity executePaymentWithCardData(@RequestBody PaymentDto paymentDto){
+        PaymentRequest paymentRequest = paymentRequestService.getPaymentRequest(paymentDto.PaymentRequestId);
+        Account merchantAccount = accountService.getMerchantAccount(paymentRequest);
+        Account issuerAccount = accountService.getIssuerAccount(paymentDto);
+        if(merchantAccount!=null){
+            if(issuerAccount!=null){
+                if(issuerAccount.getBalance()>=paymentRequest.getAmount()){
+                    issuerAccount.setBalance(issuerAccount.getBalance()-paymentRequest.getAmount());
+                    merchantAccount.setBalance(merchantAccount.getBalance()+paymentRequest.getAmount());
+                    accountService.save(issuerAccount);
+                    accountService.save(merchantAccount);
+                    return new ResponseEntity(HttpStatus.OK);
+                }
+                else{
+                    return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+                }
+            }
+            else{
+                return null;//call issuers bank via pcc
+            }
+        }
+        else{
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
     }
 }
 

@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface AccountRepository extends JpaRepository<Account, String> {
     Optional<Account> findByMerchantIdAndMerchantPassword(String merchantId, String merchantPassword);
+    Optional<Account> findByPanAndSecurityCodeAndCardHolderNameAndExpirationDate(String pan, String securityCode, String holderName, String expirationDate);
 }

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { PaymentService } from '../payment.service';
 
 @Component({
   selector: 'app-credit-card',
@@ -9,14 +10,13 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class CreditCardComponent {
   paymentId: number | undefined;
-
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute, private paymentService: PaymentService) {}
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
       const id = params.get('paymentId');
       if (id) {
-        this.paymentId = Number(id); // Convert string to number
+        this.paymentId = Number(id);
         console.log('Path parameter paymentId as number:', this.paymentId);
       }
     });
@@ -28,10 +28,11 @@ export class CreditCardComponent {
     ccv: ''
   };
   cardDetailsDto = {
-    number: '',
-    holder: '',
-    expiry: '',
-    ccv: ''
+    Pan: '',
+    HolderName: '',
+    ExpirationDate: '',
+    SecurityCode: '',
+    PaymentRequestId: 0
   }
 
   formatExpiryDate(event: Event): void {
@@ -50,7 +51,7 @@ export class CreditCardComponent {
   }
   formatCardNumber(event: Event): void {
     const input = event.target as HTMLInputElement;
-    let value = input.value.replace(/\D/g, '');  // Remove any non-digit characters
+    let value = input.value.replace(/\D/g, '');
 
     let formattedValue = '';
     for (let i = 0; i < value.length; i += 4) {
@@ -76,12 +77,15 @@ export class CreditCardComponent {
   }
 
   submit(form:NgForm): void {
-    this.cardDetailsDto.number = this.cardDetails.number.replace(/\s+/g, '');
-    this.cardDetailsDto.ccv = this.cardDetails.ccv;
-    this.cardDetailsDto.holder = this.cardDetails.holder;
-    this.cardDetailsDto.expiry = this.cardDetails.expiry;
+    this.cardDetailsDto.Pan = this.cardDetails.number.replace(/\s+/g, '');
+    this.cardDetailsDto.SecurityCode = this.cardDetails.ccv;
+    this.cardDetailsDto.HolderName = this.cardDetails.holder;
+    this.cardDetailsDto.ExpirationDate = this.cardDetails.expiry;
+    if(this.paymentId)
+      this.cardDetailsDto.PaymentRequestId = this.paymentId ;
     if (form.valid) {
-      alert(this.cardDetailsDto.number);
+      //alert(this.cardDetailsDto.Pan);
+      this.paymentService.payWithCreditCard(this.cardDetailsDto);
     } else {
       form.form.markAllAsTouched();
     }
