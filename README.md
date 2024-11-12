@@ -39,3 +39,9 @@
 |                |                       | **Database**: `taskmanager`                                            |
 |                |                       | **Username**: `admin`                                                  |
 |                |                       | **Password**: `adminpass`                                              |
+| **Eureka Server**    | **Backend**           | Spring boot                                                       |
+|                | **Backend Port (HTTP)**| `http://localhost:8761`                                                  |
+| **Gateway PSP-WS**    | **Backend**           | Spring boot                                                      |
+|                | **Backend Port (HTTP)**| `http://localhost:8086`                                                  |
+| **Gateway PSP-Bank**    | **Backend**           | Spring boot                                                      |
+|                | **Backend Port (HTTP)**| `http://localhost:8087`                                                  |
