@@ -74,7 +74,6 @@ namespace back_end.Controllers
             return Ok(user);
         }
 
-        [Authorize]
         [HttpPost]
         public async Task<ActionResult<User>> CreateUser([FromBody] User user)
         {
