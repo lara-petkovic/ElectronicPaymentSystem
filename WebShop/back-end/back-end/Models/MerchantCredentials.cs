@@ -2,11 +2,12 @@
 {
     public class MerchantCredentials
     {
-        public string MerchantId;
-        public string MerchantPass;
-        public double Amount;
-        public int MerchantOrderId;
-        public int MerchantTimestamp;
+        public int Id { get; set; }
+        public string MerchantId { get; set; }
+        public string MerchantPass { get; set; }
+        public double Amount { get; set; }
+        public int MerchantOrderId { get; set; }
+        public int MerchantTimestamp { get; set; }
         public MerchantCredentials() { }
     }
 }
