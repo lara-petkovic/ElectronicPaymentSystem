@@ -54,6 +54,18 @@ export class AuthService {
     this.router.navigate(['/']).catch(error => console.error('Navigation error:', error));
   }
 
+  subscribe(): void {
+    this.http.post<void>(`${environment.apiHost}/psp-subscription/subscribe`, {})
+      .subscribe({
+        next: () => {
+          console.log('Subscription request was successful');
+        },
+        error: (err) => {
+          console.error('Subscription request failed', err);
+        }
+      });
+  }
+
   checkIfUserExists(): void {
     const accessToken = this.tokenStorage.getAccessToken();
     if (accessToken == null) {

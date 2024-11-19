@@ -1,6 +1,6 @@
 <html>
   <body>
-    <h1>Home page</h1>
+    <h1>Welcome to our telekom service!</h1>
     <h2 >Hello userId: {{userId}}</h2>
     <a href="logout()">logout</a> <br>
     
@@ -11,8 +11,9 @@
         <div *ngFor="let service of services" class="card">
           <h3>{{ service.name }}</h3>
           <p>{{ service.description }}</p>
-          <p>Type: {{ service.serviceType }}</p>
+          <p>Type: {{ getServiceTypeLabel(service.type) }}</p>
           <p>Price: ${{ service.price }}</p>
+          <p><button type="submit">Buy</button></p>
         </div>
     </div>
     
@@ -28,10 +29,10 @@
           <div *ngFor="let packageService of package.packageServices" class="service-card">
             <h4>{{ packageService.service.name }}</h4>
             <p>{{ packageService.service.description }}</p>
-            <p>Type: {{ packageService.service.serviceType }}</p>
-            <p>Price: ${{ packageService.service.price }}</p>
+            <p>Type: {{ getServiceTypeLabel(packageService.service.type) }}</p>
           </div>
         </div>
+        <p><button type="submit" (click)="onSubscribe()">Buy</button></p>
       </div>
     </div>
   </body>

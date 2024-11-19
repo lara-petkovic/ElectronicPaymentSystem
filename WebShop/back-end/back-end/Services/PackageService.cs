@@ -17,11 +17,13 @@ namespace back_end.Services
         {
             return await _context.Packages
                 .Include(p => p.PackageServices)
-                    .ThenInclude(ps => ps.Service)
+                .ThenInclude(ps => ps.Service)
                 .Select(p => new Package
                 {
                     Id = p.Id,
                     Name = p.Name,
+                    Price = p.Price,
+                    IsBusinessPackage = p.IsBusinessPackage,
                     PackageServices = p.PackageServices.Select(ps => new Models.PackageService
                     {
                         ServiceId = ps.ServiceId,

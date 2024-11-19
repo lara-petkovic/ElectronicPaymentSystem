@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ElementRef} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/infrastructure/auth/auth.service';
 import { Service } from 'src/app/infrastructure/auth/model/service.model';
@@ -10,18 +10,26 @@ import { Package } from 'src/app/infrastructure/auth/model/package.model';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-
-
-export class HomeComponent implements OnInit{
+export class HomeComponent implements OnInit {
   userId: number;
   services: Service[] = [];
   packages: Package[] = [];
-  
-  constructor(private authService: AuthService, private router: Router, private service: FeatureModulesServicesService) { }
-  
+  serviceTypeMapping: { [key: number]: string } = {
+    0: 'Mobile Phone',
+    1: 'Fixed Phone',
+    2: 'Internet',
+    3: 'Digital TV'
+  };
+
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private service: FeatureModulesServicesService
+  ) {}
+
   ngOnInit(): void {
     this.userId = this.authService.user$.value.id;
-    
+
     this.service.getServices().subscribe({
       next: (services) => {
         this.services = services;
@@ -41,11 +49,19 @@ export class HomeComponent implements OnInit{
     });
   }
 
-  logout(){
+  logout() {
     this.authService.logout();
   }
 
-  login(){
+  login() {
     this.router.navigate(['/login']);
+  }
+
+  getServiceTypeLabel(type: string): string {
+    return this.serviceTypeMapping[Number(type)] || 'Unknown';
+  }
+
+  onSubscribe(): void {
+    this.authService.subscribe();
   }
 }
