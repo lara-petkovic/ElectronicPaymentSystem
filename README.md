@@ -18,7 +18,7 @@
 |                | **Frontend Port**     | `http://localhost:4200`                                                 |
 |                | **Database**          | PostgreSQL                                                             |
 |                | **Database Config**   | **Host**: `localhost`                                                   |
-|                |                       | **Database**: `postgres`                                                |
+|                |                       | **Database**: `webshop`                                                |
 |                |                       | **Username**: `postgres`                                               |
 |                |                       | **Password**: `super`                                                  |
 | **PaymentServiceProvider**   | **Backend**           | Spring                                                            |
