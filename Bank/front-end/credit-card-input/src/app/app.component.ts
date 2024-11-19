@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { WebSocketService } from './websocket.service';
 import { Router } from '@angular/router';
 
-const webSocketService = new WebSocketService();
 
 @Component({
   selector: 'app-root',
@@ -14,12 +13,12 @@ export class AppComponent implements OnInit, OnDestroy {
   message: string = '';
   messages: string[] = [];
 
-  constructor(private router: Router) {}
+  constructor(private webSocketService: WebSocketService, private router: Router) {}
 
   ngOnInit() {
-    webSocketService.connect('ws://localhost:8052/creditCards');
+    this.webSocketService.connect('ws://localhost:8052/creditCards');
 
-  webSocketService.getMessages().subscribe((message: string) => {
+    this.webSocketService.getMessages().subscribe((message: string) => {
     console.log('Message received from WebSocket:', message);
     this.processMessage(message);
   });
@@ -27,7 +26,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   processMessage(message: string) {
     if (message.split(',').length === 2) {
-      this.router.navigate(['credit-card-input/' + message.split(',')[0]]);
+      this.router.navigate(['credit-card-input/' + message.split(',')[0] + '/' + message.split(',')[1]]);
     }
   }
 

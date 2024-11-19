@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PaymentService } from '../payment.service';
 import { WebSocketService } from '../websocket.service';
 
@@ -11,16 +11,18 @@ import { WebSocketService } from '../websocket.service';
 })
 export class CreditCardComponent {
   paymentId: number | undefined;
-  constructor(private route: ActivatedRoute, private paymentService: PaymentService) {}
+  constructor(private webSocketService: WebSocketService, private route: ActivatedRoute, private paymentService: PaymentService, private router: Router) {}
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
       const id = params.get('paymentId');
+      this.price = params.get('amount')!;
       if (id) {
         this.paymentId = Number(id);
       }
     });
   }
+  price = '';
   cardDetails = {
     number: '',
     holder: '',
@@ -85,7 +87,9 @@ export class CreditCardComponent {
       this.cardDetailsDto.PaymentRequestId = this.paymentId ;
     if (form.valid) {
       //alert(this.cardDetailsDto.Pan);
-      this.paymentService.payWithCreditCard(this.cardDetailsDto);
+      //this.paymentService.payWithCreditCard(this.cardDetailsDto);
+      this.webSocketService.sendMessage(JSON.stringify(this.cardDetailsDto))
+      this.router.navigate(['/']);
     } else {
       form.form.markAllAsTouched();
     }

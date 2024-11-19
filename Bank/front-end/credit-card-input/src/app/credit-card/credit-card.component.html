@@ -5,7 +5,7 @@
       <h1>Enter Your Card Details</h1>
 
       <!-- Card -->
-      <form #cardForm="ngForm" (ngSubmit)="submit(cardForm)">
+      <form #cardForm="ngForm" (ngSubmit)="submit(cardForm)" class="forma">
         <div class="card">
           <img class="logo" src="https://pngimg.com/uploads/visa/visa_PNG31.png" />
 
@@ -84,6 +84,7 @@
           </div>
         </div>
         <button class="submitButton" type="submit">Submit</button>
+        <label class="amountLabel">Amount: {{price}}</label>
       </form>
     </div>
 </body>

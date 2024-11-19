@@ -3,7 +3,7 @@
   h1 {
     font-size: 30px;
     font-weight: 300;
-    margin-top: 40px;
+    margin-top: -20px;
     color: #ffffff;
     width: 420px;
     line-height: 1.5em;
@@ -193,4 +193,10 @@
   input.ng-touched.ng-invalid {
     border-bottom: 2px solid red;
   }
-  
+  .amountLabel{
+    color:white;
+    font-family: "Space Mono", monospace;
+    font-size: large;
+    margin-top: -60px;
+    margin-left: 350px;
+  }

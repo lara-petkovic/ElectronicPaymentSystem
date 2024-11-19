@@ -1,4 +1,9 @@
 package com.example.bank.config;
+import com.example.bank.domain.model.Account;
+import com.example.bank.domain.model.PaymentRequest;
+import com.example.bank.service.AccountService;
+import com.example.bank.service.PaymentRequestService;
+import com.example.bank.service.dto.PaymentDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -11,6 +16,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CreditCardWebSocketHandler extends TextWebSocketHandler {
     private WebSocketSession frontEndSession;
+    @Autowired
+    private PaymentRequestService paymentRequestService;
+    @Autowired
+    private AccountService accountService;
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         System.out.println("New WebSocket connection: " + session.getId());
@@ -20,7 +29,27 @@ public class CreditCardWebSocketHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         System.out.println("Received message: " + message.getPayload());
-        session.sendMessage(new TextMessage("Message received: " + message.getPayload()));
+        ObjectMapper objectMapper = new ObjectMapper();
+        PaymentDto paymentDto = objectMapper.readValue(message.getPayload(), PaymentDto.class);
+        PaymentRequest paymentRequest = paymentRequestService.getPaymentRequest(paymentDto.PaymentRequestId);
+        Account merchantAccount = accountService.getMerchantAccount(paymentRequest);
+        Account issuerAccount = accountService.getIssuerAccount(paymentDto);
+        if(merchantAccount!=null){
+            if(issuerAccount!=null){
+                if(issuerAccount.getBalance()>=paymentRequest.getAmount()){
+                    issuerAccount.setBalance(issuerAccount.getBalance()-paymentRequest.getAmount());
+                    merchantAccount.setBalance(merchantAccount.getBalance()+paymentRequest.getAmount());
+                    accountService.save(issuerAccount);
+                    accountService.save(merchantAccount);
+                }
+                else{
+                    //not enough money
+                }
+            }
+            else{
+                //call issuers bank via pcc
+            }
+        }
     }
     public void openCreditCardForm(int paymentId, double amount) throws Exception{
         frontEndSession.sendMessage(new TextMessage(paymentId + "," + amount));
