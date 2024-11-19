@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { PaymentService } from '../payment.service';
+import { WebSocketService } from '../websocket.service';
 
 @Component({
   selector: 'app-credit-card',
@@ -17,7 +18,6 @@ export class CreditCardComponent {
       const id = params.get('paymentId');
       if (id) {
         this.paymentId = Number(id);
-        console.log('Path parameter paymentId as number:', this.paymentId);
       }
     });
   }
