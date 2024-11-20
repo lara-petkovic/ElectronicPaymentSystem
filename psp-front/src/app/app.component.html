@@ -1,7 +1,7 @@
 
 
 <div [ngClass]="{ 'hidden': !showClientReg }">
-<app-psp-client-reg 
+<app-psp-client-reg   [optionsP]="optionsP"
 (optionsSelected)="handleOptionSelected($event)"></app-psp-client-reg>
 </div>
 
