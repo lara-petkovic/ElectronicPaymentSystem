@@ -1,38 +1,37 @@
 package com.example.bank.domain.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity(name = "accounts")
 public class Account {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private String id;
-    @Column(name = "pan", nullable = false)
+    private int id;
+    @Column(name = "pan")
     private String pan;
-    @Column(name = "number", nullable = false)
+    @Column(name = "number")
     private String number;
     @Column(name = "merchant_account", nullable = false)
     private Boolean merchantAccount;
-    @Column(name = "bank_identifier_code", nullable = false)
+    @Column(name = "bank_identifier_code")
     private String bankIdentifierCode;
     @Column(name = "merchant_password")
     private String merchantPassword;
     @Column(name = "merchant_id", unique = true)
     private String merchantId;
-    @Column(name = "expiration_date", nullable = false)
+    @Column(name = "expiration_date")
     private String expirationDate;
     @Column(name = "card_holder_name", nullable = false)
     private String cardHolderName;
-    @Column(name = "security_code", nullable = false)
+    @Column(name = "security_code")
     private String securityCode;
     @Column(name = "balance", nullable = false)
     private Double balance;
 
     public Account(){}
 
-    public Account(String id, String pan, String number, Boolean merchantAccount, String bankIdentifierCode, String merchantPassword, String merchantId, String expirationDate, String cardHolderName, String securityCode, Double balance) {
+    public Account(int id, String pan, String number, Boolean merchantAccount, String bankIdentifierCode, String merchantPassword, String merchantId, String expirationDate, String cardHolderName, String securityCode, Double balance) {
         this.id = id;
         this.pan = pan;
         this.number = number;
@@ -46,11 +45,11 @@ public class Account {
         this.balance = balance;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
