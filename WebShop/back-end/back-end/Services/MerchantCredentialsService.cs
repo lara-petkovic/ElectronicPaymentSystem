@@ -23,7 +23,16 @@ namespace back_end.Services
             };
 
             _context.MerchantCredentials.Add(credentials);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving credentials: {ex.Message}");
+                throw;
+            }
+
         }
 
         public async Task<MerchantCredentials> GetMerchantCredentialsAsync()

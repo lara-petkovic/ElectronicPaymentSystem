@@ -1,4 +1,5 @@
-﻿using back_end.Models;
+﻿using back_end.Dtos;
+using back_end.Models;
 using back_end.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,9 +25,9 @@ namespace back_end.Controllers
         }
 
         [HttpPost("credentials")]
-        public async Task<IActionResult> CreateMerchantAuthCredentials([FromBody] MerchantCredentials newTransactionDto)
+        public async Task<IActionResult> CreateMerchantAuthCredentials([FromBody] MerchantCredentialsDto merchantCredentialsDto)
         {
-            await _merchantCredentialsService.SaveMerchantCredentialsAsync(newTransactionDto.MerchantId, newTransactionDto.MerchantPass);
+            await _merchantCredentialsService.SaveMerchantCredentialsAsync(merchantCredentialsDto.MerchantId, merchantCredentialsDto.MerchantPass);
             return Ok("Merchant credentials saved successfully");
         }
 
