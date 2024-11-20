@@ -1,4 +1,5 @@
 package com.example.bank.config;
+
 import com.example.bank.domain.model.Account;
 import com.example.bank.domain.model.PaymentRequest;
 import com.example.bank.service.AccountService;
@@ -6,13 +7,9 @@ import com.example.bank.service.PaymentRequestService;
 import com.example.bank.service.dto.PaymentDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CreditCardWebSocketHandler extends TextWebSocketHandler {
     private WebSocketSession frontEndSession;
