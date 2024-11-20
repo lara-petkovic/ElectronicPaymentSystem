@@ -30,15 +30,24 @@
 |                |                       | **Database**: `psp`                                              |
 |                |                       | **Username**: `postgres`                                                   |
 |                |                       | **Password**: `super`                                            |
-| **Bank**   | **Backend**           | Spring Boot API                                                        |
-|                | **Backend Port**      | `http://localhost:8081`                                                 |
-|                | **Frontend**          | Vue.js                                                                  |
-|                | **Frontend Port**     | `http://localhost:3000`                                                 |
-|                | **Database**          | MongoDB                                                                |
+| **Bank Acquirer**   | **Backend**           | Spring Boot API                                                        |
+|                | **Backend Port**      | `http://localhost:8052`                                                 |
+|                | **Frontend**          | Angular                                                                  |
+|                | **Frontend Port**     | `http://localhost:4202`                                                 |
+|                | **Database**          | PostgreSQL                                                                |
 |                | **Database Config**   | **Host**: `localhost`                                                   |
-|                |                       | **Database**: `taskmanager`                                            |
-|                |                       | **Username**: `admin`                                                  |
-|                |                       | **Password**: `adminpass`                                              |
+|                |                       | **Database**: `sepBankAcquirer`                                            |
+|                |                       | **Username**: `postgres`                                                  |
+|                |                       | **Password**: `super`                                              |
+| **Bank Issuer**   | **Backend**           | Spring Boot API                                                        |
+|                | **Backend Port**      | `http://localhost:8051`                                                 |
+|                | **Frontend**          | /                                                                  |
+|                | **Frontend Port**     | /                                                 |
+|                | **Database**          | PostgreSQL                                                                |
+|                | **Database Config**   | **Host**: `localhost`                                                   |
+|                |                       | **Database**: `sepBankIssuer`                                            |
+|                |                       | **Username**: `postgres`                                                  |
+|                |                       | **Password**: `super`                                              |
 | **Eureka Server**    | **Backend**           | Spring boot                                                       |
 |                | **Backend Port (HTTP)**| `http://localhost:8761`                                                  |
 | **Gateway PSP-WS**    | **Backend**           | Spring boot                                                      |
