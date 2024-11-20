@@ -1,4 +1,4 @@
-import { Component,Output,EventEmitter } from '@angular/core';
+import { Component,Output,EventEmitter , Input} from '@angular/core';
 
 @Component({
   selector: 'app-psp-client-reg',
@@ -8,12 +8,20 @@ import { Component,Output,EventEmitter } from '@angular/core';
 export class PspClientRegComponent {
   @Output() optionsSelected = new EventEmitter<{ name: string ; clientId: string | null }>();
 
-  options = [
-    { name: 'Card' },
-    { name: 'QR Code' },
-    { name: 'PayPal' },
-    { name: 'Bitcoin' }
-  ];
+  options: { name: string }[] = []; 
+  @Input()
+  set optionsP(value: string) {
+    this.options = [];
+
+    if (value) {
+      const optionsArray = value.split(' ').map(option => option.trim());  
+
+      optionsArray.forEach(option => {
+        console.log(option)
+        this.options.push({ name: option });  
+      });
+    }
+  }
   
   displayedColumns: string[] = ['name'];
   selectedOptions: string[] = [];

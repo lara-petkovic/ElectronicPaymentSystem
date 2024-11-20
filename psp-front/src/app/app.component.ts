@@ -15,6 +15,7 @@ export class AppComponent {
   private webSocket: WebSocket;
   private webSocketClient: WebSocket;
   paymentOptions: string = '';
+  optionsP: string ='';
 
   constructor(private router: Router) {
     this.webSocket = new WebSocket('ws://localhost:8085/transactions');
@@ -33,7 +34,12 @@ export class AppComponent {
       console.log(event.data);
       this.showPaymentForm = false;
       this.showClientReg = true;
-      this.clientId = event.data;
+            const messageParts = event.data.split(',');
+            this.clientId = messageParts[0].trim(); 
+            const opcije = messageParts.slice(1).map((option: string) => option.trim());
+            this.optionsP = opcije.join(','); 
+            console.log('Parsed options:', this.optionsP);
+
       this.router.navigate(['/app-psp-client-reg']);
     };
   }
