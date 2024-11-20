@@ -48,6 +48,15 @@
 |                |                       | **Database**: `sepBankIssuer`                                            |
 |                |                       | **Username**: `postgres`                                                  |
 |                |                       | **Password**: `super`                                              |
+| **Payment Card Center**   | **Backend**           | Spring Boot API                                                        |
+|                | **Backend Port**      | `http://localhost:8053`                                                 |
+|                | **Frontend**          | /                                                                  |
+|                | **Frontend Port**     | /                                                 |
+|                | **Database**          | PostgreSQL                                                                |
+|                | **Database Config**   | **Host**: `localhost`                                                   |
+|                |                       | **Database**: `sepPcc`                                            |
+|                |                       | **Username**: `postgres`                                                  |
+|                |                       | **Password**: `super`                                              |
 | **Eureka Server**    | **Backend**           | Spring boot                                                       |
 |                | **Backend Port (HTTP)**| `http://localhost:8761`                                                  |
 | **Gateway PSP-WS**    | **Backend**           | Spring boot                                                      |
