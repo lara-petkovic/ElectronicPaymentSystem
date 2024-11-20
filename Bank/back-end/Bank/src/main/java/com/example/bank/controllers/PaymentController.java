@@ -27,7 +27,7 @@ public class PaymentController {
     }
     @PostMapping
     public ResponseEntity<PaymentResponseDto> processPaymentRequest(@RequestBody PaymentRequestDto paymentRequest) {
-        Boolean merchantAccountExists = accountService.checkIfMerchantAccountExists(paymentRequest);
+        Boolean merchantAccountExists = accountService.checkIfMerchantAccountExists(paymentRequest.MerchantId,paymentRequest.MerchantPassword);
         if(merchantAccountExists) {
             PaymentRequest newPR = paymentRequestService.addPaymentRequest(paymentRequest);
             try{
