@@ -49,6 +49,25 @@ public class ClientService implements IClientService{
 
         // Send the POST request
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+
+
+        //SEND TO BANK
+        RestTemplate restTemplateBank = new RestTemplate();
+        String urlBank = "http://localhost:8087/api/accounts";
+
+        HttpHeaders headersbank = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Location", address);
+
+        // Create the JSON body
+        String bodybank = "{ \"MerchantId\" : \"" + client.getMerchantId() + "\", \"MerchantPassword\" : \"" + client.getMerchantPass() + "\", \"HolderName\" : \"" + "WS"+client.getMerchantId() +"\" }";
+
+        // Set up the HTTP entity with headers and body
+        HttpEntity<String> entityBank = new HttpEntity<>(bodybank, headersbank);
+
+        // Send the POST request
+        ResponseEntity<String> responseBank = restTemplate.exchange(urlBank, HttpMethod.POST, entityBank, String.class);
+
     }
     @Override
     public ClientSubscriptionDto getSubscription(NewTransactionDto newTransactionDto) {
