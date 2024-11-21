@@ -35,7 +35,9 @@ public class CreditCardWebSocketHandler extends TextWebSocketHandler {
         PaymentWithCardDto paymentWithCardDto = objectMapper.readValue(message.getPayload(), PaymentWithCardDto.class);
         PaymentRequest paymentRequest = paymentRequestService.getPaymentRequest(paymentWithCardDto.PaymentRequestId);
         Account merchantAccount = accountService.getMerchantAccount(paymentRequest);
-
+        if(!paymentWithCardDto.isValidExpirationDate()){
+            emitErrorEvent(paymentRequest);
+        }
         if(merchantAccount!=null){
             if(checkPanNumber(paymentWithCardDto)){
                 Account issuerAccount = accountService.getIssuerAccount(paymentWithCardDto);
