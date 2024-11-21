@@ -1,10 +1,7 @@
 package com.example.bank.controllers;
 
-import com.example.bank.domain.model.PaymentRequest;
 import com.example.bank.service.AccountService;
 import com.example.bank.service.dto.MerchantRegistrationDto;
-import com.example.bank.service.dto.PaymentRequestDto;
-import com.example.bank.service.dto.PaymentResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
