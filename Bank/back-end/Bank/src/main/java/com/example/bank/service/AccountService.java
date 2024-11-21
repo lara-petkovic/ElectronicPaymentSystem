@@ -3,9 +3,9 @@ package com.example.bank.service;
 import com.example.bank.domain.model.Account;
 import com.example.bank.domain.model.PaymentRequest;
 import com.example.bank.repositories.AccountRepository;
+import com.example.bank.service.dto.IssuerPaymentDto;
 import com.example.bank.service.dto.MerchantRegistrationDto;
-import com.example.bank.service.dto.PaymentDto;
-import com.example.bank.service.dto.PaymentRequestDto;
+import com.example.bank.service.dto.PaymentWithCardDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +44,17 @@ public class AccountService {
         Optional<Account> account = repo.findByMerchantIdAndMerchantPassword(paymentRequest.getMerchantId(), paymentRequest.getMerchantPassword());
         return account.orElse(null);
     }
-    public Account getIssuerAccount(PaymentDto payment){
+    public Account getIssuerAccount(PaymentWithCardDto payment){
+        Optional<Account> account = repo.findByPanAndSecurityCodeAndCardHolderNameAndExpirationDate(
+                payment.Pan,
+                payment.SecurityCode,
+                payment.HolderName,
+                payment.ExpirationDate
+        );
+        return account.orElse(null);
+    }
+
+    public Account getIssuerAccount(IssuerPaymentDto payment){
         Optional<Account> account = repo.findByPanAndSecurityCodeAndCardHolderNameAndExpirationDate(
                 payment.Pan,
                 payment.SecurityCode,
