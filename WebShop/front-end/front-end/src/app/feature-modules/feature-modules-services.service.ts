@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { Service } from '../infrastructure/auth/model/service.model';
 import { environment } from 'src/env/environment';
 import { Package } from '../infrastructure/auth/model/package.model';
+import { Subscription } from '../infrastructure/auth/model/subscription.model';
 
 @Injectable({
   providedIn: 'root'
@@ -24,5 +25,9 @@ export class FeatureModulesServicesService {
 
   getPackages(): Observable<Package[]> {
     return this.http.get<Package[]>(`${environment.apiHost}/packages`);
+  }
+
+  createSubscription(subscription: Subscription): Observable<Subscription> {
+    return this.http.post<Subscription>(`${environment.apiHost}/subscriptions`, subscription);
   }
 }

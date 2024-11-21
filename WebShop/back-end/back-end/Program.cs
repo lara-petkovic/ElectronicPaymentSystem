@@ -2,6 +2,7 @@ using back_end.Data;
 using back_end.Services;
 using Explorer.API.Startup;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.ConfigureSwagger(builder.Configuration);
@@ -16,8 +17,15 @@ builder.Services.AddScoped<PackageService>();
 builder.Services.AddScoped<PspSubscriptionService>();
 builder.Services.AddScoped<MerchantCredentialsService>();
 builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<TransactionService>();
+builder.Services.AddScoped<SubscriptionService>();
 
-builder.Services.AddControllers();
+//builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
 builder.Services.AddEndpointsApiExplorer();
 
 var allowedOrigins = builder.Configuration.GetValue<string>("AllowedOrigins")!.Split(",");

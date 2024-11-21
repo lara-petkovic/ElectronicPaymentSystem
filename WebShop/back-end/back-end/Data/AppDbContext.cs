@@ -20,6 +20,7 @@ namespace back_end.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Package> Packages { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<MerchantCredentials> MerchantCredentials { get; set; }
 

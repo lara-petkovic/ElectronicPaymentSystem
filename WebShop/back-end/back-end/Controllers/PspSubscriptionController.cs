@@ -11,11 +11,13 @@ namespace back_end.Controllers
     {
         private readonly PspSubscriptionService _pspSubscriptionService;
         private readonly MerchantCredentialsService _merchantCredentialsService;
+        private readonly TransactionService _transactionService;
 
-        public PspSubscriptionController(PspSubscriptionService pspSubscriptionService, MerchantCredentialsService merchantCredentialsService)
+        public PspSubscriptionController(PspSubscriptionService pspSubscriptionService, MerchantCredentialsService merchantCredentialsService, TransactionService transactionService)
         {
             _pspSubscriptionService = pspSubscriptionService;
             _merchantCredentialsService = merchantCredentialsService;
+            _transactionService = transactionService;
         }
 
         [HttpPost("subscribe")]
@@ -32,7 +34,7 @@ namespace back_end.Controllers
         }
 
         [HttpPost("transaction")]
-        public async Task<IActionResult> ProcessTransaction([FromBody] MerchantCredentials newTransactionDto)
+        public async Task<IActionResult> ProcessTransaction([FromBody] Transaction newTransaction)
         {
             var credentials = await _merchantCredentialsService.GetMerchantCredentialsAsync();
 
@@ -41,12 +43,10 @@ namespace back_end.Controllers
                 return BadRequest("Merchant credentials not found");
             }
 
-            newTransactionDto.MerchantId = credentials.MerchantId;
-            newTransactionDto.MerchantPass = credentials.MerchantPass;
+            var savedTransaction = await _transactionService.SaveTransaction(newTransaction);
+            await _pspSubscriptionService.ProcessTransactionAsync(savedTransaction, credentials);
 
-            await _pspSubscriptionService.ProcessTransactionAsync(newTransactionDto);
-
-            return Ok("Transaction processed successfully");
+            return Ok("Transaction saved and processed successfully");
         }
     }
 }

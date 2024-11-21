@@ -1,6 +1,8 @@
 ﻿using System.Text;
 using System;
 using back_end.Models;
+using back_end.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace back_end.Services
 {
@@ -26,14 +28,14 @@ namespace back_end.Services
             }
         }
 
-        public async Task ProcessTransactionAsync(MerchantCredentials transactionDto)
+        public async Task ProcessTransactionAsync(Transaction transaction, MerchantCredentials merchantCredentials)
         {
             var jsonData = new StringContent(
-                $"{{\"merchantId\":\"{transactionDto.MerchantId}\", " +
-                $"\"merchantPass\":\"{transactionDto.MerchantPass}\", " +
-                $"\"amount\": {transactionDto.Amount}, " +
-                $"\"merchantOrderId\": {transactionDto.MerchantOrderId}, " +
-                $"\"merchantTimestamp\": {transactionDto.MerchantTimestamp}}}", 
+                $"{{\"merchantId\":\"{merchantCredentials.MerchantId}\", " +
+                $"\"merchantPass\":\"{merchantCredentials.MerchantPass}\", " +
+                $"\"amount\": {transaction.Amount}, " +
+                $"\"merchantOrderId\": {transaction.Id}, " +
+                $"\"merchantTimestamp\": {transaction.Timestamp}}}", 
                 Encoding.UTF8, "application/json");
 
             string url = "http://localhost:8086/api/transaction";
