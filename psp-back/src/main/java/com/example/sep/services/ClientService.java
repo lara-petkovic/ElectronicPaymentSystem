@@ -56,8 +56,7 @@ public class ClientService implements IClientService{
         String urlBank = "http://localhost:8087/api/accounts";
 
         HttpHeaders headersbank = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Location", address);
+        headersbank.setContentType(MediaType.APPLICATION_JSON);
 
         // Create the JSON body
         String bodybank = "{ \"MerchantId\" : \"" + client.getMerchantId() + "\", \"MerchantPassword\" : \"" + client.getMerchantPass() + "\", \"HolderName\" : \"" + "WS"+client.getMerchantId() +"\" }";
@@ -66,7 +65,7 @@ public class ClientService implements IClientService{
         HttpEntity<String> entityBank = new HttpEntity<>(bodybank, headersbank);
 
         // Send the POST request
-        ResponseEntity<String> responseBank = restTemplate.exchange(urlBank, HttpMethod.POST, entityBank, String.class);
+        ResponseEntity<String> responseBank = restTemplateBank.exchange(urlBank, HttpMethod.POST, entityBank, String.class);
 
     }
     @Override
