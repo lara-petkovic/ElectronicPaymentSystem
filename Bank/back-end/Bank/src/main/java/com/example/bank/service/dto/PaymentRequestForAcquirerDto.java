@@ -1,6 +1,6 @@
 package com.example.bank.service.dto;
 
-public class PaymentRequestDto {
+public class PaymentRequestForAcquirerDto {
     public String MerchantId;
     public String MerchantPassword;
     public Double Amount;
@@ -9,9 +9,9 @@ public class PaymentRequestDto {
     public String SuccessUrl;
     public String FailedUrl;
     public String ErrorUrl;
-    public PaymentRequestDto(){}
+    public PaymentRequestForAcquirerDto(){}
 
-    public PaymentRequestDto(String merchantId, String merchantPassword, Double amount, String merchantOrderId, String merchantTimestamp, String successUrl, String failedUrl, String errorUrl) {
+    public PaymentRequestForAcquirerDto(String merchantId, String merchantPassword, Double amount, String merchantOrderId, String merchantTimestamp, String successUrl, String failedUrl, String errorUrl) {
         MerchantId = merchantId;
         MerchantPassword = merchantPassword;
         Amount = amount;

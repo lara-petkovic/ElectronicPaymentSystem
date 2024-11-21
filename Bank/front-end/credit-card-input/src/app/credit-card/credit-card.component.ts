@@ -112,7 +112,23 @@ export class CreditCardComponent {
     return sum % 10 === 0;
   }
   isValidExpirationDate(date: string): boolean{
-    return date.startsWith("12") || date.startsWith("11") || date.startsWith("10") || date.startsWith("09") || date.startsWith("08") || date.startsWith("07") || date.startsWith("06") || date.startsWith("05") || date.startsWith("04") || date.startsWith("03") || date.startsWith("02") || date.startsWith("01")
+    //return date.startsWith("12") || date.startsWith("11") || date.startsWith("10") || date.startsWith("09") || date.startsWith("08") || date.startsWith("07") || date.startsWith("06") || date.startsWith("05") || date.startsWith("04") || date.startsWith("03") || date.startsWith("02") || date.startsWith("01")
+  const regex = /^(0[1-9]|1[0-2])\/\d{2}$/;
+  
+  if (!regex.test(date)) {
+    return false;
+  }
+
+  const [month, year] = date.split('/').map(num => parseInt(num, 10));
+
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth() + 1;
+  const currentYear = currentDate.getFullYear() % 100;
+
+  if (year < currentYear || (year === currentYear && month < currentMonth)) {
+    return false;
+  }
+  return true;
   }
   
 }

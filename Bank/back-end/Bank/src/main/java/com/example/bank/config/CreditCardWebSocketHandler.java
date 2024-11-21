@@ -2,11 +2,17 @@ package com.example.bank.config;
 
 import com.example.bank.domain.model.Account;
 import com.example.bank.domain.model.PaymentRequest;
+import com.example.bank.domain.model.Transaction;
 import com.example.bank.service.AccountService;
+import com.example.bank.service.BankIdentifierNumberService;
 import com.example.bank.service.PaymentRequestService;
-import com.example.bank.service.dto.PaymentDto;
+import com.example.bank.service.TransactionService;
+import com.example.bank.service.dto.CardDetailsDto;
+import com.example.bank.service.dto.PaymentRequestForIssuerDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -17,6 +23,10 @@ public class CreditCardWebSocketHandler extends TextWebSocketHandler {
     private PaymentRequestService paymentRequestService;
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private BankIdentifierNumberService bankIdentifierService;
+    @Autowired
+    private TransactionService transactionService;
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         System.out.println("New WebSocket connection: " + session.getId());
@@ -27,26 +37,84 @@ public class CreditCardWebSocketHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         System.out.println("Received message: " + message.getPayload());
         ObjectMapper objectMapper = new ObjectMapper();
-        PaymentDto paymentDto = objectMapper.readValue(message.getPayload(), PaymentDto.class);
-        PaymentRequest paymentRequest = paymentRequestService.getPaymentRequest(paymentDto.PaymentRequestId);
+        CardDetailsDto cardDetailsDto = objectMapper.readValue(message.getPayload(), CardDetailsDto.class);
+
+        PaymentRequest paymentRequest = paymentRequestService.getPaymentRequest(cardDetailsDto.PaymentRequestId);
         Account merchantAccount = accountService.getMerchantAccount(paymentRequest);
-        Account issuerAccount = accountService.getIssuerAccount(paymentDto);
+        Transaction transaction = transactionService.getTransactionByPaymentRequestId(paymentRequest.getId());
+        if(!cardDetailsDto.isValidExpirationDate()){
+            emitErrorEvent(transaction);
+        }
         if(merchantAccount!=null){
-            if(issuerAccount!=null){
+            if(checkPanNumber(cardDetailsDto)){
+                Account issuerAccount = accountService.getIssuerAccount(cardDetailsDto);
                 if(issuerAccount.getBalance()>=paymentRequest.getAmount()){
                     issuerAccount.setBalance(issuerAccount.getBalance()-paymentRequest.getAmount());
                     merchantAccount.setBalance(merchantAccount.getBalance()+paymentRequest.getAmount());
                     accountService.save(issuerAccount);
                     accountService.save(merchantAccount);
+                    emitSuccessEvent(transaction);
                 }
                 else{
-                    //not enough money
+                    emitFailedEvent(transaction);
                 }
             }
             else{
                 //call issuers bank via pcc
+                RestTemplate restTemplate = new RestTemplate();
+                String url = "http://localhost:8053/api/payments";
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+
+
+                PaymentRequestForIssuerDto issuerRequest = new PaymentRequestForIssuerDto(
+                        cardDetailsDto.Pan,
+                        cardDetailsDto.ExpirationDate,
+                        cardDetailsDto.HolderName,
+                        cardDetailsDto.SecurityCode,
+                        transaction
+                );
+
+                String body = objectMapper.writeValueAsString(issuerRequest);
+
+                HttpEntity<String> entity = new HttpEntity<>(body, headers);
+                try{
+                    ResponseEntity<Transaction> response = restTemplate.exchange(url, HttpMethod.POST, entity, Transaction.class);
+                    Transaction returnedTransaction = response.getBody();
+                    if(response.getStatusCode()==HttpStatus.OK){
+                        merchantAccount.setBalance(merchantAccount.getBalance()+paymentRequest.getAmount());
+                        accountService.save(merchantAccount);
+                        emitSuccessEvent(returnedTransaction);
+                    }
+                    else if(response.getStatusCode()==HttpStatus.FORBIDDEN || response.getStatusCode()==HttpStatus.NOT_FOUND){
+                        emitFailedEvent(returnedTransaction);
+                    }
+                    else{
+                        emitErrorEvent(returnedTransaction);
+                    }
+                }
+                catch(Exception e){
+                    emitErrorEvent(transaction);
+                }
             }
         }
+        else{
+            emitErrorEvent(transaction);
+        }
+    }
+    public void emitErrorEvent(Transaction transaction){
+        transactionService.errorTransaction(transaction);
+    }
+    public void emitSuccessEvent(Transaction transaction){
+        transactionService.successTransaction(transaction);
+    }
+    public void emitFailedEvent(Transaction transaction){
+        transactionService.failTransaction(transaction);
+    }
+    private boolean checkPanNumber(CardDetailsDto cardDetailsDto){
+        String bankIdentifier = bankIdentifierService.getId();
+        return cardDetailsDto.Pan.substring(0,4).equals(bankIdentifier);
     }
     public void openCreditCardForm(int paymentId, double amount) throws Exception{
         frontEndSession.sendMessage(new TextMessage(paymentId + "," + amount));
