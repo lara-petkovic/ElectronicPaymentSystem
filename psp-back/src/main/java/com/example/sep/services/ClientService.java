@@ -35,14 +35,14 @@ public class ClientService implements IClientService{
 
     private void SendCredentials(Client client, String address){
         RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:8086/api/psp-subscription/credentials";
+        String url = "http://localhost:5275/api/psp-subscription/credentials";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Location", address);
 
         // Create the JSON body
-        String body = "{ \"merchantId\" : \"" + client.getMerchantId() + "\", \"merchantPass\" : \"" + client.getMerchantPass() + "\" }";
+        String body = "{ \"MerchantId\" : \"" + client.getMerchantId() + "\", \"MerchantPass\" : \"" + client.getMerchantPass() + "\" }";
 
         // Set up the HTTP entity with headers and body
         HttpEntity<String> entity = new HttpEntity<>(body, headers);
