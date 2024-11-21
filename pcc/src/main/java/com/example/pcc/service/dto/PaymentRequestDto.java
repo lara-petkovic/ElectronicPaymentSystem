@@ -5,19 +5,15 @@ public class PaymentRequestDto {
     public String ExpirationDate;
     public String HolderName;
     public String SecurityCode;
-    public String Acquirer;
-    public double Amount;
-    public String AcquirerAccountNumber;
+    public TransactionDto Transaction;
     public PaymentRequestDto(){}
 
-    public PaymentRequestDto(String pan, String expirationDate, String holderName, String securityCode, String acquirer, double amount, String acquirerAccountNumber) {
+    public PaymentRequestDto(String pan, String expirationDate, String holderName, String securityCode, TransactionDto transaction) {
         Pan = pan;
         ExpirationDate = expirationDate;
         HolderName = holderName;
         SecurityCode = securityCode;
-        Acquirer = acquirer;
-        Amount = amount;
-        AcquirerAccountNumber = acquirerAccountNumber;
+        Transaction = transaction;
     }
 
 }

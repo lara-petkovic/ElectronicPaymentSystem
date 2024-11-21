@@ -2,14 +2,14 @@ package com.example.bank.service.dto;
 
 import java.time.LocalDate;
 
-public class PaymentWithCardDto {
+public class CardDetailsDto {
     public String Pan;
     public String HolderName;
     public String ExpirationDate;
     public String SecurityCode;
     public int PaymentRequestId;
-    public PaymentWithCardDto(){}
-    public PaymentWithCardDto(String pan, String holderName, String expirationDate, String securityCode, int paymentRequestId) {
+    public CardDetailsDto(){}
+    public CardDetailsDto(String pan, String holderName, String expirationDate, String securityCode, int paymentRequestId) {
         Pan = pan;
         HolderName = holderName;
         ExpirationDate = expirationDate;

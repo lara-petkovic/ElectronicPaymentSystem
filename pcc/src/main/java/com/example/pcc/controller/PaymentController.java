@@ -3,6 +3,9 @@ package com.example.pcc.controller;
 import com.example.pcc.domain.model.RegisteredBank;
 import com.example.pcc.service.RegisteredBankService;
 import com.example.pcc.service.dto.PaymentRequestDto;
+import com.example.pcc.service.dto.TransactionDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,26 +21,25 @@ public class PaymentController {
     private RegisteredBankService service;
 
     @PostMapping
-    public ResponseEntity<String> executePayment(@RequestBody PaymentRequestDto paymentRequestDto) {
+    public ResponseEntity<TransactionDto> executePayment(@RequestBody PaymentRequestDto paymentRequestDto) {
         RegisteredBank bank = service.getByPan(paymentRequestDto.Pan);
         if(bank==null)
-            return new ResponseEntity<>("account does not exist", HttpStatus.OK);
+            return new ResponseEntity<>(paymentRequestDto.Transaction, HttpStatus.NOT_FOUND);
         RestTemplate restTemplate = new RestTemplate();
         String url = bank.getUrl();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            ObjectMapper objectMapper = new ObjectMapper();
+            String body = objectMapper.writeValueAsString(paymentRequestDto);
 
-        String body = "{ \"Pan\" : \"" + paymentRequestDto.Pan + "\", " +
-                "\"ExpirationDate\" : \"" + paymentRequestDto.ExpirationDate + "\", " +
-                "\"HolderName\" : \"" + paymentRequestDto.HolderName + "\", " +
-                "\"SecurityCode\" : \"" + paymentRequestDto.SecurityCode + "\", " +
-                "\"Acquirer\" : \"" + paymentRequestDto.Acquirer + "\", " +
-                "\"AcquirerAccountNumber\" : \"" + paymentRequestDto.AcquirerAccountNumber + "\", " +
-                "\"Amount\" : \"" + paymentRequestDto.Amount +"\" }";
-
-        HttpEntity<String> entity = new HttpEntity<>(body, headers);
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-        return response;
+            HttpEntity<String> entity = new HttpEntity<>(body, headers);
+            ResponseEntity<TransactionDto> response = restTemplate.exchange(url, HttpMethod.POST, entity, TransactionDto.class);
+            return response;
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(paymentRequestDto.Transaction, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

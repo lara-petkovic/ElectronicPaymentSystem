@@ -2,10 +2,13 @@ package com.example.bank.config;
 
 import com.example.bank.domain.model.Account;
 import com.example.bank.domain.model.PaymentRequest;
+import com.example.bank.domain.model.Transaction;
 import com.example.bank.service.AccountService;
 import com.example.bank.service.BankIdentifierNumberService;
 import com.example.bank.service.PaymentRequestService;
-import com.example.bank.service.dto.PaymentWithCardDto;
+import com.example.bank.service.TransactionService;
+import com.example.bank.service.dto.CardDetailsDto;
+import com.example.bank.service.dto.PaymentRequestForIssuerDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -22,6 +25,8 @@ public class CreditCardWebSocketHandler extends TextWebSocketHandler {
     private AccountService accountService;
     @Autowired
     private BankIdentifierNumberService bankIdentifierService;
+    @Autowired
+    private TransactionService transactionService;
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         System.out.println("New WebSocket connection: " + session.getId());
@@ -32,24 +37,26 @@ public class CreditCardWebSocketHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         System.out.println("Received message: " + message.getPayload());
         ObjectMapper objectMapper = new ObjectMapper();
-        PaymentWithCardDto paymentWithCardDto = objectMapper.readValue(message.getPayload(), PaymentWithCardDto.class);
-        PaymentRequest paymentRequest = paymentRequestService.getPaymentRequest(paymentWithCardDto.PaymentRequestId);
+        CardDetailsDto cardDetailsDto = objectMapper.readValue(message.getPayload(), CardDetailsDto.class);
+
+        PaymentRequest paymentRequest = paymentRequestService.getPaymentRequest(cardDetailsDto.PaymentRequestId);
         Account merchantAccount = accountService.getMerchantAccount(paymentRequest);
-        if(!paymentWithCardDto.isValidExpirationDate()){
-            emitErrorEvent(paymentRequest);
+        Transaction transaction = transactionService.getTransactionByPaymentRequestId(paymentRequest.getId());
+        if(!cardDetailsDto.isValidExpirationDate()){
+            emitErrorEvent(transaction);
         }
         if(merchantAccount!=null){
-            if(checkPanNumber(paymentWithCardDto)){
-                Account issuerAccount = accountService.getIssuerAccount(paymentWithCardDto);
+            if(checkPanNumber(cardDetailsDto)){
+                Account issuerAccount = accountService.getIssuerAccount(cardDetailsDto);
                 if(issuerAccount.getBalance()>=paymentRequest.getAmount()){
                     issuerAccount.setBalance(issuerAccount.getBalance()-paymentRequest.getAmount());
                     merchantAccount.setBalance(merchantAccount.getBalance()+paymentRequest.getAmount());
                     accountService.save(issuerAccount);
                     accountService.save(merchantAccount);
-                    emitSuccessEvent(paymentRequest);
+                    emitSuccessEvent(transaction);
                 }
                 else{
-                    emitFailedEvent(paymentRequest);
+                    emitFailedEvent(transaction);
                 }
             }
             else{
@@ -60,50 +67,54 @@ public class CreditCardWebSocketHandler extends TextWebSocketHandler {
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
 
-                String body = "{ \"Pan\" : \"" + paymentWithCardDto.Pan + "\", " +
-                        "\"ExpirationDate\" : \"" + paymentWithCardDto.ExpirationDate + "\", " +
-                        "\"HolderName\" : \"" + paymentWithCardDto.HolderName + "\", " +
-                        "\"SecurityCode\" : \"" + paymentWithCardDto.SecurityCode + "\", " +
-                        "\"Acquirer\" : \"" + merchantAccount.getCardHolderName() + "\", " +
-                        "\"AcquirerAccountNumber\" : \"" + merchantAccount.getNumber() + "\", " +
-                        "\"Amount\" : \"" + paymentRequest.getAmount() +"\" }";
+
+                PaymentRequestForIssuerDto issuerRequest = new PaymentRequestForIssuerDto(
+                        cardDetailsDto.Pan,
+                        cardDetailsDto.ExpirationDate,
+                        cardDetailsDto.HolderName,
+                        cardDetailsDto.SecurityCode,
+                        transaction
+                );
+
+                String body = objectMapper.writeValueAsString(issuerRequest);
 
                 HttpEntity<String> entity = new HttpEntity<>(body, headers);
                 try{
-                    ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-                    if(response.getBody().equals("success")){
+                    ResponseEntity<Transaction> response = restTemplate.exchange(url, HttpMethod.POST, entity, Transaction.class);
+                    Transaction returnedTransaction = response.getBody();
+                    if(response.getStatusCode()==HttpStatus.OK){
                         merchantAccount.setBalance(merchantAccount.getBalance()+paymentRequest.getAmount());
                         accountService.save(merchantAccount);
-                        emitSuccessEvent(paymentRequest);
+                        emitSuccessEvent(returnedTransaction);
                     }
-                    else if(response.getBody().equals("not enough money")){
-                        emitFailedEvent(paymentRequest);
+                    else if(response.getStatusCode()==HttpStatus.FORBIDDEN || response.getStatusCode()==HttpStatus.NOT_FOUND){
+                        emitFailedEvent(returnedTransaction);
                     }
                     else{
-                        emitErrorEvent(paymentRequest);
+                        emitErrorEvent(returnedTransaction);
                     }
                 }
                 catch(Exception e){
-                    emitErrorEvent(paymentRequest);
+                    emitErrorEvent(transaction);
                 }
             }
         }
         else{
-            emitErrorEvent(paymentRequest);
+            emitErrorEvent(transaction);
         }
     }
-    public void emitErrorEvent(PaymentRequest paymentRequest){
-
+    public void emitErrorEvent(Transaction transaction){
+        transactionService.errorTransaction(transaction);
     }
-    public void emitSuccessEvent(PaymentRequest paymentRequest){
-
+    public void emitSuccessEvent(Transaction transaction){
+        transactionService.successTransaction(transaction);
     }
-    public void emitFailedEvent(PaymentRequest paymentRequest){
-
+    public void emitFailedEvent(Transaction transaction){
+        transactionService.failTransaction(transaction);
     }
-    private boolean checkPanNumber(PaymentWithCardDto paymentWithCardDto){
+    private boolean checkPanNumber(CardDetailsDto cardDetailsDto){
         String bankIdentifier = bankIdentifierService.getId();
-        return paymentWithCardDto.Pan.substring(0,4).equals(bankIdentifier);
+        return cardDetailsDto.Pan.substring(0,4).equals(bankIdentifier);
     }
     public void openCreditCardForm(int paymentId, double amount) throws Exception{
         frontEndSession.sendMessage(new TextMessage(paymentId + "," + amount));
