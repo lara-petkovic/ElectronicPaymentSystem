@@ -3,10 +3,7 @@ package com.example.bank.config;
 import com.example.bank.domain.model.Account;
 import com.example.bank.domain.model.PaymentRequest;
 import com.example.bank.domain.model.Transaction;
-import com.example.bank.service.AccountService;
-import com.example.bank.service.BankIdentifierNumberService;
-import com.example.bank.service.PaymentRequestService;
-import com.example.bank.service.TransactionService;
+import com.example.bank.service.*;
 import com.example.bank.service.dto.CardDetailsDto;
 import com.example.bank.service.dto.PaymentRequestForIssuerDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,6 +24,8 @@ public class CreditCardWebSocketHandler extends TextWebSocketHandler {
     private BankIdentifierNumberService bankIdentifierService;
     @Autowired
     private TransactionService transactionService;
+    @Autowired
+    private PspNotificationService pspNotificationService;
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         System.out.println("New WebSocket connection: " + session.getId());
@@ -62,11 +61,11 @@ public class CreditCardWebSocketHandler extends TextWebSocketHandler {
             else{
                 //call issuers bank via pcc
                 RestTemplate restTemplate = new RestTemplate();
+                restTemplate.setErrorHandler(new CustomResponseErrorHandler());
                 String url = "http://localhost:8053/api/payments";
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
-
 
                 PaymentRequestForIssuerDto issuerRequest = new PaymentRequestForIssuerDto(
                         cardDetailsDto.Pan,
@@ -104,13 +103,13 @@ public class CreditCardWebSocketHandler extends TextWebSocketHandler {
         }
     }
     public void emitErrorEvent(Transaction transaction){
-        transactionService.errorTransaction(transaction);
+        pspNotificationService.sendTransactionResult(transactionService.errorTransaction(transaction));
     }
     public void emitSuccessEvent(Transaction transaction){
-        transactionService.successTransaction(transaction);
+        pspNotificationService.sendTransactionResult(transactionService.successTransaction(transaction));
     }
     public void emitFailedEvent(Transaction transaction){
-        transactionService.failTransaction(transaction);
+        pspNotificationService.sendTransactionResult(transactionService.failTransaction(transaction));
     }
     private boolean checkPanNumber(CardDetailsDto cardDetailsDto){
         String bankIdentifier = bankIdentifierService.getId();

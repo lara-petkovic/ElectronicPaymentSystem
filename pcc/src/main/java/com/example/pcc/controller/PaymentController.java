@@ -1,5 +1,6 @@
 package com.example.pcc.controller;
 
+import com.example.pcc.config.CustomResponseErrorHandler;
 import com.example.pcc.domain.model.RegisteredBank;
 import com.example.pcc.service.RegisteredBankService;
 import com.example.pcc.service.dto.PaymentRequestDto;
@@ -26,6 +27,7 @@ public class PaymentController {
         if(bank==null)
             return new ResponseEntity<>(paymentRequestDto.Transaction, HttpStatus.NOT_FOUND);
         RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setErrorHandler(new CustomResponseErrorHandler());
         String url = bank.getUrl();
 
         try {

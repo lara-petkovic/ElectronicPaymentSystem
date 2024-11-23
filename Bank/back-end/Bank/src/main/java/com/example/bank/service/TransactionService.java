@@ -67,6 +67,20 @@ public class TransactionService {
         );
         return repo.save(transaction);
     }
+    public Transaction addFailedTransaction_Issuer(PaymentRequestForIssuerDto paymentRequest){
+        Transaction transaction = new Transaction(
+                paymentRequest.Transaction.getAmount(),
+                paymentRequest.Transaction.getMerchantOrderId(),
+                paymentRequest.Transaction.getMerchantTimestamp(),
+                paymentRequest.Transaction.getAcquirerOrderId(),
+                paymentRequest.Transaction.getAcquirerTimestamp(),
+                generateRandomOrderId(),
+                Instant.now().toString(),
+                "FAILED",
+                paymentRequest.Transaction.getPaymentRequestId()
+        );
+        return repo.save(transaction);
+    }
     public Transaction successTransaction(Transaction transaction){
         Transaction existingTransaction = getTransactionByAcquirerOrderId(transaction.getAcquirerOrderId());
         existingTransaction.setStatus("SUCCESS");
@@ -77,6 +91,8 @@ public class TransactionService {
     public Transaction failTransaction(Transaction transaction){
         Transaction existingTransaction = getTransactionByAcquirerOrderId(transaction.getAcquirerOrderId());
         existingTransaction.setStatus("FAILED");
+        existingTransaction.setIssuerOrderId(transaction.getIssuerOrderId());
+        existingTransaction.setIssuerTimestamp(transaction.getIssuerTimestamp());
         return repo.save(existingTransaction);
     }
     public Transaction errorTransaction(Transaction transaction){
@@ -85,8 +101,8 @@ public class TransactionService {
         return repo.save(existingTransaction);
     }
     private String generateRandomOrderId() {
-        int length = 10;
-        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        int length = 16;
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         Random random = new Random();
         StringBuilder sb = new StringBuilder(length);
         for (int i = 0; i < length; i++) {

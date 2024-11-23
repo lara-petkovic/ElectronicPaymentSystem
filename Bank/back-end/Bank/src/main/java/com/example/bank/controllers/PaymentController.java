@@ -57,8 +57,10 @@ public class PaymentController {
             if(issuerAccount==null){
                 return new ResponseEntity<>(paymentRequestForIssuerDto.Transaction, HttpStatus.NOT_FOUND);
             }
-            if(issuerAccount.getBalance()< paymentRequestForIssuerDto.Transaction.getAmount())
+            if(issuerAccount.getBalance()< paymentRequestForIssuerDto.Transaction.getAmount()) {
+                paymentRequestForIssuerDto.Transaction = transactionService.addFailedTransaction_Issuer(paymentRequestForIssuerDto);
                 return new ResponseEntity<>(paymentRequestForIssuerDto.Transaction, HttpStatus.FORBIDDEN);
+            }
             paymentRequestForIssuerDto.Transaction = transactionService.addTransaction_Issuer(paymentRequestForIssuerDto);
             issuerAccount.setBalance(issuerAccount.getBalance()- paymentRequestForIssuerDto.Transaction.getAmount());
             accountService.save(issuerAccount);
