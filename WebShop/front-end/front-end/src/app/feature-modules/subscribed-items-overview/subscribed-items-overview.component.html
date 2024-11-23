@@ -1,11 +1,28 @@
-
-<h1>Subscribed items</h1>
-<div *ngIf="itemDtos && itemDtos.length > 0; else noItems">
-    <div *ngFor="let item of itemDtos">
-      {{ item.name }}
-    </div>
-  </div>
-  <ng-template #noItems>
-    <p>No items found.</p>
-  </ng-template>
-  
+<html>
+  <head>
+    <link rel="stylesheet" href="subscribed-items-overview.component.css" />
+  </head>
+  <body>
+    <main>
+      <header class="header">
+        <h1>Subscribed Items</h1>
+      </header>
+      <section *ngIf="itemDtos && itemDtos.length > 0; else noItems" class="content">
+        <div class="item-list">
+          <div *ngFor="let item of itemDtos" class="item-card">
+            <h2 class="item-name">{{ item.name }}</h2>
+            <ul class="item-details">
+              <li *ngIf="item.isBusinessPackage">
+                <span>This package is a Business Package</span>
+              </li>             
+              <li><span>Price:</span> {{ item.price }}</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+      <ng-template #noItems>
+        <p class="no-items">No items found.</p>
+      </ng-template>
+    </main>
+  </body>
+</html>

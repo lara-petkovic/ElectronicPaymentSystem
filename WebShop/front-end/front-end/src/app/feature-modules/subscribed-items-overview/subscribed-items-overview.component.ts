@@ -1,9 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { List } from 'postcss/lib/list';
-import { Observable } from 'rxjs';
 import { AuthService } from 'src/app/infrastructure/auth/auth.service';
 import { ItemDto } from 'src/app/infrastructure/auth/model/itemDto.model';
-import { Service } from 'src/app/infrastructure/auth/model/service.model';
 import { FeatureModulesServicesService } from '../feature-modules-services.service';
 
 @Component({
