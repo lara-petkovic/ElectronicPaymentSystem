@@ -2,7 +2,6 @@ package com.example.bank.service;
 
 import com.example.bank.domain.model.PaymentRequest;
 import com.example.bank.domain.model.Transaction;
-import com.example.bank.service.dto.PaymentRequestForIssuerDto;
 import com.example.bank.service.dto.TransactionResultDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +21,9 @@ public class PspNotificationService {
         TransactionResultDto result = new TransactionResultDto();
         result.orderId = transaction.getMerchantOrderId();
         switch (transaction.getStatus()){
-            case "SUCCESS": {result.url = pr.getSuccessUrl(); break;}
-            case "FAILED": {result.url = pr.getFailedUrl(); break;}
-            default: {result.url = pr.getErrorUrl(); break;}
+            case "SUCCESS": {result.responseUrl = pr.getSuccessUrl(); break;}
+            case "FAILED": {result.responseUrl = pr.getFailedUrl(); break;}
+            default: {result.responseUrl = pr.getErrorUrl(); break;}
         }
 
         RestTemplate restTemplate = new RestTemplate();
