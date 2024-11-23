@@ -31,6 +31,12 @@ public class TradeWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+       /* String payload = message.getPayload();
+        if ("ping".equals(payload)) {
+            session.sendMessage(new TextMessage("pong"));
+            return;
+        }*/
+
         try {
             Map<String, Object> data = objectMapper.readValue(message.getPayload(), Map.class);
             String paymentOption = (String) data.get("name");
