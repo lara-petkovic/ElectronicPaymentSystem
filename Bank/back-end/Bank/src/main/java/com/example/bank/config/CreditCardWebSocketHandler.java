@@ -42,11 +42,15 @@ public class CreditCardWebSocketHandler extends TextWebSocketHandler {
         Account merchantAccount = accountService.getMerchantAccount(paymentRequest);
         Transaction transaction = transactionService.getTransactionByPaymentRequestId(paymentRequest.getId());
         if(!cardDetailsDto.isValidExpirationDate()){
-            emitErrorEvent(transaction);
+            emitFailedEvent(transaction);
         }
         if(merchantAccount!=null){
             if(checkPanNumber(cardDetailsDto)){
                 Account issuerAccount = accountService.getIssuerAccount(cardDetailsDto);
+                if(issuerAccount==null){
+                    emitFailedEvent(transaction);
+                    return;
+                }
                 if(issuerAccount.getBalance()>=paymentRequest.getAmount()){
                     issuerAccount.setBalance(issuerAccount.getBalance()-paymentRequest.getAmount());
                     merchantAccount.setBalance(merchantAccount.getBalance()+paymentRequest.getAmount());
