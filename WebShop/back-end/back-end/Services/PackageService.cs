@@ -13,6 +13,10 @@ namespace back_end.Services
             _context = context;
         }
 
+        public Package Get(int id)
+        {
+            return _context.Packages.Where(p => p.Id == id).FirstOrDefault();
+        }
         public async Task<List<Package>> GetPackagesAsync()
         {
             return await _context.Packages
