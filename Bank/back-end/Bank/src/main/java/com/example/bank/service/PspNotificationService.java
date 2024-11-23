@@ -16,7 +16,7 @@ public class PspNotificationService {
     private TransactionService transactionService;
     @Autowired
     private PaymentRequestService paymentRequestService;
-    private String gatewayUrl = "http://localhost:8087/api/payments";
+    private String gatewayUrl = "http://localhost:8087/api/response";
     public void sendTransactionResult(Transaction transaction){
         PaymentRequest pr = paymentRequestService.getPaymentRequest(transaction.getPaymentRequestId());
         TransactionResultDto result = new TransactionResultDto();
@@ -36,7 +36,7 @@ public class PspNotificationService {
             String body = objectMapper.writeValueAsString(result);
 
             HttpEntity<String> entity = new HttpEntity<>(body, headers);
-            //restTemplate.exchange(gatewayUrl, HttpMethod.POST, entity, Object.class);
+            restTemplate.exchange(gatewayUrl, HttpMethod.POST, entity, Object.class);
         }
         catch(Exception e){
             //nista
