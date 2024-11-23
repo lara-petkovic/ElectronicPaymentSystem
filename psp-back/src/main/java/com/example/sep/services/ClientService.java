@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import java.security.SecureRandom;
 
 @Service
-public class ClientService implements IClientService{
+public class ClientService implements IClientService {
     @Autowired
     private ClientRepository clientRepository;
 
@@ -28,27 +28,25 @@ public class ClientService implements IClientService{
         String merchantId=generateRandomString();
         client.setMerchantId(merchantId);
         client.setMerchantPass(generateRandomString());
+        client.setPort(address);
         this.clientRepository.save(client);
         SendCredentials(client,address);
         return new ClientAuthenticationDataDto(client.getMerchantId(),client.getMerchantPass());
     }
 
+
     private void SendCredentials(Client client, String address){
-        RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:5275/api/psp-subscription/credentials";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Location", address);
-
-        // Create the JSON body
-        String body = "{ \"MerchantId\" : \"" + client.getMerchantId() + "\", \"MerchantPass\" : \"" + client.getMerchantPass() + "\" }";
-
-        // Set up the HTTP entity with headers and body
-        HttpEntity<String> entity = new HttpEntity<>(body, headers);
-
-        // Send the POST request
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+//        RestTemplate restTemplate = new RestTemplate();
+//        String url = "http://localhost:5275/api/psp-subscription/credentials";
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+//        headers.set("Location", address);
+//
+//        String body = "{ \"MerchantId\" : \"" + client.getMerchantId() + "\", \"MerchantPass\" : \"" + client.getMerchantPass() + "\" }";
+//
+//        HttpEntity<String> entity = new HttpEntity<>(body, headers);
+//        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
 
         //SEND TO BANK
@@ -58,10 +56,8 @@ public class ClientService implements IClientService{
         HttpHeaders headersbank = new HttpHeaders();
         headersbank.setContentType(MediaType.APPLICATION_JSON);
 
-        // Create the JSON body
         String bodybank = "{ \"MerchantId\" : \"" + client.getMerchantId() + "\", \"MerchantPassword\" : \"" + client.getMerchantPass() + "\", \"HolderName\" : \"" + "WS"+client.getMerchantId() +"\" }";
 
-        // Set up the HTTP entity with headers and body
         HttpEntity<String> entityBank = new HttpEntity<>(bodybank, headersbank);
 
         // Send the POST request
@@ -70,13 +66,20 @@ public class ClientService implements IClientService{
     }
     @Override
     public ClientSubscriptionDto getSubscription(NewTransactionDto newTransactionDto) {
-        Client client=clientRepository.getClientByMerchantId(newTransactionDto.merchantId);
-        if(client!=null && client.getMerchantPass().equals(newTransactionDto.getMerchantPass())){
+        Client client=clientRepository.getClientByPort(newTransactionDto.port);
+        if(client != null) {
             return new ClientSubscriptionDto(client.getSubscription(),client.getMerchantId(),newTransactionDto.getMerchantOrderId());
         }
         return null;
     }
 
+    public Client getClientByPort(String port){
+        return clientRepository.getClientByPort(port);
+    }
+    @Override
+    public Client getClientByMerchantId(String merchantId) {
+        return clientRepository.getClientByMerchantId(merchantId);
+    }
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private static final SecureRandom random = new SecureRandom();

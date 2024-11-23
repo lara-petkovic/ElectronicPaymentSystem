@@ -9,5 +9,6 @@
         public string Status {  get; set; }
         public int? PurcasedServiceId { get; set; }
         public int? PurchasedPackageId { get; set; }
+        public Transaction() { }
     }
 }

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface IClientService {
-    public ClientAuthenticationDataDto create(Client client, String address);
-    public ClientSubscriptionDto getSubscription(NewTransactionDto newTransactionDto);
+    ClientAuthenticationDataDto create(Client client, String address);
+    ClientSubscriptionDto getSubscription(NewTransactionDto newTransactionDto);
+    Client getClientByMerchantId(String merchantId);
+    Client getClientByPort(String port);
 }

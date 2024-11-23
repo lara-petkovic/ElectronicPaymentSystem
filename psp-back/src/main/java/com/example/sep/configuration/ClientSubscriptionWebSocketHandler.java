@@ -20,7 +20,7 @@ public class ClientSubscriptionWebSocketHandler extends TextWebSocketHandler {
     private ClientRepository clientRepository;
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+    public void afterConnectionEstablished(WebSocketSession session) {
         sessions.add(session);
     }
     public void broadcastMessage(String message) throws Exception{
@@ -31,6 +31,12 @@ public class ClientSubscriptionWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+       /* String payload = message.getPayload();
+        if ("ping".equals(payload)) {
+            session.sendMessage(new TextMessage("pong"));
+            return;
+        }*/
+
         try {
             Map<String, Object> data = objectMapper.readValue(message.getPayload(), Map.class);
             String address = (String) data.get("clientId");
@@ -45,11 +51,10 @@ public class ClientSubscriptionWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private void createClient(String subscription, String address){
-        Client client=new Client();
+    private void createClient(String subscription, String address) {
+        Client client = new Client();
         client.setSubscription(subscription);
-        ClientService clientService=new ClientService(clientRepository);
+        ClientService clientService = new ClientService(clientRepository);
         clientService.create(client, address);
-
     }
 }

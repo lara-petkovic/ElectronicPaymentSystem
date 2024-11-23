@@ -40,8 +40,7 @@ public class RouteConfiguration {
                             return chain.filter(updatedExchange);
 
                         }))
-                        .uri("http://localhost")) 
+                        .uri("http://localhost"))
                 .build();
     }
-
 }

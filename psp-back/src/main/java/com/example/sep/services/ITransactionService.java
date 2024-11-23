@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface ITransactionService {
-    public Transaction SaveTransaction(Transaction transaction);
-    public Transaction GetTransactionByMerchantIdAndMerchantOrderId(String merchantId, Integer merchantOdrderId);
+    Transaction SaveTransaction(Transaction transaction);
+    Transaction GetTransactionByMerchantIdAndMerchantOrderId(String merchantId, Integer merchantOdrderId);
+    Transaction GetTransactionByOrderId(Long orderId);
 }
