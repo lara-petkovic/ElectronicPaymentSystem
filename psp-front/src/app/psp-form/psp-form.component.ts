@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Router } from '@angular/router';
 
 interface Card {
   name: string;
@@ -10,12 +11,17 @@ interface Card {
   templateUrl: './psp-form.component.html',
   styleUrls: ['./psp-form.component.css']
 })
-export class PspFormComponent {
+export class PspFormComponent implements OnInit{
   @Output() paymentMethodSelected = new EventEmitter<{ name: string; orderid: string | null; merchantid: string | null }>();
 
+  constructor(private router: Router){}
   selectedRow: any = null;
   header: string = "Choose one payment method";
   cards: Card[] = [];
+
+  ngOnInit(): void {
+    this.selectedRow = null;
+  }
 
   private _paymentOptions: string = '';
 
@@ -32,16 +38,22 @@ export class PspFormComponent {
   displayedColumns: string[] = ['name'];
 
   selectCard(card: any) {
+    if(card.name!=='Card'){
+      alert('Payment option not supported yet.');
+      this.selectedRow = null;
+      return;
+    }
     if (this.selectedRow === card) {
       return;
     }
     this.selectedRow = card;
-    this.header = "Chosen payment method - " + card.name;
+    alert('chosen payment method : '+card.name);
     const jsonString = this._paymentOptions
     .replace(/'/g, '"')
     .replace(/(\w+)=/g, '"$1":');
     const data = JSON.parse(jsonString);
     this.paymentMethodSelected.emit({ name: card.name, orderid: data.orderId, merchantid: data.merchantId });
+    this.selectedRow = null;
   }
 
   private updateCards() {

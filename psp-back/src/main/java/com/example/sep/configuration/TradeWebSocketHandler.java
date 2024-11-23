@@ -1,7 +1,9 @@
 package com.example.sep.configuration;
 
+import com.example.sep.models.Client;
 import com.example.sep.models.Transaction;
 import com.example.sep.repositories.TransactionRepository;
+import com.example.sep.services.ClientService;
 import com.example.sep.services.TransactionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +20,8 @@ public class TradeWebSocketHandler extends TextWebSocketHandler {
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private TransactionRepository transactionRepository;
-
+    @Autowired
+    private ClientService clientService;
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
             sessions.add(session);
@@ -43,6 +46,8 @@ public class TradeWebSocketHandler extends TextWebSocketHandler {
             Integer orderid = (Integer) data.get("orderid");
             String merchantid = (String) data.get("merchantid");
 
+            Client client = clientService.getClientByMerchantId(merchantid);
+
             TransactionService transactionService=new TransactionService(this.transactionRepository);
             Transaction transaction=transactionService.GetTransactionByMerchantIdAndMerchantOrderId(merchantid,orderid);
             System.out.println("Received payment opotion: " + paymentOption + ", ID: " + orderid+merchantid);
@@ -52,23 +57,23 @@ public class TradeWebSocketHandler extends TextWebSocketHandler {
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("Payment", paymentOption);
+            //headers.set("Payment", paymentOption);
 
             // Create the JSON body
             String body = "{ \"MerchantId\" : \"" + transaction.getMerchantId() + "\", " +
-                    "\"MerchantPassword\" : \"" + transaction.getMerchantPass() + "\", " +
+                    "\"MerchantPassword\" : \"" + client.getMerchantPass() + "\", " +
                     "\"Amount\" : \"" + transaction.getAmount() + "\", " +
                     "\"MerchantOrderId\" : \"" + transaction.getOrderId() + "\", " +
                     "\"MerchantTimestamp\" : \"" + transaction.getTimestamp() + "\", " +
                     "\"SuccessUrl\" : \"http://localhost:4201/success\", " +
                     "\"FailedUrl\" : \"http://localhost:4201/fail\", " +
-                    "\"Error\" : \"http://localhost:4201/error\" }";
+                    "\"ErrorUrl\" : \"http://localhost:4201/error\" }";
 
             // Set up the HTTP entity with headers and body
             HttpEntity<String> entity = new HttpEntity<>(body, headers);
 
             // Send the POST request
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+            restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
 
         } catch (Exception e) {

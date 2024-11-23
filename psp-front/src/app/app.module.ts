@@ -11,6 +11,7 @@ import { SuccessPageComponent } from './success-page/success-page.component';
 import { FailedPageComponent } from './failed-page/failed-page.component';
 import { ErrorPageComponent } from './error-page/error-page.component';
 import { RouterModule } from '@angular/router';
+import { HomeComponent } from './home/home.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { RouterModule } from '@angular/router';
     PspClientRegComponent,
     SuccessPageComponent,
     FailedPageComponent,
-    ErrorPageComponent
+    ErrorPageComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,

@@ -126,6 +126,9 @@ export class AppComponent {
     const message = JSON.stringify(selectedOption);
     this.webSocket.send(message);
     console.log('Sent option:', message);
+    this.showClientReg = false;
+    this.showPaymentForm = false;
+    this.router.navigate(['home'])
   }
 
   handleOptionSelected(option: { name: string; clientId: string | null }) {
