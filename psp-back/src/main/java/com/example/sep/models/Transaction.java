@@ -25,10 +25,8 @@ public class Transaction {
     public Transaction(NewTransactionDto newTransactionDto){
         this.amount=newTransactionDto.getAmount();
         this.orderId=newTransactionDto.getMerchantOrderId();
-        this.merchantId= newTransactionDto.getMerchantId();
-        this.merchantPass= newTransactionDto.getMerchantPass();
+        this.merchantId= newTransactionDto.getPort();
         this.timestamp=newTransactionDto.getMerchantTimestamp();
-
     }
     public Long getTransactionId() {
         return transactionId;

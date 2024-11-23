@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import java.security.SecureRandom;
 
 @Service
-public class ClientService implements IClientService{
+public class ClientService implements IClientService {
     @Autowired
     private ClientRepository clientRepository;
 
@@ -36,17 +36,17 @@ public class ClientService implements IClientService{
 
 
     private void SendCredentials(Client client, String address){
-        RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:5275/api/psp-subscription/credentials";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Location", address);
-
-        String body = "{ \"MerchantId\" : \"" + client.getMerchantId() + "\", \"MerchantPass\" : \"" + client.getMerchantPass() + "\" }";
-
-        HttpEntity<String> entity = new HttpEntity<>(body, headers);
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+//        RestTemplate restTemplate = new RestTemplate();
+//        String url = "http://localhost:5275/api/psp-subscription/credentials";
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+//        headers.set("Location", address);
+//
+//        String body = "{ \"MerchantId\" : \"" + client.getMerchantId() + "\", \"MerchantPass\" : \"" + client.getMerchantPass() + "\" }";
+//
+//        HttpEntity<String> entity = new HttpEntity<>(body, headers);
+//        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
 
         //SEND TO BANK
@@ -66,8 +66,8 @@ public class ClientService implements IClientService{
     }
     @Override
     public ClientSubscriptionDto getSubscription(NewTransactionDto newTransactionDto) {
-        Client client=clientRepository.getClientByMerchantId(newTransactionDto.merchantId);
-        if(client!=null && client.getMerchantPass().equals(newTransactionDto.getMerchantPass())){
+        Client client=clientRepository.getClientByMerchantId(newTransactionDto.port);
+        if(client != null && client.getMerchantPass().equals(newTransactionDto.getPort())) {
             return new ClientSubscriptionDto(client.getSubscription(),client.getMerchantId(),newTransactionDto.getMerchantOrderId());
         }
         return null;

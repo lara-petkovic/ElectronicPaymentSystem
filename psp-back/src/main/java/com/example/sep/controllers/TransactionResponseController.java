@@ -28,7 +28,6 @@ public class TransactionResponseController {
 
     @PostMapping
     public void HandleTransactionResponse(@RequestBody TransactionResponseDto transactionResponseDto) throws Exception {
-        System.out.println("LARAAAAAAAAAAAAAAAAAA");
         System.out.println(transactionResponseDto.responseUrl);
         transactionResponseHandler.broadcastMessage(transactionResponseDto.responseUrl);
         if(transactionResponseDto.responseUrl.contains("success")) {

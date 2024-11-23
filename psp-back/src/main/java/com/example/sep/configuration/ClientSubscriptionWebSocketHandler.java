@@ -20,7 +20,7 @@ public class ClientSubscriptionWebSocketHandler extends TextWebSocketHandler {
     private ClientRepository clientRepository;
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+    public void afterConnectionEstablished(WebSocketSession session) {
         sessions.add(session);
     }
     public void broadcastMessage(String message) throws Exception{
@@ -45,11 +45,10 @@ public class ClientSubscriptionWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private void createClient(String subscription, String address){
-        Client client=new Client();
+    private void createClient(String subscription, String address) {
+        Client client = new Client();
         client.setSubscription(subscription);
-        ClientService clientService=new ClientService(clientRepository);
+        ClientService clientService = new ClientService(clientRepository);
         clientService.create(client, address);
-
     }
 }

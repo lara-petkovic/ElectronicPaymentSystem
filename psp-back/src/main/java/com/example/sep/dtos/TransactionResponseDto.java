@@ -3,9 +3,7 @@ package com.example.sep.dtos;
 public class TransactionResponseDto {
     public String responseUrl;
     public long orderId;
-    public TransactionResponseDto() {
-
-    }
+    public TransactionResponseDto() { }
 
     public String getResponseUrl() {
         return responseUrl;

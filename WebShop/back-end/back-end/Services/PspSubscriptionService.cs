@@ -28,11 +28,10 @@ namespace back_end.Services
             }
         }
 
-        public async Task ProcessTransactionAsync(Transaction transaction, MerchantCredentials merchantCredentials)
+        public async Task ProcessTransactionAsync(Transaction transaction)
         {
             var jsonData = new StringContent(
-                $"{{\"merchantId\":\"{merchantCredentials.MerchantId}\", " +
-                $"\"merchantPass\":\"{merchantCredentials.MerchantPass}\", " +
+                $"{{\"port\":\"{"5275"}\", " +
                 $"\"amount\": {transaction.Amount}, " +
                 $"\"merchantOrderId\": {transaction.Id}, " +
                 $"\"merchantTimestamp\": {transaction.Timestamp}}}", 

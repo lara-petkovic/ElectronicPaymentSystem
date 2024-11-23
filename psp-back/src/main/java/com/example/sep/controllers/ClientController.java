@@ -27,7 +27,7 @@ public class ClientController {
     }
     @PostMapping
     public NewClientDto CreateClient(@RequestBody NewClientDto newClient) throws Exception {
-        List<PaymentOption> paymentOptionList=paymentOptionService.getAll();
+        List<PaymentOption> paymentOptionList = paymentOptionService.getAll();
         StringBuilder message= new StringBuilder(newClient.apiKey + ",");
         for(int i=0;i<paymentOptionList.size()-1;i++){
             message.append(paymentOptionList.get(i).getOption()).append(" ");

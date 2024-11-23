@@ -1,37 +1,20 @@
 package com.example.sep.dtos;
 
 public class NewTransactionDto {
-    public String merchantId;
-    public String merchantPass;
+    public String port;
     public Double amount;
     public Long merchantOrderId;
     public Long merchantTimestamp;
-    public NewTransactionDto(){}
+    public NewTransactionDto() {}
 
-    public NewTransactionDto(String merchantId, String merchantPass, Double amount, Long merchantOrderId, Long merchantTimestamp) {
-        this.merchantId = merchantId;
-        this.merchantPass = merchantPass;
+    public NewTransactionDto(String port, Double amount, Long merchantOrderId, Long merchantTimestamp) {
+        this.port = port;
         this.amount = amount;
         this.merchantOrderId = merchantOrderId;
         this.merchantTimestamp = merchantTimestamp;
     }
-
-    public String getMerchantId() {
-        return merchantId;
-    }
-
-    public void setMerchantId(String merchantId) {
-        this.merchantId = merchantId;
-    }
-
-    public String getMerchantPass() {
-        return merchantPass;
-    }
-
-    public void setMerchantPass(String merchantPass) {
-        this.merchantPass = merchantPass;
-    }
-
+    public String getPort() { return port; }
+    public void setPort(String port) { this.port = port; }
     public Double getAmount() {
         return amount;
     }

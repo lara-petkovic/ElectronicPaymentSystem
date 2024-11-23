@@ -26,25 +26,25 @@ namespace back_end.Controllers
             this._pspSubscriptionService.CreateSubscription();
         }
 
-        [HttpPost("credentials")]
-        public async Task<IActionResult> CreateMerchantAuthCredentials([FromBody] MerchantCredentialsDto merchantCredentialsDto)
-        {
-            await _merchantCredentialsService.SaveMerchantCredentialsAsync(merchantCredentialsDto.MerchantId, merchantCredentialsDto.MerchantPass);
-            return Ok("Merchant credentials saved successfully");
-        }
+        //[HttpPost("credentials")]
+        //public async Task<IActionResult> CreateMerchantAuthCredentials([FromBody] MerchantCredentialsDto merchantCredentialsDto)
+        //{
+        //    await _merchantCredentialsService.SaveMerchantCredentialsAsync(merchantCredentialsDto.MerchantId, merchantCredentialsDto.MerchantPass);
+        //    return Ok("Merchant credentials saved successfully");
+        //}
 
         [HttpPost("transaction")]
         public async Task<IActionResult> ProcessTransaction([FromBody] Transaction newTransaction)
         {
-            var credentials = await _merchantCredentialsService.GetMerchantCredentialsAsync();
+            //var credentials = await _merchantCredentialsService.GetMerchantCredentialsAsync();
 
-            if (credentials == null)
-            {
-                return BadRequest("Merchant credentials not found");
-            }
+            //if (credentials == null)
+            //{
+            //    return BadRequest("Merchant credentials not found");
+            //}
 
             var savedTransaction = await _transactionService.SaveTransaction(newTransaction);
-            await _pspSubscriptionService.ProcessTransactionAsync(savedTransaction, credentials);
+            await _pspSubscriptionService.ProcessTransactionAsync(savedTransaction);
 
             return Ok("Transaction saved and processed successfully");
         }
