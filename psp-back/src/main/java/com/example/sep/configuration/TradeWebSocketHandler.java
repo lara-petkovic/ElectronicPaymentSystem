@@ -42,7 +42,7 @@ public class TradeWebSocketHandler extends TextWebSocketHandler {
             System.out.println("Received payment opotion: " + paymentOption + ", ID: " + orderid+merchantid);
 
             RestTemplate restTemplate = new RestTemplate();
-            String url = "http://localhost:8086/api/payments";
+            String url = "http://localhost:8052/api/payments";
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);

@@ -4,10 +4,10 @@ public class NewTransactionDto {
     public String port;
     public Double amount;
     public Long merchantOrderId;
-    public Long merchantTimestamp;
+    public String merchantTimestamp;
     public NewTransactionDto() {}
 
-    public NewTransactionDto(String port, Double amount, Long merchantOrderId, Long merchantTimestamp) {
+    public NewTransactionDto(String port, Double amount, Long merchantOrderId, String merchantTimestamp) {
         this.port = port;
         this.amount = amount;
         this.merchantOrderId = merchantOrderId;
@@ -31,11 +31,11 @@ public class NewTransactionDto {
         this.merchantOrderId = merchantOrderId;
     }
 
-    public Long getMerchantTimestamp() {
+    public String getMerchantTimestamp() {
         return merchantTimestamp;
     }
 
-    public void setMerchantTimestamp(Long merchantTimestamp) {
+    public void setMerchantTimestamp(String merchantTimestamp) {
         this.merchantTimestamp = merchantTimestamp;
     }
 }

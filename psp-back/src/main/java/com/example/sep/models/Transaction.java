@@ -10,7 +10,6 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "transactionId", unique = true, nullable = false)
     private Long transactionId;
-
     @Column(name = "amount")
     private Double amount;
     @Column(name = "merchantId")
@@ -20,12 +19,12 @@ public class Transaction {
     @Column(name = "orderId")
     private Long orderId;
     @Column(name = "timestamp")
-    private Long timestamp;
+    private String timestamp;
 
-    public Transaction(NewTransactionDto newTransactionDto){
+    public Transaction(NewTransactionDto newTransactionDto, String merchantId){
         this.amount=newTransactionDto.getAmount();
         this.orderId=newTransactionDto.getMerchantOrderId();
-        this.merchantId= newTransactionDto.getPort();
+        this.merchantId= merchantId;
         this.timestamp=newTransactionDto.getMerchantTimestamp();
     }
     public Long getTransactionId() {
@@ -68,16 +67,16 @@ public class Transaction {
         this.orderId = orderId;
     }
 
-    public Long getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Long timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 
     public Transaction(){}
-    public Transaction(Long transactionId, Double amount, String merchantId, String merchantPass, Long orderId, Long timestamp) {
+    public Transaction(Long transactionId, Double amount, String merchantId, String merchantPass, Long orderId, String timestamp) {
         this.transactionId = transactionId;
         this.amount = amount;
         this.merchantId = merchantId;

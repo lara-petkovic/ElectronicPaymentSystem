@@ -66,13 +66,16 @@ public class ClientService implements IClientService {
     }
     @Override
     public ClientSubscriptionDto getSubscription(NewTransactionDto newTransactionDto) {
-        Client client=clientRepository.getClientByMerchantId(newTransactionDto.port);
-        if(client != null && client.getMerchantPass().equals(newTransactionDto.getPort())) {
+        Client client=clientRepository.getClientByPort(newTransactionDto.port);
+        if(client != null) {
             return new ClientSubscriptionDto(client.getSubscription(),client.getMerchantId(),newTransactionDto.getMerchantOrderId());
         }
         return null;
     }
 
+    public Client getClientByPort(String port){
+        return clientRepository.getClientByPort(port);
+    }
     @Override
     public Client getClientByMerchantId(String merchantId) {
         return clientRepository.getClientByMerchantId(merchantId);

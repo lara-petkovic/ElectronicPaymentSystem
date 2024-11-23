@@ -3,6 +3,7 @@ package com.example.sep.controllers;
 import com.example.sep.configuration.TradeWebSocketHandler;
 import com.example.sep.dtos.ClientSubscriptionDto;
 import com.example.sep.dtos.NewTransactionDto;
+import com.example.sep.models.Client;
 import com.example.sep.models.Transaction;
 import com.example.sep.services.IClientService;
 import com.example.sep.services.ITransactionService;
@@ -29,12 +30,12 @@ public class TransactionController {
     @PostMapping
     public NewTransactionDto CreateTransaction(@RequestBody NewTransactionDto transaction, HttpServletRequest request) throws Exception {
         String port = Integer.toString(request.getRemotePort());
-        transaction.setPort(port);
+        //transaction.setPort(port);
         ClientSubscriptionDto clientSubscriptionDto = clientService.getSubscription(transaction);
-
+        Client c = clientService.getClientByPort(transaction.port);
         if(clientSubscriptionDto != null) {
             tradeWebSocketHandler.broadcastMessage(clientSubscriptionDto.toString());
-            this.transactionService.SaveTransaction(new Transaction(transaction));
+            this.transactionService.SaveTransaction(new Transaction(transaction, c.getMerchantId()));
         }
         return  transaction;
     }

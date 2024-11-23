@@ -11,4 +11,5 @@ public interface IClientService {
     ClientAuthenticationDataDto create(Client client, String address);
     ClientSubscriptionDto getSubscription(NewTransactionDto newTransactionDto);
     Client getClientByMerchantId(String merchantId);
+    Client getClientByPort(String port);
 }
