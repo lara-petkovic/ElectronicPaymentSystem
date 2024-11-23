@@ -14,7 +14,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(tradeWebSocketHandler(), "/transactions").setAllowedOrigins("*");
         registry.addHandler(clientSubscriptionWebSocketHandler(), "/clients").setAllowedOrigins("*");
-
+        registry.addHandler(transactionResponseHandler(), "/responses").setAllowedOrigins("*");
     }
     @Bean
     public ClientSubscriptionWebSocketHandler clientSubscriptionWebSocketHandler() {
@@ -23,5 +23,9 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     @Bean
     public TradeWebSocketHandler tradeWebSocketHandler() {
         return new TradeWebSocketHandler();
+    }
+    @Bean
+    public TransactionResponseHandler transactionResponseHandler() {
+        return new TransactionResponseHandler();
     }
 }

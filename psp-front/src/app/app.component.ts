@@ -14,12 +14,14 @@ export class AppComponent {
   showPaymentForm = false;
   private webSocket: WebSocket;
   private webSocketClient: WebSocket;
+  private webSocketResponse: WebSocket;
   paymentOptions: string = '';
   optionsP: string ='';
 
   constructor(private router: Router) {
     this.webSocket = new WebSocket('ws://localhost:8085/transactions');
     this.webSocketClient = new WebSocket('ws://localhost:8085/clients');
+    this.webSocketResponse = new WebSocket('ws//localhost:8085/responses');
 
     this.webSocket.onmessage = (event) => {
       console.log(event.data);
@@ -41,6 +43,21 @@ export class AppComponent {
             console.log('Parsed options:', this.optionsP);
 
       this.router.navigate(['/app-psp-client-reg']);
+    };
+
+    this.webSocketResponse.onmessage = (event) => {
+      console.log(event.data);
+      this.showPaymentForm = false;
+      this.showClientReg = false;
+      if(event.data.includes("success")) {
+        this.router.navigate(['success']);
+      }
+      if(event.data.includes("error")) {
+        this.router.navigate(['error']);
+      }
+      if(event.data.includes("fail")) {
+        this.router.navigate(['fail']);
+      }
     };
   }
 

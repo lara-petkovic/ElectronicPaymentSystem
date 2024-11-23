@@ -4,10 +4,18 @@ import jakarta.persistence.*;
 
 @Entity
 public class Client {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", unique = true, nullable = false)
+    private Long id;
     @Column(name="merchantId")
     private String merchantId;
     @Column(name="merchantPass")
     private String merchantPass;
+    @Column(name="port")
+    private String port;
+    @Column(name="subscription")
+    private String subscription;
 
     public String getSubscription() {
         return subscription;
@@ -16,13 +24,6 @@ public class Client {
     public void setSubscription(String subscription) {
         this.subscription = subscription;
     }
-
-    @Column(name="subscription")
-    private String subscription;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", unique = true, nullable = false)
-    private Long id;
 
     public String getMerchantId() {
         return merchantId;
@@ -46,5 +47,11 @@ public class Client {
 
     public Long getId() {
         return id;
+    }
+    public String getPort() {
+        return port;
+    }
+    public void setPort(String port) {
+        this.port = port;
     }
 }

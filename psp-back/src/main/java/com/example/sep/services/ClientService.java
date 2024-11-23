@@ -28,10 +28,12 @@ public class ClientService implements IClientService{
         String merchantId=generateRandomString();
         client.setMerchantId(merchantId);
         client.setMerchantPass(generateRandomString());
+        client.setPort(address);
         this.clientRepository.save(client);
         SendCredentials(client,address);
         return new ClientAuthenticationDataDto(client.getMerchantId(),client.getMerchantPass());
     }
+
 
     private void SendCredentials(Client client, String address){
         RestTemplate restTemplate = new RestTemplate();
@@ -41,13 +43,9 @@ public class ClientService implements IClientService{
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Location", address);
 
-        // Create the JSON body
         String body = "{ \"MerchantId\" : \"" + client.getMerchantId() + "\", \"MerchantPass\" : \"" + client.getMerchantPass() + "\" }";
 
-        // Set up the HTTP entity with headers and body
         HttpEntity<String> entity = new HttpEntity<>(body, headers);
-
-        // Send the POST request
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
 
@@ -58,10 +56,8 @@ public class ClientService implements IClientService{
         HttpHeaders headersbank = new HttpHeaders();
         headersbank.setContentType(MediaType.APPLICATION_JSON);
 
-        // Create the JSON body
         String bodybank = "{ \"MerchantId\" : \"" + client.getMerchantId() + "\", \"MerchantPassword\" : \"" + client.getMerchantPass() + "\", \"HolderName\" : \"" + "WS"+client.getMerchantId() +"\" }";
 
-        // Set up the HTTP entity with headers and body
         HttpEntity<String> entityBank = new HttpEntity<>(bodybank, headersbank);
 
         // Send the POST request
@@ -77,6 +73,10 @@ public class ClientService implements IClientService{
         return null;
     }
 
+    @Override
+    public Client getClientByMerchantId(String merchantId) {
+        return clientRepository.getClientByMerchantId(merchantId);
+    }
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private static final SecureRandom random = new SecureRandom();
