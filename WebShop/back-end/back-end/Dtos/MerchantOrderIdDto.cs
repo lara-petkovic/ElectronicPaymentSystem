@@ -2,6 +2,7 @@
 {
     public class MerchantOrderIdDto
     {
-        public String MerchantOrderId {  get; set; }
+        public long MerchantOrderId {  get; set; }
+        public String Status {  get; set; }
     }
 }

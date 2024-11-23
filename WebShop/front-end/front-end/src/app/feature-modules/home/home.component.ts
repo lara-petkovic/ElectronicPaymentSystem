@@ -86,4 +86,8 @@ export class HomeComponent implements OnInit {
   onSubscribe(): void {
     this.authService.subscribe();
   }
+
+  openMySubscriptions() {
+    this.router.navigate(['/my-subscriptions']);
+  }
 }

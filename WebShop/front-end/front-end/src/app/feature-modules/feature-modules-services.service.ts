@@ -7,6 +7,7 @@ import { Service } from '../infrastructure/auth/model/service.model';
 import { environment } from 'src/env/environment';
 import { Package } from '../infrastructure/auth/model/package.model';
 import { Subscription } from '../infrastructure/auth/model/subscription.model';
+import { ItemDto } from '../infrastructure/auth/model/itemDto.model';
 
 @Injectable({
   providedIn: 'root'
@@ -29,5 +30,9 @@ export class FeatureModulesServicesService {
 
   createSubscription(subscription: Subscription): Observable<Subscription> {
     return this.http.post<Subscription>(`${environment.apiHost}/subscriptions`, subscription);
+  }
+
+  getItemDtos(loggedUserId: number): Observable<ItemDto[]> {
+    return this.http.get<ItemDto[]>(`${environment.apiHost}/response/`+ loggedUserId);
   }
 }
