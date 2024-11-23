@@ -14,8 +14,7 @@ public class Transaction {
     private Double amount;
     @Column(name = "merchantId")
     private String merchantId;
-    @Column(name = "merchantPass")
-    private String merchantPass;
+
     @Column(name = "orderId")
     private Long orderId;
     @Column(name = "timestamp")
@@ -51,13 +50,7 @@ public class Transaction {
         this.merchantId = merchantId;
     }
 
-    public String getMerchantPass() {
-        return merchantPass;
-    }
 
-    public void setMerchantPass(String merchantPass) {
-        this.merchantPass = merchantPass;
-    }
 
     public Long getOrderId() {
         return orderId;
@@ -76,12 +69,5 @@ public class Transaction {
     }
 
     public Transaction(){}
-    public Transaction(Long transactionId, Double amount, String merchantId, String merchantPass, Long orderId, String timestamp) {
-        this.transactionId = transactionId;
-        this.amount = amount;
-        this.merchantId = merchantId;
-        this.merchantPass = merchantPass;
-        this.orderId = orderId;
-        this.timestamp = timestamp;
-    }
+
 }
