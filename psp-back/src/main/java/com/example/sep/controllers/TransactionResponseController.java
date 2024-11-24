@@ -33,7 +33,15 @@ public class TransactionResponseController {
         System.out.println(transactionResponseDto.responseUrl);
         transactionResponseHandler.broadcastMessage(transactionResponseDto.responseUrl);
 
-        setStatus(transactionResponseDto);
+        if(transactionResponseDto.responseUrl.contains("success")) {
+            status = "success";
+        }
+        if(transactionResponseDto.responseUrl.contains("fail")) {
+            status = "fail";
+        }
+        if(transactionResponseDto.responseUrl.contains("error")) {
+            status = "error";
+        }
 
         Transaction transaction = transactionService.GetTransactionByOrderId(transactionResponseDto.orderId);
         Client client = clientService.getClientByMerchantId(transaction.getMerchantId());
@@ -53,18 +61,5 @@ public class TransactionResponseController {
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
 
-    }
-
-    private static void setStatus(TransactionResponseDto transactionResponseDto) {
-        String status;
-        if(transactionResponseDto.responseUrl.contains("success")) {
-            status = "success";
-        }
-        if(transactionResponseDto.responseUrl.contains("fail")) {
-            status = "fail";
-        }
-        if(transactionResponseDto.responseUrl.contains("error")) {
-            status = "error";
-        }
     }
 }

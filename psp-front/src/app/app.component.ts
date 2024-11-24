@@ -128,7 +128,7 @@ export class AppComponent {
     console.log('Sent option:', message);
     this.showClientReg = false;
     this.showPaymentForm = false;
-    this.router.navigate(['home'])
+    this.router.navigate(['home']);
   }
 
   handleOptionSelected(option: { name: string; clientId: string | null }) {
@@ -136,5 +136,8 @@ export class AppComponent {
     const message = JSON.stringify(option);
     this.webSocketClient.send(message);
     console.log('Sent options:', message);
+    this.showClientReg = false;
+    this.showPaymentForm = false;
+    this.router.navigate(['home']);
   }
 }
