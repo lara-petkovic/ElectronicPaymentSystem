@@ -46,7 +46,7 @@ namespace back_end.Controllers
 
                     if(subscription != null)
                     {
-                        ItemDto item = new ItemDto(package, subscription.Status);
+                        ItemDto item = new ItemDto(package, subscription.Status, subscription.StartDate);
                         result.Add(item);
                     }
                 }

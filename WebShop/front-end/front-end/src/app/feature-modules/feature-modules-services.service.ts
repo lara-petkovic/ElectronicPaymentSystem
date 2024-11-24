@@ -42,6 +42,11 @@ export class FeatureModulesServicesService {
 
   cancelSubscription(userId: number, itemName: string, itemPrice: number): Observable<void> {
     const url = `${environment.apiHost}/subscriptions/cancel/${userId}/${itemName}/${itemPrice}`;
-    return this.http.put<void>(url, {}); // `itemName` should already be encoded
-  }  
+    return this.http.put<void>(url, {});
+  }
+
+  extendSubscription(userId: number, itemName: string, itemPrice: number, years: number): Observable<void> {
+    const url = `${environment.apiHost}/subscriptions/extend/${userId}/${itemName}/${itemPrice}/${years}`;
+    return this.http.put<void>(url, {});
+  }
 }

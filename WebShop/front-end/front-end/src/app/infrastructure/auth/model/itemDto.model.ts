@@ -5,5 +5,6 @@ export interface ItemDto {
     price : number,
     isBusinessPackage : boolean,
     isPackage : boolean,
-    status: string
+    status: string,
+    startDate?: string
 }

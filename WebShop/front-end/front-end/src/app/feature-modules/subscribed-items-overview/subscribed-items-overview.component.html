@@ -11,6 +11,7 @@
             <span>This package is a Business Package</span>
           </li>
           <li><span>Price:</span> {{ item.price }}</li>
+          <li><span>Created on:</span> {{ item.startDate }}</li>
         </ul>
         <div class="item-actions">
           <button *ngIf="item.status != 'CANCELED'" class="cancel-button" (click)="cancelSubscription(item.name, item.price)">

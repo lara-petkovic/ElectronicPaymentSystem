@@ -42,6 +42,22 @@ namespace back_end.Controllers
             return result;
         }
 
+        [HttpPut("extend/{userId}/{itemName}/{itemPrice}/{years}")]
+        public async Task<ActionResult> ExtendSubscription(int userId, string itemName, double itemPrice, int years)
+        {
+            var decodedItemName = Uri.UnescapeDataString(itemName);
+            var package = _packageService.GetPackageByNameAndPrice(decodedItemName, itemPrice);
+            var subscription = _subscriptionService.FindUsersSubscriptionByPackage(userId, package);
+
+            if (subscription == null)
+            {
+                return NotFound("Subscription not found.");
+            }
+
+            var result = await _subscriptionService.ExtendSubscription(subscription, years);
+            return result;
+        }
+
 
         [HttpPost]
         public async Task<ActionResult<Subscription>> CreateSubscription([FromBody] Subscription subscription)

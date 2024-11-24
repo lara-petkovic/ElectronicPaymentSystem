@@ -2,7 +2,6 @@
 using back_end.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Http;
 using System.Text;
 
 namespace back_end.Services
@@ -48,6 +47,30 @@ namespace back_end.Services
             }
         }
 
+        public async Task<ActionResult> ExtendSubscription(Subscription subscription, int years)
+        {
+            var existingSubscription = await _context.Subscriptions
+                .FirstOrDefaultAsync(s => s.UserId == subscription.UserId && s.PackageId == subscription.PackageId);
+
+            if (existingSubscription == null)
+            {
+                return new NotFoundObjectResult("Subscription not found.");
+            }
+
+            existingSubscription.StartDate = existingSubscription.StartDate.AddYears(years);
+            _context.Subscriptions.Update(existingSubscription);
+
+            var result = await _context.SaveChangesAsync();
+
+            if (result > 0)
+            {
+                return new OkObjectResult("Subscription successfully extended.");
+            }
+            else
+            {
+                return new BadRequestObjectResult("Error occurred while extending the subscription.");
+            }
+        }
 
         public async Task<Subscription> CreateSubscription(Subscription subscription)
         {

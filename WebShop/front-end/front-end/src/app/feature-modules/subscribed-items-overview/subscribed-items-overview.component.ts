@@ -30,6 +30,7 @@ export class SubscribedItemsOverviewComponent implements OnInit {
       }
     });
   }
+
   cancelSubscription(itemName: string, itemPrice: number): void {
     const encodedItemName = encodeURIComponent(itemName);
     this.service.cancelSubscription(this.userId, encodedItemName, itemPrice).subscribe({
@@ -42,13 +43,11 @@ export class SubscribedItemsOverviewComponent implements OnInit {
         console.error('Error canceling subscription:', err);
       }
     });
-    this.loadItemDtos();
-    console.log(`Canceling subscription for item:`, itemName);
   }
-  
 
   extendSubscription(itemName: string, itemPrice: number, event: Event): void {
-    const target = event.target as HTMLSelectElement; // Type assertion for event.target
+    const encodedItemName = encodeURIComponent(itemName);
+    const target = event.target as HTMLSelectElement;
     const years = target?.value;
   
     if (!years) {
@@ -62,10 +61,19 @@ export class SubscribedItemsOverviewComponent implements OnInit {
       return;
     }
   
-    console.log(`Extending membership for "${itemName}" priced at ${itemPrice} by ${parsedYears} year(s).`);
-    alert(`Membership for "${itemName}" has been extended by ${parsedYears} year(s).`);
+    console.log(`Extending subscription for "${itemName}" by ${parsedYears} year(s).`);
+    
+    this.service.extendSubscription(this.userId, encodedItemName, itemPrice, parsedYears).subscribe({
+      next: () => {
+        alert(`Subscription for "${itemName}" has been extended by ${parsedYears} year(s).`);
+        this.loadItemDtos();
+      },
+      error: (err) => {
+        console.error('Error extending subscription:', err);
+        this.loadItemDtos();
+      }
+    });
   }
-  
 
   private findItem(name: string, price: number): ItemDto | undefined {
     return this.itemDtos.find(item => item.name === name && item.price === price);
