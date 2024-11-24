@@ -24,6 +24,7 @@
       <div *ngFor="let package of packages" class="package-card">
         <h3>{{ package.name }}</h3>
         <p>Price: ${{ package.price }}</p>
+        <p *ngIf="package.isBusinessPackage" style="color: green;">Business package</p>
         
         <div class="service-list">
           <div *ngFor="let packageService of package.packageServices" class="service-card">
