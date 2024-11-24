@@ -19,6 +19,7 @@ builder.Services.AddScoped<MerchantCredentialsService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<TransactionService>();
 builder.Services.AddScoped<SubscriptionService>();
+builder.Services.AddScoped<SubscriptionBackgroundService>();
 
 //builder.Services.AddControllers();
 builder.Services.AddControllers()

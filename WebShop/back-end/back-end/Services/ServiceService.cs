@@ -17,5 +17,10 @@ namespace back_end.Services
         {
             return await _context.Services.ToListAsync();
         }
+
+        public Service Get(int id)
+        {
+            return _context.Services.Where(p => p.Id == id).FirstOrDefault();
+        }
     }
 }

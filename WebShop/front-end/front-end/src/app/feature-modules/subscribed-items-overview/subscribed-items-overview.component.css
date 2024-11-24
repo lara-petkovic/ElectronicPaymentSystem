@@ -1,0 +1,141 @@
+/* General styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+main {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #1f3a56 !important;
+  color: #ffffff;
+  font-family: 'Arial', sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.header {
+  background-color: #0a1f33;
+  color: #d6a725;
+  padding: 1rem;
+  text-align: center;
+  border-bottom: 2px solid #2d4a6a;
+  width: 100%;
+}
+
+/* Item List */
+.item-list {
+  display: block;
+  margin-top: 2rem;
+  max-width: 35vw;
+  width: 100%;
+  text-align: center;
+}
+
+.item-card {
+  background-color: #2d4a6a;
+  color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: left;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-bottom: 1.5rem;
+}
+
+.item-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+}
+
+.item-name {
+  font-size: 1.5rem;
+  color: #d6a725;
+  margin-bottom: 0.5rem;
+}
+
+.item-details {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item-details li {
+  margin-bottom: 0.5rem;
+}
+
+.item-details span {
+  font-weight: bold;
+  color: #4a90e2;
+}
+
+/* Empty State */
+.no-items {
+  color: #4a90e2;
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 1.2rem;
+}
+
+/* Item Actions */
+.item-actions {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cancel-button {
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.cancel-button:hover {
+  background-color: #d32f2f;
+}
+
+.dropdown-label {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.dropdown {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #d6a725;
+}
+
+.canceled-message {
+  background-color: #5d5d5d;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding: 0.5rem;
+  border-radius: 4px;
+  text-align: center;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

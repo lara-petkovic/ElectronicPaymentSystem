@@ -1,5 +1,5 @@
 html, body {
-  height: 100%;
+  height: 210vh;
   margin: 0;
   padding: 0;
   background-color: #0a1f33;
@@ -10,7 +10,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 140vh;
+  min-height: 160vh;
 }
 
 main {
