@@ -13,7 +13,7 @@
           <p>{{ service.description }}</p>
           <p>Type: {{ getServiceTypeLabel(service.type) }}</p>
           <p>Price: ${{ service.price }}</p>
-          <p><button type="submit">Buy</button></p>
+          <p><button type="submit" (click)="onServiceBuy(service.id)">Buy</button></p>
         </div>
     </div>
     
@@ -24,6 +24,7 @@
       <div *ngFor="let package of packages" class="package-card">
         <h3>{{ package.name }}</h3>
         <p>Price: ${{ package.price }}</p>
+        <p *ngIf="package.isBusinessPackage" style="color: green;">Business package</p>
         
         <div class="service-list">
           <div *ngFor="let packageService of package.packageServices" class="service-card">
@@ -50,6 +51,7 @@
         </button>
       </div>
     </div>
+    <button (click)="openMySubscriptions()" style="width: 25vw;">My subscriptions</button>
     <p><button type="submit" (click)="onSubscribe()">Choose payment system</button></p>
   </body>
 </html>

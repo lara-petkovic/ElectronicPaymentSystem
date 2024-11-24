@@ -20,5 +20,24 @@ namespace back_end.Services
             await _context.SaveChangesAsync();
             return transaction;
         }
+
+        public async Task<Models.Transaction> SetStatusTransaction(Models.Transaction transaction, String status)
+        {
+            Models.Transaction tr = GetTransaction(transaction.Id).Result;
+            tr.Status = status;
+            _context.Transactions.Update(tr);
+            await _context.SaveChangesAsync();
+            return transaction;
+        }
+
+        public async Task<Models.Transaction> GetTransaction(long merchantOrderId)
+        {
+            return _context.Transactions.Where(p => p.Id == merchantOrderId).FirstOrDefault();
+        }
+
+        public async Task<List<Models.Transaction>> GetSuccessfulTransactions(long userId)
+        {
+            return _context.Transactions.Where(p => p.Status == "success" && p.UserId == userId).ToList();
+        }
     }
 }

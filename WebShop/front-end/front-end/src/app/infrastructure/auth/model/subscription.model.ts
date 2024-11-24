@@ -9,4 +9,5 @@ export interface Subscription {
     durationInYears: number;
     user?: User;
     package?: Package;
+    status: string;
 }

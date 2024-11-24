@@ -28,26 +28,43 @@ public class TransactionResponseController {
 
     @PostMapping
     public void HandleTransactionResponse(@RequestBody TransactionResponseDto transactionResponseDto) throws Exception {
+        String status = "";
+
         System.out.println(transactionResponseDto.responseUrl);
         transactionResponseHandler.broadcastMessage(transactionResponseDto.responseUrl);
+
+        setStatus(transactionResponseDto);
+
+        Transaction transaction = transactionService.GetTransactionByOrderId(transactionResponseDto.orderId);
+        Client client = clientService.getClientByMerchantId(transaction.getMerchantId());
+
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:" + client.getPort() + "/api/response";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        String body = "{ \"MerchantOrderId\": \"" + transaction.getOrderId() + "\", \"Status\": \"" + status + "\" }";
+
+        // Set up the HTTP entity with headers and body
+        HttpEntity<String> entity = new HttpEntity<>(body, headers);
+
+        // Send the POST request
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+
+
+    }
+
+    private static void setStatus(TransactionResponseDto transactionResponseDto) {
+        String status;
         if(transactionResponseDto.responseUrl.contains("success")) {
-            Transaction transaction = transactionService.GetTransactionByOrderId(transactionResponseDto.orderId);
-            Client client = clientService.getClientByMerchantId(transaction.getMerchantId());
-
-            RestTemplate restTemplate = new RestTemplate();
-            String url = "http://localhost:" + client.getPort() + "/api/response";
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            String body = "{ \"MerchantOrderId\" : \"" + transaction.getOrderId() + "\" }";
-
-            // Set up the HTTP entity with headers and body
-            HttpEntity<String> entity = new HttpEntity<>(body, headers);
-
-            // Send the POST request
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-
+            status = "success";
+        }
+        if(transactionResponseDto.responseUrl.contains("fail")) {
+            status = "fail";
+        }
+        if(transactionResponseDto.responseUrl.contains("error")) {
+            status = "error";
         }
     }
 }

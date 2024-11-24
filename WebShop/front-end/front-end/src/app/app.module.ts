@@ -12,11 +12,13 @@ import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HomeComponent } from './feature-modules/home/home.component';
+import { SubscribedItemsOverviewComponent } from './feature-modules/subscribed-items-overview/subscribed-items-overview.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    HomeComponent
+    HomeComponent,
+    SubscribedItemsOverviewComponent
   ],
   imports: [
     BrowserModule,
