@@ -29,10 +29,14 @@ public class TransactionController {
     }
     @PostMapping
     public NewTransactionDto CreateTransaction(@RequestBody NewTransactionDto transaction, HttpServletRequest request) throws Exception {
-        String port = Integer.toString(request.getRemotePort());
-        //transaction.setPort(port);
-        ClientSubscriptionDto clientSubscriptionDto = clientService.getSubscription(transaction);
-        Client c = clientService.getClientByPort(transaction.port);
+        String clientPort = request.getHeader("Port");
+        if (clientPort != null) {
+            System.out.println("Port: " + clientPort);
+        } else {
+            throw new IllegalArgumentException("not found port");
+        }
+        ClientSubscriptionDto clientSubscriptionDto = clientService.getSubscription(transaction, clientPort);
+        Client c = clientService.getClientByPort(clientPort);
         if(clientSubscriptionDto != null) {
             tradeWebSocketHandler.broadcastMessage(clientSubscriptionDto.toString());
             this.transactionService.SaveTransaction(new Transaction(transaction, c.getMerchantId()));

@@ -14,6 +14,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import java.security.SecureRandom;
+import java.util.List;
 
 @Service
 public class ClientService implements IClientService {
@@ -65,9 +66,10 @@ public class ClientService implements IClientService {
 
     }
     @Override
-    public ClientSubscriptionDto getSubscription(NewTransactionDto newTransactionDto) {
-        Client client=clientRepository.getClientsByPort(newTransactionDto.port).getLast();
-        if(client != null) {
+    public ClientSubscriptionDto getSubscription(NewTransactionDto newTransactionDto, String port) {
+        List<Client> clients=clientRepository.getClientsByPort(port);
+        if(!clients.isEmpty()) {
+            Client client=clients.getLast();
             return new ClientSubscriptionDto(client.getSubscription(),client.getMerchantId(),newTransactionDto.getMerchantOrderId());
         }
         return null;

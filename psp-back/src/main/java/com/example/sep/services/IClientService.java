@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface IClientService {
     ClientAuthenticationDataDto create(Client client, String address);
-    ClientSubscriptionDto getSubscription(NewTransactionDto newTransactionDto);
+    ClientSubscriptionDto getSubscription(NewTransactionDto newTransactionDto, String poirt);
     Client getClientByMerchantId(String merchantId);
     Client getClientByPort(String port);
 }

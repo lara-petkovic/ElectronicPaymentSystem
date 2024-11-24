@@ -31,7 +31,7 @@ namespace back_end.Services
         public async Task ProcessTransactionAsync(Transaction transaction)
         {
             var jsonData = new StringContent(
-                $"{{\"port\":\"5275\", " +
+                $"{{"+
                 $"\"amount\": {transaction.Amount}, " +
                 $"\"merchantOrderId\": {transaction.Id}, " +
                 $"\"merchantTimestamp\": \"{transaction.Timestamp}\"}}",
@@ -41,6 +41,8 @@ namespace back_end.Services
             string url = "http://localhost:8086/api/transaction";
             try
             {
+                httpClient.DefaultRequestHeaders.Add("Port", "5275");
+
                 HttpResponseMessage response = await httpClient.PostAsync(url, jsonData);
                 response.EnsureSuccessStatusCode();
 
