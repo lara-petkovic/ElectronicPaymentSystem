@@ -56,7 +56,8 @@ export class HomeComponent implements OnInit {
       userId: this.userId, 
       packageId: packageId,
       startDate: new Date(), 
-      durationInYears: durationInYears
+      durationInYears: durationInYears,
+      status: "CREATED"
     };
   
     this.service.createSubscription(subscription).subscribe({

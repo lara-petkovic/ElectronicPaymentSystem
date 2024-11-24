@@ -17,6 +17,11 @@ namespace back_end.Services
         {
             return _context.Packages.Where(p => p.Id == id).FirstOrDefault();
         }
+
+        public Package GetPackageByNameAndPrice(string name, double price)
+        {
+            return _context.Packages.Where(p => p.Name == name && (double)p.Price == price).FirstOrDefault();
+        }
         public async Task<List<Package>> GetPackagesAsync()
         {
             return await _context.Packages

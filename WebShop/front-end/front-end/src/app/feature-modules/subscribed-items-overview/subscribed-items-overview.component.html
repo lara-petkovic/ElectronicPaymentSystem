@@ -1,28 +1,41 @@
-<html>
-  <head>
-    <link rel="stylesheet" href="subscribed-items-overview.component.css" />
-  </head>
-  <body>
-    <main>
-      <header class="header">
-        <h1>Subscribed Items</h1>
-      </header>
-      <section *ngIf="itemDtos && itemDtos.length > 0; else noItems" class="content">
-        <div class="item-list">
-          <div *ngFor="let item of itemDtos" class="item-card">
-            <h2 class="item-name">{{ item.name }}</h2>
-            <ul class="item-details">
-              <li *ngIf="item.isBusinessPackage">
-                <span>This package is a Business Package</span>
-              </li>             
-              <li><span>Price:</span> {{ item.price }}</li>
-            </ul>
+<main>
+  <header class="header">
+    <h1>Subscribed Items</h1>
+  </header>
+  <section *ngIf="itemDtos && itemDtos.length > 0; else noItems" class="content">
+    <div class="item-list">
+      <div *ngFor="let item of itemDtos" class="item-card">
+        <h2 class="item-name">{{ item.name }}</h2>
+        <ul class="item-details">
+          <li *ngIf="item.isBusinessPackage">
+            <span>This package is a Business Package</span>
+          </li>
+          <li><span>Price:</span> {{ item.price }}</li>
+        </ul>
+        <div class="item-actions">
+          <button *ngIf="item.status != 'CANCELED'" class="cancel-button" (click)="cancelSubscription(item.name, item.price)">
+            Cancel Subscription
+          </button>
+          <div *ngIf="item.status == 'CANCELED'" class="canceled-message">
+            <label>Subscription Canceled</label>
           </div>
+          <label *ngIf="item.status != 'CANCELED'" for="extend-membership-{{ item.name }}" class="dropdown-label">
+            Extend Subscription:
+          </label>
+          <select *ngIf="item.status != 'CANCELED'"
+            id="extend-membership-{{ item.name }}"
+            class="dropdown"
+            (change)="extendSubscription(item.name, item.price, $event)">
+            <option value="" disabled selected>Select duration (years)</option>
+            <option *ngFor="let year of [1, 2, 3, 4, 5]" [value]="year">
+              {{ year }} year{{ year > 1 ? 's' : '' }}
+            </option>
+          </select>
         </div>
-      </section>
-      <ng-template #noItems>
-        <p class="no-items">No items found.</p>
-      </ng-template>
-    </main>
-  </body>
-</html>
+      </div>
+    </div>
+  </section>
+  <ng-template #noItems>
+    <p class="no-items">No items found.</p>
+  </ng-template>
+</main>

@@ -1,5 +1,7 @@
 ﻿using back_end.Data;
 using back_end.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net.Http;
 using System.Text;
 
@@ -15,6 +17,38 @@ namespace back_end.Services
             _context = context;
             _packageService = packageService;
         }
+
+        public Subscription FindUsersSubscriptionByPackage(int userId, Package package)
+        {
+            return _context.Subscriptions.Where(s => s.UserId == userId && s.PackageId == package.Id).FirstOrDefault();
+        }
+
+        public async Task<ActionResult> CancelSubscription(Subscription subscription)
+        {
+            var existingSubscription = await _context.Subscriptions
+                .FirstOrDefaultAsync(s => s.UserId == subscription.UserId && s.PackageId == subscription.PackageId);
+
+            if (existingSubscription == null)
+            {
+                return new NotFoundObjectResult("Subscription not found.");
+            }
+
+            existingSubscription.Status = "CANCELED";
+            _context.Subscriptions.Update(existingSubscription);
+
+            var result = await _context.SaveChangesAsync();
+
+            if (result > 0)
+            {
+                return new OkObjectResult("Subscription successfully canceled.");
+            }
+            else
+            {
+                return new BadRequestObjectResult("Error occurred while canceling the subscription.");
+            }
+        }
+
+
         public async Task<Subscription> CreateSubscription(Subscription subscription)
         {
             if (subscription == null)
@@ -29,6 +63,7 @@ namespace back_end.Services
             }
 
             subscription.StartDate = DateTime.UtcNow;
+            subscription.Status = "CREATED";
 
             _context.Subscriptions.Add(subscription);
             await _context.SaveChangesAsync();
@@ -86,6 +121,5 @@ namespace back_end.Services
 
             await _context.SaveChangesAsync();
         }
-
     }
 }

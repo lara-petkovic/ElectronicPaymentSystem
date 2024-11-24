@@ -1,8 +1,9 @@
 export interface ItemDto {
-    name : number,
-    description : String,
-    type : String,
+    name : string,
+    description : string,
+    type : string,
     price : number,
     isBusinessPackage : boolean,
-    isPackage : boolean
+    isPackage : boolean,
+    status: string
 }

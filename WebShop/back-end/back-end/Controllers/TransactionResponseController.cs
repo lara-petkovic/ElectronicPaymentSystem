@@ -13,12 +13,14 @@ namespace back_end.Controllers
         private Services.PackageService _packageService;
         private ServiceService _serviceService;
         private PspSubscriptionService _pspSubscriptionService;
-        public TransactionResponseController(TransactionService transactionService, Services.PackageService packageService, ServiceService serviceService, PspSubscriptionService pspSubscriptionService)
+        private SubscriptionService _subscriptionService;
+        public TransactionResponseController(TransactionService transactionService, Services.PackageService packageService, ServiceService serviceService, PspSubscriptionService pspSubscriptionService, SubscriptionService subscriptionService)
         {
             _transactionService = transactionService;
             _packageService = packageService;
             _serviceService = serviceService;
             _pspSubscriptionService = pspSubscriptionService;
+            _subscriptionService = subscriptionService;
         }
 
         [HttpPost]
@@ -40,8 +42,13 @@ namespace back_end.Controllers
                 if(transaction.PurcasedServiceId == null)
                 {
                     Package package = _packageService.Get((int)transaction.PurchasedPackageId);
-                    ItemDto item = new ItemDto(package);
-                    result.Add(item);
+                    var subscription = _subscriptionService.FindUsersSubscriptionByPackage(loggedUserId, package);
+
+                    if(subscription != null)
+                    {
+                        ItemDto item = new ItemDto(package, subscription.Status);
+                        result.Add(item);
+                    }
                 }
 
                 else

@@ -10,14 +10,16 @@ namespace back_end.Dtos
         public decimal Price { get; set; }
         public bool? IsBusinessPackage { get; set; }
         public bool IsPackage { get; set; }
+        public string Status { get; set; }
 
-        public ItemDto(Package package) {
+        public ItemDto(Package package, string status) {
             Name = package.Name;
             Description = null;
             Type = null;
             Price = package.Price;
             IsBusinessPackage = package.IsBusinessPackage;
             IsPackage = true;
+            Status = status;
         }
 
         public ItemDto(Service service)
@@ -28,6 +30,7 @@ namespace back_end.Dtos
             Price = service.Price;
             IsBusinessPackage = null;
             IsPackage = false;
+            Status = "CREATED";
         }
     }
 }

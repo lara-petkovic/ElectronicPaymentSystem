@@ -4,68 +4,7 @@ body {
     color: #0a1f33;
     background-color: #1f3a56;
   }
-  
-  .header {
-    background-color: #0a1f33;
-    color: #d6a725;
-    padding: 1rem;
-    text-align: center;
-    border-bottom: 2px solid #2d4a6a;
+  to {
+    opacity: 1;
   }
-  
-  main {
-    max-width: 40vw;
-    margin: 0 auto;
-    padding: 2rem;
-  }
-  
-  .item-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-top: 2rem;
-  }
-  
-  .item-card {
-    background-color: #2d4a6a;
-    color: #ffffff;
-    padding: 1.5rem;
-    border-radius: 8px;
-    text-align: left;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  
-  .item-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
-  }
-  
-  .item-name {
-    font-size: 1.5rem;
-    color: #d6a725;
-    margin-bottom: 0.5rem;
-  }
-  
-  .item-details {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .item-details li {
-    margin-bottom: 0.5rem;
-  }
-  
-  .item-details span {
-    font-weight: bold;
-    color: #4a90e2;
-  }
-  
-  .no-items {
-    color: #4a90e2;
-    text-align: center;
-    margin-top: 2rem;
-    font-size: 1.2rem;
-  }
-  
+}

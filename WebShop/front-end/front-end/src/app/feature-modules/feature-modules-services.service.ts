@@ -38,5 +38,10 @@ export class FeatureModulesServicesService {
 
   processServiceTransaction(serviceId: number, userId: number): Observable<void> {
     return this.http.post<void>(`${environment.apiHost}/response/service-transaction/` + serviceId + "/" + userId, {});
+  }
+
+  cancelSubscription(userId: number, itemName: string, itemPrice: number): Observable<void> {
+    const url = `${environment.apiHost}/subscriptions/cancel/${userId}/${itemName}/${itemPrice}`;
+    return this.http.put<void>(url, {}); // `itemName` should already be encoded
   }  
 }

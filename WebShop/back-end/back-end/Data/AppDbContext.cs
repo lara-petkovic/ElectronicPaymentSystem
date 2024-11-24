@@ -80,7 +80,8 @@ namespace back_end.Data
                    UserId = -1,
                    PackageId = -1,
                    StartDate = DateTime.SpecifyKind(new DateTime(2024, 1, 1, 0, 0, 0), DateTimeKind.Utc),
-                   DurationInYears = 1
+                   DurationInYears = 1,
+                   Status = "CREATED"
                }
            );
 
