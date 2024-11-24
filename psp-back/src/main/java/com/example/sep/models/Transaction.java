@@ -4,6 +4,7 @@ import com.example.sep.dtos.NewTransactionDto;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "transaction")
 public class Transaction {
 
     @Id
