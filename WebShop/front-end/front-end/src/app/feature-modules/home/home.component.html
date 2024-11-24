@@ -13,7 +13,7 @@
           <p>{{ service.description }}</p>
           <p>Type: {{ getServiceTypeLabel(service.type) }}</p>
           <p>Price: ${{ service.price }}</p>
-          <p><button type="submit">Buy</button></p>
+          <p><button type="submit" (click)="onServiceBuy(service.id)">Buy</button></p>
         </div>
     </div>
     

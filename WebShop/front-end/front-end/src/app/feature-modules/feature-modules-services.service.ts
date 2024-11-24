@@ -35,4 +35,8 @@ export class FeatureModulesServicesService {
   getItemDtos(loggedUserId: number): Observable<ItemDto[]> {
     return this.http.get<ItemDto[]>(`${environment.apiHost}/response/`+ loggedUserId);
   }
+
+  processServiceTransaction(serviceId: number, userId: number): Observable<void> {
+    return this.http.post<void>(`${environment.apiHost}/response/service-transaction/` + serviceId + "/" + userId, {});
+  }  
 }

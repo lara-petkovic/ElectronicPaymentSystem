@@ -90,4 +90,16 @@ export class HomeComponent implements OnInit {
   openMySubscriptions() {
     this.router.navigate(['/my-subscriptions']);
   }
+
+  onServiceBuy(serviceId: number) {
+    this.service.processServiceTransaction(serviceId, this.userId).subscribe({
+      next: () => {
+        alert("Proceed to PSP for finishing the transaction.");
+      },
+      error: (err) => {
+        console.error('Error processing service transaction:', err);
+        alert('Failed to process the transaction. Please try again.');
+      }
+    });
+  }  
 }

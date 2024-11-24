@@ -12,10 +12,13 @@ namespace back_end.Controllers
         private TransactionService _transactionService;
         private Services.PackageService _packageService;
         private ServiceService _serviceService;
-        public TransactionResponseController(TransactionService transactionService, Services.PackageService packageService, ServiceService serviceService) {
+        private PspSubscriptionService _pspSubscriptionService;
+        public TransactionResponseController(TransactionService transactionService, Services.PackageService packageService, ServiceService serviceService, PspSubscriptionService pspSubscriptionService)
+        {
             _transactionService = transactionService;
             _packageService = packageService;
             _serviceService = serviceService;
+            _pspSubscriptionService = pspSubscriptionService;
         }
 
         [HttpPost]
@@ -50,6 +53,26 @@ namespace back_end.Controllers
                 
             }
             return Ok(result);
+        }
+
+        [HttpPost("service-transaction/{serviceId}/{userId}")]
+        public async Task<ActionResult<Subscription>> CreateTransaction(int serviceId, int userId)
+        {
+            var service = _serviceService.Get(serviceId);
+
+            var newTransaction = new Transaction
+            {
+                PurcasedServiceId = service.Id,
+                UserId = userId,
+                Status = "CREATED",
+                Timestamp = DateTime.UtcNow,
+                Amount = (double)service.Price
+            };
+
+            var savedTransaction = await _transactionService.SaveTransaction(newTransaction);
+            await _pspSubscriptionService.ProcessTransactionAsync(savedTransaction);
+
+            return Ok(savedTransaction);
         }
     }
 }
