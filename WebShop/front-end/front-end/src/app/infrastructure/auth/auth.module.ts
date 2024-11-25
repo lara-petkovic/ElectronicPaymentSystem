@@ -10,12 +10,14 @@ import { MatInputModule } from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { AdminHomeComponent } from 'src/app/feature-modules/admin-home/admin-home.component';
 
 
 @NgModule({
   declarations: [
     LoginComponent,
-    RegistrationComponent
+    RegistrationComponent,
+    AdminHomeComponent
   ],
   imports: [
     CommonModule,
