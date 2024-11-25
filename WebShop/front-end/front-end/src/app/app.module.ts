@@ -13,12 +13,14 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HomeComponent } from './feature-modules/home/home.component';
 import { SubscribedItemsOverviewComponent } from './feature-modules/subscribed-items-overview/subscribed-items-overview.component';
+import { AdminHomeComponent } from './feature-modules/admin-home/admin-home.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
-    SubscribedItemsOverviewComponent
+    SubscribedItemsOverviewComponent,
+    AdminHomeComponent
   ],
   imports: [
     BrowserModule,
