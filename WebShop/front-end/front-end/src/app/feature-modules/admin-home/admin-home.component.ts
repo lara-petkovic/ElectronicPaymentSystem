@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from 'src/app/infrastructure/auth/auth.service';
 
 @Component({
@@ -9,10 +10,14 @@ import { AuthService } from 'src/app/infrastructure/auth/auth.service';
 export class AdminHomeComponent {
 
   constructor(
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
   
   onButtonClick(): void {
     this.authService.subscribe();
+  }
+  logout() {
+    this.router.navigate(['/login']);
   }
 }

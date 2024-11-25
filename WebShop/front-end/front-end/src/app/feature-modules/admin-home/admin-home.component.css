@@ -1,26 +1,23 @@
-/* Stilizacija za ceo ekran */
 .page-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #007bff; /* Plava pozadina */
-    color: white; /* Bela boja teksta */
+    background-color: #0a1f33;
+    color: white;
     font-family: Arial, sans-serif;
     margin: 0;
   }
   
-  /* Stil za naslov */
   .page-title {
     font-size: 24px;
     font-weight: bold;
     margin-bottom: 20px;
   }
   
-  /* Stil za dugme */
   .subscribe-button {
-    background-color: #0056b3; /* Tamnija plava */
+    background-color: #0056b3;
     color: white;
     border: none;
     border-radius: 5px;
@@ -28,9 +25,10 @@
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    margin-top: 2vh;
   }
   
   .subscribe-button:hover {
-    background-color: #003f7f; /* Još tamnija plava pri hoveru */
+    background-color: #003f7f;
   }
   
