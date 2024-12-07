@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface PaymentOptionRepository extends JpaRepository<PaymentOption,Long> {
     List<PaymentOption> findAll();
+    PaymentOption getPaymentOptionByOption (String option);
 }

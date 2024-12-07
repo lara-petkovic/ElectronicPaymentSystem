@@ -6,5 +6,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 @Service
 public interface IPaymentOptionService {
-    public List<PaymentOption> getAll();
+     List<PaymentOption> getAll();
+     PaymentOption getByOptionName(String option);
+     PaymentOption create (String name);
+     void remove (String name);
+
+
 }

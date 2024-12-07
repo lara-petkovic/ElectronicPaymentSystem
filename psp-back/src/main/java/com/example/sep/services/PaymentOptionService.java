@@ -18,4 +18,23 @@ public class PaymentOptionService implements  IPaymentOptionService{
     public List<PaymentOption> getAll() {
         return paymentOptionRepository.findAll();
     }
+
+    @Override
+    public PaymentOption getByOptionName(String option) {
+        return paymentOptionRepository.getPaymentOptionByOption(option);
+    }
+
+    @Override
+    public PaymentOption create(String name) {
+        PaymentOption paymentOption=new PaymentOption();
+        paymentOption.setOption(name);
+        return paymentOptionRepository.save(paymentOption);
+    }
+
+    @Override
+    public void remove(String name) {
+        PaymentOption paymentOption=paymentOptionRepository.getPaymentOptionByOption(name);
+         paymentOptionRepository.delete(paymentOption);
+    }
+
 }

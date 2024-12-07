@@ -4,7 +4,9 @@ import com.example.sep.dtos.ClientAuthenticationDataDto;
 import com.example.sep.dtos.ClientSubscriptionDto;
 import com.example.sep.dtos.NewTransactionDto;
 import com.example.sep.models.Client;
+import com.example.sep.models.PaymentOption;
 import com.example.sep.repositories.ClientRepository;
+import com.example.sep.repositories.PaymentOptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -15,21 +17,35 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ClientService implements IClientService {
     @Autowired
     private ClientRepository clientRepository;
+    @Autowired
+    private PaymentOptionRepository paymentOptionRepository;
 
-    public ClientService(ClientRepository clientRepository){
+    public ClientService(ClientRepository clientRepository, PaymentOptionRepository paymentOptionRepository){
         this.clientRepository=clientRepository;
+        this.paymentOptionRepository=paymentOptionRepository;
     }
     @Override
-    public ClientAuthenticationDataDto create(Client client, String address) {
+    public ClientAuthenticationDataDto create(String subscription, String address) {
+        Client client = new Client();
         String merchantId=generateRandomString();
         client.setMerchantId(merchantId);
         client.setMerchantPass(generateRandomString());
         client.setPort(address);
+
+
+        String[] options = subscription.split(",");
+        for (String s : options) {
+            PaymentOption option = paymentOptionRepository.getPaymentOptionByOption(s);
+            client.addPaymentOption(option);
+        }
+
         this.clientRepository.save(client);
         SendCredentials(client,address);
         return new ClientAuthenticationDataDto(client.getMerchantId(),client.getMerchantPass());
@@ -70,7 +86,11 @@ public class ClientService implements IClientService {
         List<Client> clients=clientRepository.getClientsByPort(port);
         if(!clients.isEmpty()) {
             Client client=clients.getLast();
-            return new ClientSubscriptionDto(client.getSubscription(),client.getMerchantId(),newTransactionDto.getMerchantOrderId());
+            Set<PaymentOption> options=client.getPaymentOptions();
+            String optionsString=options.stream()
+                    .map(PaymentOption::toString)
+                    .collect(Collectors.joining(","));
+            return new ClientSubscriptionDto(optionsString,client.getMerchantId(),newTransactionDto.getMerchantOrderId());
         }
         return null;
     }

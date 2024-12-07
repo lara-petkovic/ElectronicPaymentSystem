@@ -2,6 +2,7 @@ package com.example.sep.configuration;
 
 import com.example.sep.models.Client;
 import com.example.sep.repositories.ClientRepository;
+import com.example.sep.repositories.PaymentOptionRepository;
 import com.example.sep.services.ClientService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ public class ClientSubscriptionWebSocketHandler extends TextWebSocketHandler {
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private ClientRepository clientRepository;
+    @Autowired
+    private PaymentOptionRepository paymentOptionRepository;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
@@ -52,9 +55,7 @@ public class ClientSubscriptionWebSocketHandler extends TextWebSocketHandler {
     }
 
     private void createClient(String subscription, String address) {
-        Client client = new Client();
-        client.setSubscription(subscription);
-        ClientService clientService = new ClientService(clientRepository);
-        clientService.create(client, address);
+        ClientService clientService = new ClientService(clientRepository, paymentOptionRepository);
+        clientService.create(subscription, address);
     }
 }
