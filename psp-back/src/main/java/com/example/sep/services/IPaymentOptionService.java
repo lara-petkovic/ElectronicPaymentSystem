@@ -1,5 +1,6 @@
 package com.example.sep.services;
 
+import com.example.sep.dtos.PaymentOptionDto;
 import com.example.sep.models.PaymentOption;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +11,7 @@ public interface IPaymentOptionService {
      PaymentOption getByOptionName(String option);
      PaymentOption create (String name);
      void remove (String name);
+     List<PaymentOptionDto> getAllOptions();
 
 
 }

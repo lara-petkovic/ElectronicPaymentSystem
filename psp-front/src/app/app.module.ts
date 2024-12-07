@@ -12,6 +12,9 @@ import { FailedPageComponent } from './failed-page/failed-page.component';
 import { ErrorPageComponent } from './error-page/error-page.component';
 import { RouterModule } from '@angular/router';
 import { HomeComponent } from './home/home.component';
+import { OptionsManagmentComponent } from './options-managment/options-managment.component';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -21,7 +24,8 @@ import { HomeComponent } from './home/home.component';
     SuccessPageComponent,
     FailedPageComponent,
     ErrorPageComponent,
-    HomeComponent
+    HomeComponent,
+    OptionsManagmentComponent
   ],
   imports: [
     BrowserModule,
@@ -29,7 +33,9 @@ import { HomeComponent } from './home/home.component';
     MatSortModule,
     MatPaginatorModule,
     MatTableModule,
-    RouterModule
+    RouterModule,
+    FormsModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

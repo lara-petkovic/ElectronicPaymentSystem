@@ -1,0 +1,29 @@
+<div>
+    <h2>Payment Options</h2>
+  
+    <!-- Tabela koja prikazuje listu opcija -->
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let option of paymentOptions; let i = index">
+          <td>{{ option.name }}</td>
+          <td>
+            <!-- Dugme za uklanjanje opcije -->
+            <button (click)="removePaymentOption(i)">Remove</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <!-- Input polje za unos nove opcije -->
+    <div>
+      <input [(ngModel)]="newOptionName" placeholder="New payment option name" />
+      <button (click)="addPaymentOption()">Add New Option</button>
+    </div>
+  </div>
+  

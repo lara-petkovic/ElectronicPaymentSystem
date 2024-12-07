@@ -1,8 +1,8 @@
 package com.example.sep.dtos;
 
-public class PaymentOptionCreationDto {
+public class PaymentOptionDto {
     public String name;
-    public PaymentOptionCreationDto(){}
+    public PaymentOptionDto(){}
 
     public String getName() {
         return name;

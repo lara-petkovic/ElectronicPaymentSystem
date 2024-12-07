@@ -1,0 +1,57 @@
+/* Centriranje tabele na stranici */
+table {
+    width: 30%;  /* Postavljanje širine tabele na 30% stranice */
+    margin: 20px auto;  /* Automatsko centriranje sa margina */
+    border-collapse: collapse;  /* Uklanjanje razmaka između ćelija tabele */
+  }
+
+  h2{
+    color: white;
+    text-align: center;
+    margin-top: 10%;
+  }
+  
+  /* Stilizovanje zaglavlja tabele */
+  th {
+    background-color: #f2f2f2;  /* Svetlo siva boja za zaglavlje */
+    padding: 10px;  /* Dodavanje razmaka unutar zaglavlja */
+    text-align: left;  /* Poravnavanje teksta ulevo */
+  }
+  
+  /* Stilizovanje ćelija u tabeli */
+  td {
+    padding: 8px;  /* Dodavanje razmaka unutar ćelija */
+    border-bottom: 1px solid #ddd;  /* Dodavanje svetlog donjeg okvira */
+  }
+  
+  
+  /* Dodavanje boje pri hover-u na redovima */
+  tr {
+    background-color: #d1e7ff;  /* Svetlo plava pozadina pri hover-u */
+  }
+  
+  /* Stilizovanje dugmadi */
+  button {
+    padding: 5px 10px;  /* Dodavanje razmaka oko teksta u dugmetu */
+    background-color: blue;  /* Zelena boja za dugme */
+    color: white;  /* Bela boja za tekst dugmeta */
+    border: none;  /* Uklanjanje ivica */
+    cursor: pointer;  /* Kursor kao ruka pri hover-u */
+  }
+  
+  button:hover {
+    background-color: blue;  /* Tamnija nijansa zelene pri hover-u */
+  }
+  
+  /* Stilizacija input polja */
+  input {
+    padding: 8px;
+    margin-top: 10px;
+    width: 90%;  /* Širina input polja 90% širine tabele */
+    border: 1px solid #ddd;  /* Dodavanje svetlih ivica input polju */
+    border-radius: 4px;  /* Zaobljeni uglovi input polja */
+    width: 30%;
+    align-items: center;
+    margin-left: 35%;
+  }
+  
