@@ -1,6 +1,7 @@
 package com.example.gatetway.demo.model;
 
 import jakarta.persistence.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
 
 @Entity
 public class PaymentOption {
@@ -13,12 +14,15 @@ public class PaymentOption {
     private String option;
     @Column(name = "address")
     private String address;
+    @Column(name = "port")
+    private Integer port;
 
     public PaymentOption(){}
-    public PaymentOption(Long id, String option, String address) {
+    public PaymentOption(Long id, String option, String address, Integer port) {
         this.id = id;
         this.option = option;
         this.address = address;
+        this.port = port;
     }
 
     public Long getId() {
@@ -43,5 +47,13 @@ public class PaymentOption {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public Integer getPort() {
+        return port;
+    }
+
+    public void setPort(Integer port) {
+        this.port = port;
     }
 }

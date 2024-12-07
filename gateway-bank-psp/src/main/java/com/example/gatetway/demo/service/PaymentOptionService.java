@@ -15,8 +15,8 @@ public class PaymentOptionService {
         this.paymentOptionRepo=_paymentOptionRepo;
     }
 
-    public String getAddressByOption(String option){
+    public PaymentOption getAddressByOption(String option){
         PaymentOption paymentOption=paymentOptionRepo.getPaymentOptionByOption(option);
-        return  paymentOption.getAddress();
+        return  paymentOption;
     }
 }
