@@ -2,13 +2,14 @@ package com.example.sep.controllers;
 
 import com.example.sep.configuration.ClientSubscriptionWebSocketHandler;
 import com.example.sep.dtos.NewClientDto;
+import com.example.sep.dtos.PaymentOptionDto;
 import com.example.sep.models.PaymentOption;
+import com.example.sep.services.IClientService;
 import com.example.sep.services.PaymentOptionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,15 +19,18 @@ import java.util.List;
 public class ClientController {
     @Autowired
     private PaymentOptionService paymentOptionService;
+    @Autowired
+    private IClientService clientService;
     private final ClientSubscriptionWebSocketHandler clientSubscriptionWebSocketHandler;
 
     @Autowired
-    public ClientController(ClientSubscriptionWebSocketHandler clientSubscriptionWebSocketHandler, PaymentOptionService paymentOptionService) {
+    public ClientController(ClientSubscriptionWebSocketHandler clientSubscriptionWebSocketHandler, PaymentOptionService paymentOptionService, IClientService clientService) {
         this.clientSubscriptionWebSocketHandler = clientSubscriptionWebSocketHandler;
         this.paymentOptionService=paymentOptionService;
+        this.clientService=clientService;
     }
     @PostMapping
-    public NewClientDto CreateClient(@RequestBody NewClientDto newClient) throws Exception {
+    public ResponseEntity<NewClientDto> CreateClient(@RequestBody NewClientDto newClient) throws Exception {
         List<PaymentOption> paymentOptionList = paymentOptionService.getAll();
         StringBuilder message= new StringBuilder(newClient.apiKey + ",");
         for(int i=0;i<paymentOptionList.size()-1;i++){
@@ -34,6 +38,19 @@ public class ClientController {
         }
         message.append(paymentOptionList.get(paymentOptionList.size() - 1).getOption());
         clientSubscriptionWebSocketHandler.broadcastMessage(message.toString());
-        return  newClient;
+        return new ResponseEntity<>(newClient, HttpStatus.CREATED) ;
+    }
+    @GetMapping("/{port}")
+    public ResponseEntity<List<PaymentOptionDto>> GetByClient (@PathVariable String port){
+        if(clientService.getClientByPort(port)==null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(clientService.getOptionsForClient(port),HttpStatus.OK);
+    }
+    @DeleteMapping("/{port}")
+    public ResponseEntity<String> RemoveOption(@PathVariable String port, @RequestBody PaymentOptionDto option){
+        if(clientService.getClientByPort(port)==null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        clientService.RemoveOption(port, option.getName());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

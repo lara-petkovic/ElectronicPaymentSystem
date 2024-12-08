@@ -10,4 +10,5 @@ import java.util.List;
 public interface ClientRepository extends JpaRepository<Client, Long> {
     Client getClientByMerchantId(String merchantId);
     List<Client> getClientsByPort(String port);
+    Client getFirstByPort(String port);
 }

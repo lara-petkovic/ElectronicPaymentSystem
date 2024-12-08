@@ -3,6 +3,7 @@ package com.example.sep.services;
 import com.example.sep.dtos.ClientAuthenticationDataDto;
 import com.example.sep.dtos.ClientSubscriptionDto;
 import com.example.sep.dtos.NewTransactionDto;
+import com.example.sep.dtos.PaymentOptionDto;
 import com.example.sep.models.Client;
 import com.example.sep.models.PaymentOption;
 import com.example.sep.repositories.ClientRepository;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -98,6 +100,28 @@ public class ClientService implements IClientService {
     public Client getClientByPort(String port){
         return clientRepository.getClientsByPort(port).getLast();
     }
+
+    @Override
+    public List<PaymentOptionDto> getOptionsForClient(String port) {
+        Client client=clientRepository.getFirstByPort(port);
+        List<PaymentOptionDto> paymentOptionDtos=new ArrayList<PaymentOptionDto>();
+        for(PaymentOption po:client.getPaymentOptions()){
+            PaymentOptionDto paymentOptionDto=new PaymentOptionDto();
+            paymentOptionDto.setName(po.getOption());
+            paymentOptionDtos.add(paymentOptionDto);
+        }
+        return paymentOptionDtos;
+    }
+
+    @Override
+    public void RemoveOption(String port, String name) {
+        Client client=clientRepository.getFirstByPort(port);
+        PaymentOption paymentOption=paymentOptionRepository.getPaymentOptionByOption(name);
+        if(paymentOption!=null)
+            client.removePaymentOption(paymentOption);
+        clientRepository.save(client);
+    }
+
     @Override
     public Client getClientByMerchantId(String merchantId) {
         return clientRepository.getClientByMerchantId(merchantId);
