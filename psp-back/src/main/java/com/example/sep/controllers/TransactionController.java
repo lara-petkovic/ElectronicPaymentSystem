@@ -35,6 +35,9 @@ public class TransactionController {
         } else {
             throw new IllegalArgumentException("not found port");
         }
+        if(clientPort.length()>4)
+            clientPort=clientPort.substring(0, 4);
+
         ClientSubscriptionDto clientSubscriptionDto = clientService.getSubscription(transaction, clientPort);
         Client c = clientService.getClientByPort(clientPort);
         if(clientSubscriptionDto != null) {

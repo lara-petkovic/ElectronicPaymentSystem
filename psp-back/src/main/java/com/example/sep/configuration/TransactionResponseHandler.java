@@ -19,13 +19,4 @@ public class TransactionResponseHandler extends TextWebSocketHandler {
         }
     }
 
-    @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-      /*  String payload = message.getPayload();
-        if ("ping".equals(payload)) {
-            session.sendMessage(new TextMessage("pong"));
-            return;
-        }
-        System.out.println("Received message: " + payload);*/
-    }
 }
