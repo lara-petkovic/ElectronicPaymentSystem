@@ -35,8 +35,10 @@ public class PaymentOptionService implements  IPaymentOptionService{
 
     @Override
     public void remove(String name) {
-        PaymentOption paymentOption=paymentOptionRepository.getPaymentOptionByOption(name);
-         paymentOptionRepository.delete(paymentOption);
+        if(paymentOptionRepository.findAll().size()>=2) {
+            PaymentOption paymentOption = paymentOptionRepository.getPaymentOptionByOption(name);
+            paymentOptionRepository.delete(paymentOption);
+        }
     }
 
     @Override

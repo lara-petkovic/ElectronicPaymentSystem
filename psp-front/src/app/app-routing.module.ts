@@ -7,6 +7,7 @@ import { FailedPageComponent } from './failed-page/failed-page.component';
 import { ErrorPageComponent } from './error-page/error-page.component';
 import { HomeComponent } from './home/home.component';
 import { OptionsManagmentComponent } from './options-managment/options-managment.component';
+import { LoginComponent } from './login/login.component';
 
 const routes: Routes = [
   { path: 'payment-options/:id', component: PspFormComponent }, 
@@ -15,9 +16,8 @@ const routes: Routes = [
   { path: 'fail', component: FailedPageComponent }, 
   { path: 'error', component: ErrorPageComponent },
   { path: 'home', component: HomeComponent} ,
-  { path : 'manage', component: OptionsManagmentComponent}
-
-
+  { path : 'manage', component: OptionsManagmentComponent},
+  { path : 'login', component: LoginComponent}
 ];
 
 @NgModule({

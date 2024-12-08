@@ -15,6 +15,7 @@ import { HomeComponent } from './home/home.component';
 import { OptionsManagmentComponent } from './options-managment/options-managment.component';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { LoginComponent } from './login/login.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { HttpClientModule } from '@angular/common/http';
     FailedPageComponent,
     ErrorPageComponent,
     HomeComponent,
-    OptionsManagmentComponent
+    OptionsManagmentComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
