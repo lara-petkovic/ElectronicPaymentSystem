@@ -19,7 +19,9 @@ export class AuthService {
     firstName: '',
     lastName: '',
     email: '',
-    password: '' });
+    password: '',
+    role: "USER"
+  });
 
   constructor(private http: HttpClient,
     private tokenStorage: TokenStorage,
@@ -49,7 +51,8 @@ export class AuthService {
       firstName: '',
       lastName: '',
       email: '',
-      password: ''
+      password: '',
+      role: "USER"
     });
     this.router.navigate(['/']).catch(error => console.error('Navigation error:', error));
   }
@@ -75,7 +78,8 @@ export class AuthService {
         firstName: '',
         lastName: '',
         email: '',
-        password: ''
+        password: '',
+        role: "USER"
       });
       return;
     }
@@ -91,10 +95,22 @@ export class AuthService {
       firstName: jwtHelperService.decodeToken(accessToken).firstName,
       lastName: jwtHelperService.decodeToken(accessToken).lastName,
       password: jwtHelperService.decodeToken(accessToken).password,
-      email: jwtHelperService.decodeToken(accessToken).email
+      email: jwtHelperService.decodeToken(accessToken).email,
+      role: jwtHelperService.decodeToken(accessToken).role
     };
     this.user$.next(user);
   }
+
+  getPaymentOptions(): Observable<any[]> {
+    return this.http.get<any[]>(`${environment.apiHost}/psp-subscription/payment-options`);
+  }
+  
+  removePaymentOption(option: any): Observable<void> {
+    return this.http.delete<void>(`${environment.apiHost}/psp-subscription/payment-option`, {
+      body: option
+    });
+  }
+  
   
   getAccessToken(): string | null {
     const token = this.tokenStorage.getAccessToken(); 

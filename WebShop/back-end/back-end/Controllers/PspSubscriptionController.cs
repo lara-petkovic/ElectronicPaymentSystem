@@ -1,10 +1,12 @@
 ﻿using back_end.Dtos;
 using back_end.Models;
 using back_end.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace back_end.Controllers
 {
+    //[Authorize(Policy = "adminPolicy")]
     [Route("api/psp-subscription")]
     [ApiController]
     public class PspSubscriptionController: ControllerBase
@@ -21,10 +23,13 @@ namespace back_end.Controllers
         }
 
         [HttpPost("subscribe")]
+        [Authorize(Roles = "Admin")]
         public void CreateConfiguration()
         {
             this._pspSubscriptionService.CreateSubscription();
         }
+
+
 
         //[HttpPost("credentials")]
         //public async Task<IActionResult> CreateMerchantAuthCredentials([FromBody] MerchantCredentialsDto merchantCredentialsDto)
@@ -47,6 +52,27 @@ namespace back_end.Controllers
             await _pspSubscriptionService.ProcessTransactionAsync(savedTransaction);
 
             return Ok("Transaction saved and processed successfully");
+        }
+
+        [HttpGet("payment-options")]
+        public async Task<IActionResult> GetPaymentOptions()
+        {
+            var paymentOptions = await _pspSubscriptionService.GetPaymentOptions();
+            return Ok(paymentOptions);
+        }
+
+        [HttpDelete("payment-option")]
+        public async Task<IActionResult> RemovePaymentOption([FromBody] PaymentOptionDto option)
+        {
+            var success = await _pspSubscriptionService.RemovePaymentOption(option);
+            if (success)
+            {
+                return Ok("Payment option removed successfully");
+            }
+            else
+            {
+                return BadRequest("Failed to remove payment option");
+            }
         }
     }
 }

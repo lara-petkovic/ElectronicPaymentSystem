@@ -1,34 +1,65 @@
 .page-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #0a1f33;
-    color: white;
-    font-family: Arial, sans-serif;
-    margin: 0;
-  }
-  
-  .page-title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
-  
-  .subscribe-button {
-    background-color: #0056b3;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 2vh;
-  }
-  
-  .subscribe-button:hover {
-    background-color: #003f7f;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #0a1f33;
+  color: white;
+  font-family: Arial, sans-serif;
+  margin: 0;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.subscribe-button {
+  background-color: #0056b3;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 2vh;
+}
+
+.subscribe-button:hover {
+  background-color: #003f7f;
+}
+
+.payment-options {
+  list-style: none;
+  padding: 0;
+}
+
+.payment-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0;
+  background: #004080;
+  padding: 10px;
+  border-radius: 5px;
+  width: 300px;
+  color: white;
+}
+
+.remove-button {
+  background: #b30000;
+  border: none;
+  border-radius: 3px;
+  color: white;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.remove-button:hover {
+  background: #800000;
+}
