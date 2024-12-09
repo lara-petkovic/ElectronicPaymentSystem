@@ -8,6 +8,7 @@ import com.example.sep.models.Client;
 import com.example.sep.models.PaymentOption;
 import com.example.sep.repositories.ClientRepository;
 import com.example.sep.repositories.PaymentOptionRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -34,24 +35,44 @@ public class ClientService implements IClientService {
         this.paymentOptionRepository=paymentOptionRepository;
     }
     @Override
+    @Transactional
     public ClientAuthenticationDataDto create(String subscription, String address) {
+        // Kreiraj novi Client entitet
         Client client = new Client();
-        String merchantId=generateRandomString();
+
+        // Generiši Merchant ID i Merchant Pass
+        String merchantId = generateRandomString();
         client.setMerchantId(merchantId);
         client.setMerchantPass(generateRandomString());
         client.setPort(address);
+        client = clientRepository.save(client); // `save` metoda obično radi merge za detached entitete
 
 
+        // Podeli subscription na opcije
         String[] options = subscription.split(",");
+
+        // Učitaj opcije i poveži ih sa Client entitetom
         for (String s : options) {
+            // Dohvati PaymentOption entitet prema opciji
             PaymentOption option = paymentOptionRepository.getPaymentOptionByOption(s);
-            client.addPaymentOption(option);
+
+            if (option != null) {
+                // Dodaj PaymentOption u Client
+                client.addPaymentOption(option);
+            }
         }
 
-        this.clientRepository.save(client);
-        SendCredentials(client,address);
-        return new ClientAuthenticationDataDto(client.getMerchantId(),client.getMerchantPass());
+        // Spasi Client entitet u bazi, save obavlja merge za detached entitete
+        client = clientRepository.save(client);// `save` metoda obično radi merge za detached entitete
+
+        // Pozovi metodu za slanje kredencijala
+        SendCredentials(client, address);
+
+        // Vratite DTO sa Merchant ID i Merchant Pass
+        return new ClientAuthenticationDataDto(client.getMerchantId(), client.getMerchantPass());
     }
+
+
 
 
     private void SendCredentials(Client client, String address){

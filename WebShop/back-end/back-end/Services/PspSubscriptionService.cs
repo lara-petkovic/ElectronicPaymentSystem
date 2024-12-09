@@ -11,7 +11,7 @@ namespace back_end.Services
         private const string BaseUrl = "http://localhost:8086/api";
 
         private static readonly string SubscriptionEndpoint = $"{BaseUrl}/subscription";
-        private static readonly string PaymentOptionEndpoint = $"{BaseUrl}/paymentoption";
+        private static readonly string PaymentOptionEndpoint = $"{BaseUrl}/subscription/5275";
         private static readonly string TransactionEndpoint = $"{BaseUrl}/transaction";
 
         public async void CreateSubscription() {

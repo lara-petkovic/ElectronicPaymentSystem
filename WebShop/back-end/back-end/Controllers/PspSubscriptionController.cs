@@ -23,7 +23,7 @@ namespace back_end.Controllers
         }
 
         [HttpPost("subscribe")]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public void CreateConfiguration()
         {
             this._pspSubscriptionService.CreateSubscription();
