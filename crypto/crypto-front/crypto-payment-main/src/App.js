@@ -11,6 +11,7 @@ function App() {
   const [merchantId, setMerchantId] = useState(null);
   const [transactionId, setTransactionId] = useState(null);
   const [destinationAddress, setDestinationAddress] = useState("");
+  const [eth, setTEuri] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
   const web3 = new Web3(window.ethereum);
@@ -26,10 +27,11 @@ function App() {
     client.onConnect = () => {
       console.log("Connected to WebSocket");
       client.subscribe("/topic/string-data", (msg) => {
-        const [receivedAmount, receivedMerchantId, receivedTransactionId] = msg.body.split(",");
+        const [receivedAmount, receivedMerchantId, receivedTransactionId,eth] = msg.body.split(",");
         setAmount(receivedAmount);
         setMerchantId(receivedMerchantId);
         setTransactionId(receivedTransactionId);
+        setTEuri(eth);
         setShowForm(true);
         console.log("Transaction details received");
       });
@@ -59,9 +61,8 @@ function App() {
 
   async function sendEther(to, amount) {
     const from = "0xe338ef3F5b907E62b40655570D0A3eB642Bd8d13";
-
-    // Ensure the amount is correctly formatted
-    const formattedAmount = parseFloat(amount).toFixed(18); // Convert to string with 18 decimals
+   
+    const formattedAmount = parseFloat(amount).toFixed(18); 
     const value = web3.utils.toWei(formattedAmount, "ether");
 
     try {
@@ -83,7 +84,7 @@ function App() {
   const handleSubmit = (e) => {
     e.preventDefault();
     enableMetaMask();
-    sendEther(destinationAddress, amount);
+    sendEther(destinationAddress, eth);
   };
 
   return (
@@ -91,6 +92,8 @@ function App() {
       <div className="center">
         {showForm ? (
           <form onSubmit={handleSubmit}>
+            <label>{amount} EUR = {eth} SepoliaETH</label>
+            <br></br>
             <label htmlFor="destinationAddress">Destination Address:</label>
             <input
               type="text"
@@ -102,7 +105,7 @@ function App() {
             <button type="submit">Submit</button>
           </form>
         ) : (
-          <h2>Waiting for transaction details...</h2>
+          <h2>Waiting for transaction...</h2>
         )}
         <ToastContainer />
       </div>

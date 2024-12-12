@@ -21,8 +21,9 @@ public class TransactionService implements ITransactionService {
     @Override
     public Transaction create(Transaction transaction) {
         double amount=currencyConversionService.convertEurToSepoliaEth(transaction.getAmount());
+        String transactionToSend=transaction.getAmount()+","+transaction.getMerchantId()+","+transaction.getId()+","+amount;
+        messagingTemplate.convertAndSend("/topic/string-data", transactionToSend);
         transaction.setAmount(amount);
-        messagingTemplate.convertAndSend("/topic/string-data", transaction.toString());
         return transactionRepository.save(transaction);
     }
 }
