@@ -4,7 +4,6 @@ public class TransactionStatusDto {
     private String status;
     private String details;
     private String transactionId;
-    private String merchantId;
 
     public TransactionStatusDto(){}
 
@@ -12,7 +11,6 @@ public class TransactionStatusDto {
         this.status = status;
         this.details = details;
         this.transactionId = transactionId;
-        this.merchantId = merchantId;
     }
 
     public String getStatus() {
@@ -39,11 +37,4 @@ public class TransactionStatusDto {
         this.transactionId = transactionId;
     }
 
-    public String getMerchantId() {
-        return merchantId;
-    }
-
-    public void setMerchantId(String merchantId) {
-        this.merchantId = merchantId;
-    }
 }

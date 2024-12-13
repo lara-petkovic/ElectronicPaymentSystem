@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 @Table(name = "transaction")
 public class Transaction {
     @Column
+    private Long merchantOrderId;
+    @Column
     private Double amount;
     @Column
     private String merchantId;
@@ -19,10 +21,12 @@ public class Transaction {
 
     public Transaction(){}
 
-    public Transaction(Double amount, String merchantId, String timestamp) {
-        this.amount = amount;
-        this.merchantId = merchantId;
-        this.timestamp = timestamp;
+    public Long getMerchantOrderId() {
+        return merchantOrderId;
+    }
+
+    public void setMerchantOrderId(Long merchantOrderId) {
+        this.merchantOrderId = merchantOrderId;
     }
 
     public Double getAmount() {
@@ -57,9 +61,4 @@ public class Transaction {
         return id;
     }
 
-    @Override
-    public String toString() {
-        return  amount +
-                "," + merchantId+","+id;
-    }
 }

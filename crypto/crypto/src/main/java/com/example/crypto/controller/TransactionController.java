@@ -33,6 +33,7 @@ public class TransactionController {
     public ResponseEntity<String> handleTransactionStatus(@RequestBody TransactionStatusDto transactionStatusDto) {
 
         System.out.println(transactionStatusDto.getDetails());
+        Transaction t=transactionService.getById(Long.parseLong(transactionStatusDto.getTransactionId()));
 
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://localhost:8087/api/response";
@@ -40,7 +41,7 @@ public class TransactionController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String body = "{ \"responseUrl\": \"" + transactionStatusDto.getStatus() + "\", \"orderId\": \"" + transactionStatusDto.getTransactionId() + "\" }";
+        String body = "{ \"responseUrl\": \"" + transactionStatusDto.getStatus() + "\", \"orderId\": \"" + t.getMerchantOrderId() + "\" }";
 
         HttpEntity<String> entity = new HttpEntity<>(body, headers);
 

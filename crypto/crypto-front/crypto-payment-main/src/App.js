@@ -8,7 +8,7 @@ import SockJS from "sockjs-client";
 
 function App() {
   const [amount, setAmount] = useState(null);
-  const [merchantId, setMerchantId] = useState(null);
+  const [to, setTo] = useState(null);
   const [transactionId, setTransactionId] = useState(null);
   const [destinationAddress, setDestinationAddress] = useState("");
   const [eth, setTEuri] = useState(null);
@@ -27,9 +27,9 @@ function App() {
     client.onConnect = () => {
       console.log("Connected to WebSocket");
       client.subscribe("/topic/string-data", (msg) => {
-        const [receivedAmount, receivedMerchantId, receivedTransactionId, eth] = msg.body.split(",");
+        const [receivedAmount, receivedTo, receivedTransactionId, eth] = msg.body.split(",");
         setAmount(receivedAmount);
-        setMerchantId(receivedMerchantId);
+        setTo(receivedTo);
         setTransactionId(receivedTransactionId);
         setTEuri(eth);
         setShowForm(true);
@@ -59,8 +59,10 @@ function App() {
     }
   }
 
-  async function sendEther(to, amount) {
-    const from = "0xe338ef3F5b907E62b40655570D0A3eB642Bd8d13";
+  async function sendEther(inputFrom, amount) {
+   // const from = "0xe338ef3F5b907E62b40655570D0A3eB642Bd8d13";
+    const from= inputFrom;
+    const to=to;
     const formattedAmount = parseFloat(amount).toFixed(18);
     const value = web3.utils.toWei(formattedAmount, "ether");
 
@@ -94,7 +96,6 @@ function App() {
           status,
           details,
           transactionId,
-          merchantId,
         }),
       });
 
@@ -120,7 +121,7 @@ function App() {
           <form onSubmit={handleSubmit}>
             <label>{amount} EUR = {eth} SepoliaETH</label>
             <br></br>
-            <label htmlFor="destinationAddress">Destination Address:</label>
+            <label htmlFor="destinationAddress">Your wallet address:</label>
             <input
               type="text"
               id="destinationAddress"

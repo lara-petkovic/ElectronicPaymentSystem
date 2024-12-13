@@ -5,5 +5,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface ITransactionService {
-    public Transaction create(Transaction transaction);
+     Transaction create(Transaction transaction);
+     Transaction getById(Long id);
+
 }
