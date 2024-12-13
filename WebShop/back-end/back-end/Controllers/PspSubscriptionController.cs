@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace back_end.Controllers
 {
-    //[Authorize(Policy = "adminPolicy")]
     [Route("api/psp-subscription")]
     [ApiController]
     public class PspSubscriptionController: ControllerBase
@@ -41,13 +40,6 @@ namespace back_end.Controllers
         [HttpPost("transaction")]
         public async Task<IActionResult> ProcessTransaction([FromBody] Transaction newTransaction)
         {
-            //var credentials = await _merchantCredentialsService.GetMerchantCredentialsAsync();
-
-            //if (credentials == null)
-            //{
-            //    return BadRequest("Merchant credentials not found");
-            //}
-
             var savedTransaction = await _transactionService.SaveTransaction(newTransaction);
             await _pspSubscriptionService.ProcessTransactionAsync(savedTransaction);
 
@@ -61,7 +53,7 @@ namespace back_end.Controllers
             return Ok(paymentOptions);
         }
 
-        [HttpDelete("payment-option")]
+        [HttpPut("payment-option")]
         public async Task<IActionResult> RemovePaymentOption([FromBody] PaymentOptionDto option)
         {
             var success = await _pspSubscriptionService.RemovePaymentOption(option);

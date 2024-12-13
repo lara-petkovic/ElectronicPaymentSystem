@@ -25,10 +25,10 @@ public class PaymentOptionController {
         PaymentOption paymentOption=paymentOptionService.create(newPaymentOption.name);
         return new ResponseEntity<>(paymentOption, HttpStatus.CREATED);
     }
-
     @DeleteMapping
-    public void RemovePaymentOption (@RequestBody PaymentOptionDto paymentOption){
-        paymentOptionService.remove(paymentOption.name);
+    public void RemovePaymentOption(@RequestBody PaymentOptionDto paymentOption) {
+        System.out.println("Received PaymentOption: " + paymentOption.getName());
+        paymentOptionService.remove(paymentOption.getName());
     }
     @GetMapping
     public ResponseEntity<List<PaymentOptionDto>> getAll(){

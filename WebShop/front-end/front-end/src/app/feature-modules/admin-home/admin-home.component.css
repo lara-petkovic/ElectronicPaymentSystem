@@ -32,21 +32,34 @@
   background-color: #003f7f;
 }
 
+.subscriptions-container {
+  margin-top: 4vh;
+  width: 100%;
+  text-align: center;
+}
+
 .payment-options {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .payment-option {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 10px 0;
+  margin: 10px auto;
   background: #004080;
   padding: 10px;
   border-radius: 5px;
   width: 300px;
   color: white;
+}
+
+.no-subscriptions-message {
+  color: #bbb;
+  font-size: 16px;
+  margin-top: 10px;
 }
 
 .remove-button {

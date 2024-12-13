@@ -106,11 +106,8 @@ export class AuthService {
   }
   
   removePaymentOption(option: any): Observable<void> {
-    return this.http.delete<void>(`${environment.apiHost}/psp-subscription/payment-option`, {
-      body: option
-    });
-  }
-  
+    return this.http.put<void>(`${environment.apiHost}/psp-subscription/payment-option`, option);
+  }  
   
   getAccessToken(): string | null {
     const token = this.tokenStorage.getAccessToken(); 

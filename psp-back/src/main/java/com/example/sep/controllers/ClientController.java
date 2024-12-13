@@ -46,7 +46,7 @@ public class ClientController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(clientService.getOptionsForClient(port),HttpStatus.OK);
     }
-    @DeleteMapping("/{port}")
+    @PutMapping("/{port}")
     public ResponseEntity<String> RemoveOption(@PathVariable String port, @RequestBody PaymentOptionDto option){
         if(clientService.getClientByPort(port)==null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

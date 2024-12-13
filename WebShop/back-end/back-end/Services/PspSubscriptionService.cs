@@ -64,7 +64,7 @@ namespace back_end.Services
 
                 var request = new HttpRequestMessage
                 {
-                    Method = HttpMethod.Delete,
+                    Method = HttpMethod.Put,
                     RequestUri = new Uri(PaymentOptionEndpoint),
                     Content = content
                 };

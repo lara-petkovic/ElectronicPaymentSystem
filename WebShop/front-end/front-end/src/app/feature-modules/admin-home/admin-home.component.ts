@@ -42,11 +42,12 @@ export class AdminHomeComponent implements OnInit {
     this.authService.removePaymentOption(option).subscribe({
       next: () => {
         console.log('Removed payment option:', option.name);
-        this.paymentOptions = this.paymentOptions.filter(o => o.name !== option.name);
+        this.loadPaymentOptions();
       },
       error: (err) => {
         console.error('Failed to remove payment option', err);
       }
     });
-  }
+    this.loadPaymentOptions();
+  }  
 }
