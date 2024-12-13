@@ -27,7 +27,7 @@ function App() {
     client.onConnect = () => {
       console.log("Connected to WebSocket");
       client.subscribe("/topic/string-data", (msg) => {
-        const [receivedAmount, receivedMerchantId, receivedTransactionId,eth] = msg.body.split(",");
+        const [receivedAmount, receivedMerchantId, receivedTransactionId, eth] = msg.body.split(",");
         setAmount(receivedAmount);
         setMerchantId(receivedMerchantId);
         setTransactionId(receivedTransactionId);
@@ -61,8 +61,7 @@ function App() {
 
   async function sendEther(to, amount) {
     const from = "0xe338ef3F5b907E62b40655570D0A3eB642Bd8d13";
-   
-    const formattedAmount = parseFloat(amount).toFixed(18); 
+    const formattedAmount = parseFloat(amount).toFixed(18);
     const value = web3.utils.toWei(formattedAmount, "ether");
 
     try {
@@ -71,13 +70,40 @@ function App() {
         to,
         value,
       });
+
       console.log(response);
+      await notifyBackend("success", response.transactionHash);
       toast.success("Transaction successful: " + response.transactionHash, {
         autoClose: 3000,
       });
-      setShowForm(false); // Hide the form after successful transaction
+      setShowForm(false);
     } catch (error) {
+      await notifyBackend("fail", error.message);
       toast.error(error.message, { autoClose: 3000 });
+    }
+  }
+
+  async function notifyBackend(status, details) {
+    try {
+      const response = await fetch("http://localhost:8088/api/transaction/status", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status,
+          details,
+          transactionId,
+          merchantId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to notify backend");
+      }
+      console.log("Backend notified successfully");
+    } catch (error) {
+      console.error("Error notifying backend: ", error);
     }
   }
 
