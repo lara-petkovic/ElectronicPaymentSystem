@@ -32,7 +32,8 @@ public class TransactionController {
     @PostMapping("/status")
     public ResponseEntity<String> handleTransactionStatus(@RequestBody TransactionStatusDto transactionStatusDto) {
 
-        System.out.println(transactionStatusDto.getDetails());
+        System.out.println(transactionStatusDto.getTransactionId());
+        System.out.println(Long.parseLong(transactionStatusDto.getTransactionId()));
         Transaction t=transactionService.getById(Long.parseLong(transactionStatusDto.getTransactionId()));
 
         RestTemplate restTemplate = new RestTemplate();

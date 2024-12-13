@@ -27,6 +27,7 @@ function App() {
     client.onConnect = () => {
       console.log("Connected to WebSocket");
       client.subscribe("/topic/string-data", (msg) => {
+        console.log(msg)
         const [receivedAmount, receivedTo, receivedTransactionId, eth] = msg.body.split(",");
         setAmount(receivedAmount);
         setTo(receivedTo);
@@ -62,7 +63,7 @@ function App() {
   async function sendEther(inputFrom, amount) {
    // const from = "0xe338ef3F5b907E62b40655570D0A3eB642Bd8d13";
     const from= inputFrom;
-    const to=to;
+    //const to=to;
     const formattedAmount = parseFloat(amount).toFixed(18);
     const value = web3.utils.toWei(formattedAmount, "ether");
 
@@ -86,6 +87,8 @@ function App() {
   }
 
   async function notifyBackend(status, details) {
+    console.log("ID JE")
+    console.log(transactionId)
     try {
       const response = await fetch("http://localhost:8088/api/transaction/status", {
         method: "POST",

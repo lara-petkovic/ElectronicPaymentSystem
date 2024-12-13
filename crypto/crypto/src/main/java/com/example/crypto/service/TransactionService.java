@@ -29,10 +29,12 @@ public class TransactionService implements ITransactionService {
         double amount=currencyConversionService.convertEurToSepoliaEth(transaction.getAmount());
         Merchant m=merchantService.getByMerchantId(transaction.getMerchantId());
         if(m!=null) {
+            transaction=transactionRepository.save(transaction);
+            System.out.println("JJJJJJJJJJJJJJJJJJJ"+transaction.getId());
             String transactionToSend = transaction.getAmount() + "," + m.getWalletAddress() + "," + transaction.getId() + "," + amount;
             messagingTemplate.convertAndSend("/topic/string-data", transactionToSend);
             transaction.setAmount(amount);
-            return transactionRepository.save(transaction);
+            return transaction;
         }else{
             RestTemplate restTemplate = new RestTemplate();
             String url = "http://localhost:8087/api/response";
