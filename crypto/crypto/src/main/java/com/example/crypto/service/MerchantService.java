@@ -10,6 +10,11 @@ public class MerchantService implements IMerchantService{
     @Autowired
     private MerchantRepository merchantRepository;
     @Override
+    public Merchant getByMerchantIdAndMerchantPass(String merchantId, String merchantPass) {
+        return merchantRepository.getMerchantByMerchantIdAndMerchantPass(merchantId, merchantPass);
+    }
+
+    @Override
     public Merchant getByMerchantId(String merchantId) {
         return merchantRepository.getMerchantByMerchantId(merchantId);
     }
@@ -17,8 +22,8 @@ public class MerchantService implements IMerchantService{
     @Override
     public Merchant create(Merchant merchant) {
 
-        if(merchantRepository.getMerchantByMerchantId(merchant.getMerchantId())==null){
-            Merchant m=new Merchant(merchant.getMerchantId(),merchant.getWalletAddress());
+        if(merchantRepository.getMerchantByMerchantIdAndMerchantPass(merchant.getMerchantId(), merchant.getMerchantPass())==null){
+            Merchant m=new Merchant(merchant.getMerchantId(),merchant.getWalletAddress(),merchant.getMerchantPass());
             return  merchantRepository.save(m);
         }
         return null;

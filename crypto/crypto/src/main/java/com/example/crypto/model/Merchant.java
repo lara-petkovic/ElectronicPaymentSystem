@@ -13,6 +13,8 @@ public class Merchant {
 
     @Column
     private String merchantId;
+    @Column
+    private String merchantPass;
 
     @Column
     private String walletAddress;
@@ -43,8 +45,17 @@ public class Merchant {
         this.walletAddress = walletAddress;
     }
 
-    public Merchant(String merchantId, String walletAddress) {
+    public String getMerchantPass() {
+        return merchantPass;
+    }
+
+    public void setMerchantPass(String merchantPass) {
+        this.merchantPass = merchantPass;
+    }
+
+    public Merchant(String merchantId, String walletAddress, String merchantPass) {
         this.merchantId = merchantId;
         this.walletAddress = walletAddress;
+        this.merchantPass=merchantPass;
     }
 }

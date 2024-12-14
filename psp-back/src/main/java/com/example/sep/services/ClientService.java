@@ -8,6 +8,7 @@ import com.example.sep.models.Client;
 import com.example.sep.models.PaymentOption;
 import com.example.sep.repositories.ClientRepository;
 import com.example.sep.repositories.PaymentOptionRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +36,8 @@ public class ClientService implements IClientService {
         this.paymentOptionRepository=paymentOptionRepository;
     }
     @Override
-    public ClientAuthenticationDataDto create(String subscription, String address) {
+    @Transactional
+    public ClientAuthenticationDataDto create(String subscription, String address, String walletAddress) {
         Client client = new Client();
         String merchantId=generateRandomString();
         client.setMerchantId(merchantId);
@@ -42,33 +45,45 @@ public class ClientService implements IClientService {
         client.setPort(address);
 
 
+        Boolean containsBank=false;
+        Boolean containsCrypto=false;
         String[] options = subscription.split(",");
         for (String s : options) {
+            if(s.equals("Card") || s.equals("QR")) {
+                containsBank=true;
+            }
+            if(s.equals("Crypto")){
+                containsCrypto=true;
+            }
             PaymentOption option = paymentOptionRepository.getPaymentOptionByOption(s);
             client.addPaymentOption(option);
         }
 
         this.clientRepository.save(client);
-        SendCredentials(client,address);
+        if(containsBank)
+            SendCredentialsToBank(client);
+        if(containsCrypto)
+            SendWalletCredentials(client, walletAddress);
         return new ClientAuthenticationDataDto(client.getMerchantId(),client.getMerchantPass());
     }
 
+    private void SendWalletCredentials(Client client, String walletAddress){
+        RestTemplate restTemplateBank = new RestTemplate();
+        String urlBank = "http://localhost:8087/api/merchant";
 
-    private void SendCredentials(Client client, String address){
-//        RestTemplate restTemplate = new RestTemplate();
-//        String url = "http://localhost:5275/api/psp-subscription/credentials";
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_JSON);
-//        headers.set("Location", address);
-//
-//        String body = "{ \"MerchantId\" : \"" + client.getMerchantId() + "\", \"MerchantPass\" : \"" + client.getMerchantPass() + "\" }";
-//
-//        HttpEntity<String> entity = new HttpEntity<>(body, headers);
-//        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+        HttpHeaders headersbank = new HttpHeaders();
+        headersbank.setContentType(MediaType.APPLICATION_JSON);
 
+        String bodybank = "{ \"merchantId\" : \"" + client.getMerchantId() + "\", \"merchantPass\" : \"" + client.getMerchantPass() + "\", \"walletAddress\" : \"" + walletAddress +"\" }";
 
-        //SEND TO BANK
+        HttpEntity<String> entity= new HttpEntity<>(bodybank, headersbank);
+
+        // Send the POST request
+        ResponseEntity<String> responseBank = restTemplateBank.exchange(urlBank, HttpMethod.POST, entity, String.class);
+    }
+
+    private void SendCredentialsToBank(Client client){
+
         RestTemplate restTemplateBank = new RestTemplate();
         String urlBank = "http://localhost:8087/api/accounts";
 

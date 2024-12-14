@@ -61,7 +61,7 @@ export class PspFormComponent implements OnInit{
     if (this.paymentOptions.includes("Card")) this.cards.push({ name: 'Card', id: '1' });
     if (this.paymentOptions.includes("QR")) this.cards.push({ name: 'QR Code', id: '2' });
     if (this.paymentOptions.includes("PayPal")) this.cards.push({ name: 'PayPal', id: '3' });
-    if (this.paymentOptions.includes("Bitcoin")) this.cards.push({ name: 'Bitcoin', id: '4' });
+    if (this.paymentOptions.includes("Crypto")) this.cards.push({ name: 'Crypto', id: '4' });
     // this.paymentOptions.split(',').forEach((option, index) => {
     //   const trimmedOption = option.trim(); 
     //   if (trimmedOption) {

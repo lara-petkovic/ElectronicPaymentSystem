@@ -20,11 +20,6 @@ export class AppComponent {
 
   constructor(private router: Router) {
     this.initializeWebSockets();
-/*
-    setInterval(() => {
-      this.sendPing();
-    }, 1500);
-    */
   }
 
   private initializeWebSockets() {
@@ -72,19 +67,6 @@ export class AppComponent {
       this.webSocketResponse = webSocket;
     }
   }
-/*
-  private sendPing() {
-    if (this.webSocket?.readyState === WebSocket.OPEN) {
-      this.webSocket.send('ping');
-    }
-    if (this.webSocketClient?.readyState === WebSocket.OPEN) {
-      this.webSocketClient.send('ping');
-    }
-    if (this.webSocketResponse?.readyState === WebSocket.OPEN) {
-      this.webSocketResponse.send('ping');
-    }
-  }
-  */
 
   private handleTransactionMessage(event: MessageEvent) {
     console.log(event.data);
@@ -131,11 +113,22 @@ export class AppComponent {
     this.router.navigate(['home']);
   }
 
-  handleOptionSelected(option: { name: string; clientId: string | null }) {
+  handleOptionSelected(option: { name: string; clientId: string | null; walletAddress?: string | null }) {
     option.clientId = this.clientId;
+  
+    if (option.name.includes('Crypto')) {
+      if (!option.walletAddress) {
+        console.error('Wallet address is required for Crypto.');
+        return;
+      }
+    } else {
+      option.walletAddress = null; 
+    }
+  
     const message = JSON.stringify(option);
     this.webSocketClient.send(message);
     console.log('Sent options:', message);
+  
     this.showClientReg = false;
     this.showPaymentForm = false;
     this.router.navigate(['home']);
