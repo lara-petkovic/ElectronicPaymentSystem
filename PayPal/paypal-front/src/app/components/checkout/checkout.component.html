@@ -1,0 +1,10 @@
+<div *ngIf="selectedProduct; else emptyCart">
+    <h2>Proizvod: {{ selectedProduct.name }}</h2>
+    <p>Cena: ${{ selectedProduct.price }}</p>
+    
+    <div id="paypal-button-container"></div>
+</div>
+  
+<ng-template #emptyCart>
+<h2>Korpa je prazna!</h2>
+</ng-template>  
