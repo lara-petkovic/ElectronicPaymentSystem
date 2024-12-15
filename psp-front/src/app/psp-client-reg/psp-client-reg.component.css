@@ -54,3 +54,36 @@
     transform: scale(1.01);
     background-color: lightsteelblue;
   }
+
+  .wallet-input {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 20px auto; /* Centriranje */
+  }
+  
+  .wallet-input label {
+    font-size: 1.2em;
+    color: white; /* Bela boja za tekst */
+    margin-bottom: 10px;
+  }
+  
+  .wallet-input input {
+    width: 400px; /* Veća širina za input */
+    height: 40px; /* Veća visina za input */
+    font-size: 1.1em; /* Veći font */
+    border: 2px solid #007BFF; /* Svetlo plava boja za okvir */
+    border-radius: 5px;
+    padding: 5px 10px;
+    outline: none;
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .wallet-input input:focus {
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.7); /* Svetlo plava senka */
+  }
+  
+  .wallet-input input::placeholder {
+    color: #B0DFFB; /* Svetlo plava boja za placeholder */
+  }
