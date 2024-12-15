@@ -37,27 +37,43 @@ public class ClientService implements IClientService {
     }
     @Override
     @Transactional
+
     public ClientAuthenticationDataDto create(String subscription, String address, String walletAddress) {
+
         Client client = new Client();
-        String merchantId=generateRandomString();
+
+        // Generiši Merchant ID i Merchant Pass
+        String merchantId = generateRandomString();
         client.setMerchantId(merchantId);
         client.setMerchantPass(generateRandomString());
         client.setPort(address);
+        client = clientRepository.save(client); // `save` metoda obično radi merge za detached entitete
+
 
 
         Boolean containsBank=false;
         Boolean containsCrypto=false;
+
         String[] options = subscription.split(",");
+
+        // Učitaj opcije i poveži ih sa Client entitetom
         for (String s : options) {
+
             if(s.equals("Card") || s.equals("QR")) {
                 containsBank=true;
             }
             if(s.equals("Crypto")){
                 containsCrypto=true;
             }
+
             PaymentOption option = paymentOptionRepository.getPaymentOptionByOption(s);
-            client.addPaymentOption(option);
+
+            if (option != null) {
+                // Dodaj PaymentOption u Client
+                client.addPaymentOption(option);
+            }
         }
+
 
         this.clientRepository.save(client);
         if(containsBank)
@@ -65,14 +81,17 @@ public class ClientService implements IClientService {
         if(containsCrypto)
             SendWalletCredentials(client, walletAddress);
         return new ClientAuthenticationDataDto(client.getMerchantId(),client.getMerchantPass());
+
     }
 
     private void SendWalletCredentials(Client client, String walletAddress){
         RestTemplate restTemplateBank = new RestTemplate();
         String urlBank = "http://localhost:8087/api/merchant";
 
+
         HttpHeaders headersbank = new HttpHeaders();
         headersbank.setContentType(MediaType.APPLICATION_JSON);
+
 
         String bodybank = "{ \"merchantId\" : \"" + client.getMerchantId() + "\", \"merchantPass\" : \"" + client.getMerchantPass() + "\", \"walletAddress\" : \"" + walletAddress +"\" }";
 

@@ -1,6 +1,18 @@
-<div class="page-container">
-    <p class="page-title">Payments subscriptions</p>
-    <button class="subscribe-button" (click)="onButtonClick()">Subscribe</button>
-    <button class="subscribe-button" (click)="logout()">Logout</button>
+<div class="page-container"> 
+  <p class="page-title">Payments subscriptions</p>
+  <button class="subscribe-button" (click)="onButtonClick()">Subscribe</button>
+  <button class="subscribe-button" (click)="logout()">Logout</button>
+
+  <div class="subscriptions-container">
+    <h2>My subscriptions</h2>
+    <ul class="payment-options" *ngIf="paymentOptions.length > 0; else noSubscriptions">
+        <li *ngFor="let option of paymentOptions" class="payment-option">
+            {{ option.name }}
+            <button class="remove-button" (click)="removePaymentOption(option)">X</button>
+        </li>
+    </ul>
+    <ng-template #noSubscriptions>
+      <p class="no-subscriptions-message">No subscriptions available</p>
+    </ng-template>
   </div>
-  
+</div>

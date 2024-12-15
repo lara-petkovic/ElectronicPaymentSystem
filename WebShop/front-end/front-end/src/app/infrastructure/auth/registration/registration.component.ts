@@ -36,7 +36,8 @@ export class RegistrationComponent {
         lastName: this.registrationForm.get('surname')?.value || '',
         email: this.registrationForm.get('email')?.value || '',
         password: this.registrationForm.get('password')?.value || '',
-        subscriptions: null!
+        subscriptions: null!,
+        role: "USER"
       };
   
       this.authService.register(newUser).subscribe({

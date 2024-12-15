@@ -22,7 +22,9 @@ public class Client {
     @Column(name="port")
     private String port;
 
+
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
+
     @JoinTable(name = "payment_option_client", joinColumns = @JoinColumn(name = "client_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "option_id", referencedColumnName = "id"))
     @JsonIgnore

@@ -8,5 +8,6 @@ export interface User {
     password: string;
     email: string;
     subscriptions?: Subscription[];
+    role: string;
 }
   

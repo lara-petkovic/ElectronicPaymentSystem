@@ -57,9 +57,10 @@ namespace back_end.Data
         private static void SeedData(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().HasData(
-                new User { Id = -1, Username = "larapetkovic", FirstName = "Lara", LastName = "Petkovic", Password = "password", Email = "lara@gmail.com" },
-                new User { Id = -2, Username = "jelisavetaletic", FirstName = "Jelisaveta", LastName = "Letic", Password = "password", Email = "jelly@hotmail.com" },
-                new User { Id = -3, Username = "aaa", FirstName = "aaa", LastName = "aaa", Password = "aaa", Email = "aaa@aaa.com" }
+                new User { Id = -1, Username = "larapetkovic", FirstName = "Lara", LastName = "Petkovic", Password = "password", Email = "lara@gmail.com", Role = "User" },
+                new User { Id = -2, Username = "jelisavetaletic", FirstName = "Jelisaveta", LastName = "Letic", Password = "password", Email = "jelly@hotmail.com", Role = "User" },
+                new User { Id = -3, Username = "aaa", FirstName = "aaa", LastName = "aaa", Password = "aaa", Email = "aaa@aaa.com", Role = "User" },
+                new User { Id = -4, Username = "admin", FirstName = "admin", LastName = "admin", Password = "admin", Email = "admin@gmail.com", Role = "Admin" }
             );
 
             modelBuilder.Entity<Service>().HasData(

@@ -18,7 +18,9 @@ public class PaymentOption {
     @Column(name = "option")
     private String option;
 
+
     @ManyToMany(mappedBy = "paymentOptions",fetch=FetchType.EAGER,cascade = {CascadeType.MERGE})
+
     @JsonIgnore
     private Set<Client> clients=new HashSet<Client>();
 

@@ -1,22 +1,26 @@
 ﻿using System.Text;
-using System;
 using back_end.Models;
-using back_end.Data;
-using Microsoft.EntityFrameworkCore;
+using back_end.Dtos;
+using System.Text.Json;
 
 namespace back_end.Services
 {
     public class PspSubscriptionService
     {
         private static readonly HttpClient httpClient = new HttpClient();
+        private const string BaseUrl = "http://localhost:8086/api";
+
+        private static readonly string SubscriptionEndpoint = $"{BaseUrl}/subscription";
+        private static readonly string PaymentOptionEndpoint = $"{BaseUrl}/subscription/5275";
+        private static readonly string TransactionEndpoint = $"{BaseUrl}/transaction";
 
         public async void CreateSubscription() {
             var jsonData = "{\"apiKey\": \"5275\"}";
             var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-            string url = "http://localhost:8086/api/subscription";
+
             try
             {
-                HttpResponseMessage response = await httpClient.PostAsync(url, content);
+                HttpResponseMessage response = await httpClient.PostAsync(SubscriptionEndpoint, content);
                 response.EnsureSuccessStatusCode(); 
 
                 string responseData = await response.Content.ReadAsStringAsync();
@@ -28,6 +32,56 @@ namespace back_end.Services
             }
         }
 
+        public async Task<List<PaymentOptionDto>> GetPaymentOptions()
+        {
+            try
+            {
+                HttpResponseMessage response = await httpClient.GetAsync(PaymentOptionEndpoint);
+                response.EnsureSuccessStatusCode();
+
+                string responseData = await response.Content.ReadAsStringAsync();
+
+                var paymentOptions = JsonSerializer.Deserialize<List<PaymentOptionDto>>(responseData, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                return paymentOptions ?? new List<PaymentOptionDto>();
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine("An error has occurred while fetching payment options: " + e.Message);
+                return new List<PaymentOptionDto>();
+            }
+        }
+
+        public async Task<bool> RemovePaymentOption(PaymentOptionDto option)
+        {
+            try
+            {
+                var jsonData = JsonSerializer.Serialize(option);
+                var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Put,
+                    RequestUri = new Uri(PaymentOptionEndpoint),
+                    Content = content
+                };
+
+                HttpResponseMessage response = await httpClient.SendAsync(request);
+
+                response.EnsureSuccessStatusCode();
+                return true;
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine("An error occurred while removing the payment option: " + e.Message);
+                return false;
+            }
+        }
+
+
         public async Task ProcessTransactionAsync(Transaction transaction)
         {
             var jsonData = new StringContent(
@@ -37,13 +91,11 @@ namespace back_end.Services
                 $"\"merchantTimestamp\": \"{transaction.Timestamp}\"}}",
                 Encoding.UTF8, "application/json");
 
-
-            string url = "http://localhost:8086/api/transaction";
             try
             {
                 httpClient.DefaultRequestHeaders.Add("Port", "5275");
 
-                HttpResponseMessage response = await httpClient.PostAsync(url, jsonData);
+                HttpResponseMessage response = await httpClient.PostAsync(TransactionEndpoint, jsonData);
                 response.EnsureSuccessStatusCode();
 
                 string responseData = await response.Content.ReadAsStringAsync();
