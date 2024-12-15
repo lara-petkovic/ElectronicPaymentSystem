@@ -38,11 +38,6 @@ export class PspFormComponent implements OnInit{
   displayedColumns: string[] = ['name'];
 
   selectCard(card: any) {
-    if(card.name!=='Card'){
-      alert('Payment option not supported yet.');
-      this.selectedRow = null;
-      return;
-    }
     if (this.selectedRow === card) {
       return;
     }

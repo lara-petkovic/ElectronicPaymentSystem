@@ -10,6 +10,8 @@ public class Transaction {
     @Column
     private Double amount;
     @Column
+    private Double amountEth;
+    @Column
     private String merchantId;
     @Column
     private String timestamp;
@@ -61,4 +63,11 @@ public class Transaction {
         return id;
     }
 
+    public Double getAmountEth() {
+        return amountEth;
+    }
+
+    public void setAmountEth(Double amountEth) {
+        this.amountEth = amountEth;
+    }
 }

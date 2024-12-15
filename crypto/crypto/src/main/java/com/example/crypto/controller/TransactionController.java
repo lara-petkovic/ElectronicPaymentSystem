@@ -1,5 +1,6 @@
 package com.example.crypto.controller;
 
+import com.example.crypto.dto.NewTransactionDto;
 import com.example.crypto.dto.TransactionStatusDto;
 import com.example.crypto.model.Transaction;
 import com.example.crypto.service.ITransactionService;
@@ -23,8 +24,7 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<Transaction> CreateTransaction(@RequestBody Transaction transaction) throws Exception {
-
+    public ResponseEntity<Transaction> CreateTransaction(@RequestBody NewTransactionDto transaction) throws Exception {
         Transaction t=transactionService.create(transaction);
         return  new ResponseEntity<>(t, HttpStatus.CREATED);
     }
