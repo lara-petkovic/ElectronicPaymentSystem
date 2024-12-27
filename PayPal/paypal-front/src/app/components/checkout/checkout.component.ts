@@ -38,16 +38,16 @@ export class CheckoutComponent implements OnInit {
         onApprove: async (data: any, actions: any) => {
           const order = await actions.order.capture();
           console.log('Order successfully paid:', order);
-          alert('Uspešno plaćanje!');
+          alert('Payment successful!');
           localStorage.removeItem('selectedProduct');
         },
         onError: (err: any) => {
           console.error('Error during PayPal payment:', err);
-          alert('Došlo je do greške tokom plaćanja.');
+          alert('An error has occured. Please try again.');
         }
       }).render('#paypal-button-container');
     } else {
-      console.error('PayPal SDK nije učitan!');
+      console.error('PayPal SDK not loaded!');
     }
   }
 }
