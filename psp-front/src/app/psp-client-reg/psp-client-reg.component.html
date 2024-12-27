@@ -2,25 +2,48 @@
   <h1>Select payment options</h1>
 </div>
 
-<button mat-raised-button class="confirm-button" [disabled]="selectedOptions.length === 0" (click)="confirmSelection()">Confirm</button>
+<button 
+  mat-raised-button 
+  class="confirm-button" 
+  [disabled]="selectedOptions.length === 0" 
+  (click)="confirmSelection()"
+>
+  Confirm
+</button>
+
+<div *ngIf="selectedOptions.includes('Crypto')" class="wallet-input">
+  <label for="walletAddress">Enter Wallet Address:</label>
+  <input 
+    id="walletAddress" 
+    [(ngModel)]="walletAddress" 
+    type="text" 
+    placeholder="Enter wallet address"
+  />
+</div>
 
 <div class="card-container">
   <table mat-table [dataSource]="options" class="options-table" matSort>
     <!-- Definicija zaglavlja tabele -->
     <ng-container matColumnDef="name">
-      <td mat-cell *matCellDef="let option" 
-          [ngClass]="{ 'selected': selectedOptions.includes(option.name) }"
-          (click)="toggleSelection(option.name)"
-          (mouseover)="hoverOption = option.name"
-          (mouseleave)="hoverOption = ''"
-          [style.fontSize]="hoverOption === option.name ? '1.2em' : '1em'">
+      <td 
+        mat-cell 
+        *matCellDef="let option" 
+        [ngClass]="{ 'selected': selectedOptions.includes(option.name) }"
+        (click)="toggleSelection(option.name)"
+        (mouseover)="hoverOption = option.name"
+        (mouseleave)="hoverOption = ''"
+        [style.fontSize]="hoverOption === option.name ? '1.2em' : '1em'"
+      >
         {{ option.name }}
       </td>
     </ng-container>
 
     <!-- Prikazivanje reda sa podacima -->
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
-        [ngClass]="{'selected': selectedOptions.includes(row.name)}"
-        [class.hover]="hoverOption === row.name"></tr> <!-- Red podataka -->
+    <tr 
+      mat-row 
+      *matRowDef="let row; columns: displayedColumns;" 
+      [ngClass]="{'selected': selectedOptions.includes(row.name)}"
+      [class.hover]="hoverOption === row.name"
+    ></tr>
   </table>
 </div>

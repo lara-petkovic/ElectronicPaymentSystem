@@ -15,10 +15,10 @@ public class PaymentOption {
     @Column(name = "address")
     private String address;
     @Column(name = "port")
-    private Integer port;
+    private String port;
 
     public PaymentOption(){}
-    public PaymentOption(Long id, String option, String address, Integer port) {
+    public PaymentOption(Long id, String option, String address, String port) {
         this.id = id;
         this.option = option;
         this.address = address;
@@ -49,11 +49,11 @@ public class PaymentOption {
         this.address = address;
     }
 
-    public Integer getPort() {
+    public String getPort() {
         return port;
     }
 
-    public void setPort(Integer port) {
+    public void setPort(String port) {
         this.port = port;
     }
 }

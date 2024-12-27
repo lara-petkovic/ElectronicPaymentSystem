@@ -1,0 +1,52 @@
+.main-div {
+  background-image: url('./../public/wallpaper.jpg');
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Arial, sans-serif";
+}
+
+.center {
+  text-align: center;
+  border: 2px solid #ddd;
+  border-radius: 10%;
+  padding: 30px;
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  width: 80%;
+  max-width: 600px;
+}
+
+.center h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.center p {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.pay-button {
+  padding: 12px 30px;
+  font-size: 18px;
+  background-color: #61bbf8;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+}
+
+.pay-button:hover {
+  background-color: #306b8b;
+}
+
+input{
+  width: 400px;
+}

@@ -38,7 +38,8 @@ public class ClientSubscriptionWebSocketHandler extends TextWebSocketHandler {
             Map<String, Object> data = objectMapper.readValue(message.getPayload(), Map.class);
             String address = (String) data.get("clientId");
             String subscription = (String) data.get("name");
-            createClient(subscription,address);
+            String walletAddress = (String) data.get("walletAddress");
+            createClient(subscription,address, walletAddress);
 
             System.out.println("Received subscription: " +  ", ID: " + address+subscription);
 
@@ -48,8 +49,8 @@ public class ClientSubscriptionWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private void createClient(String subscription, String address) {
+    private void createClient(String subscription, String address, String walletAddress) {
         ClientService clientService = new ClientService(clientRepository, paymentOptionRepository);
-        clientService.create(subscription, address);
+        clientService.create(subscription, address, walletAddress);
     }
 }
