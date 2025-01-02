@@ -2,28 +2,32 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { PaymentOptionDto } from './options.model';
+import { TransactionDto } from './transactiondto.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PaymentOptionsServiceService {
 
-  private apiUrl = 'http://localhost:8085/api/paymentoption';  // Putanja do tvoje API kontrolera
+  private paymentOptionApiUrl = 'http://localhost:8085/api/paymentoption';
+  private responseApiUrl = 'http://localhost:8085/api/response';
 
   constructor(private http: HttpClient) { }
 
-  // Metoda za dobijanje svih opcija plačanja
   getAllOptions(): Observable<PaymentOptionDto[]> {
-    return this.http.get<PaymentOptionDto[]>(this.apiUrl);  // HTTP GET poziv
+    return this.http.get<PaymentOptionDto[]>(this.paymentOptionApiUrl);
   }
 
-  // Metoda za dodavanje nove opcije plačanja
   addPaymentOption(newOption: PaymentOptionDto): Observable<PaymentOptionDto> {
-    return this.http.post<PaymentOptionDto>(this.apiUrl, newOption);  // HTTP POST poziv
+    return this.http.post<PaymentOptionDto>(this.paymentOptionApiUrl, newOption);
   }
 
-  // Metoda za uklanjanje opcije plačanja
   removePaymentOption(option: PaymentOptionDto): Observable<void> {
-    return this.http.delete<void>(this.apiUrl, { body: option });  // HTTP DELETE poziv
+    return this.http.delete<void>(this.paymentOptionApiUrl, { body: option });
+  }
+
+  getTransactionByMerchantOrderIdAndOrderId(merchantOrderId: string, orderId: number): Observable<TransactionDto> {
+    const url = `${this.responseApiUrl}/by-merchant-order-id/${merchantOrderId}/order-id/${orderId}`;
+    return this.http.get<TransactionDto>(url);
   }
 }

@@ -1,8 +1,10 @@
 import { Routes } from '@angular/router';
 import { ProductListComponent } from './components/product-list/product-list.component';
 import { CheckoutComponent } from './components/checkout/checkout.component';
+import { SuccessComponent } from './components/success/success.component';
 
 export const routes: Routes = [
-  { path: '', component: ProductListComponent },
-  { path: 'checkout', component: CheckoutComponent }
+  { path: 'product-list', component: ProductListComponent },
+  { path: '', component: CheckoutComponent },
+  { path: 'success', component: SuccessComponent}
 ];

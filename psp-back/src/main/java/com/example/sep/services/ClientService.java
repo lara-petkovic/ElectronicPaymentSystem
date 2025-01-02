@@ -120,19 +120,19 @@ public class ClientService implements IClientService {
     @Override
     public ClientSubscriptionDto getSubscription(NewTransactionDto newTransactionDto, String port) {
         List<Client> clients=clientRepository.getClientsByPort(port);
-        if(!clients.isEmpty()) {
-            Client client=clients.getLast();
-            Set<PaymentOption> options=client.getPaymentOptions();
-            String optionsString=options.stream()
+        if (!clients.isEmpty()) {
+            Client client = clients.get(clients.size() - 1);
+            Set<PaymentOption> options = client.getPaymentOptions();
+            String optionsString = options.stream()
                     .map(PaymentOption::toString)
                     .collect(Collectors.joining(","));
-            return new ClientSubscriptionDto(optionsString,client.getMerchantId(),newTransactionDto.getMerchantOrderId());
+            return new ClientSubscriptionDto(optionsString, client.getMerchantId(), newTransactionDto.getMerchantOrderId());
         }
         return null;
     }
 
     public Client getClientByPort(String port){
-        return clientRepository.getClientsByPort(port).getLast();
+        return clientRepository.getClientsByPort(port).get(clientRepository.getClientsByPort(port).size() - 1);
     }
 
     @Override

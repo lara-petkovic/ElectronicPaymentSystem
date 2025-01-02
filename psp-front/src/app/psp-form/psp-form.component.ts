@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
+import { TransactionDto } from '../transactiondto.model';
+import { PaymentOptionsServiceService } from '../payment-options-service.service';
 
 interface Card {
   name: string;
@@ -14,7 +16,7 @@ interface Card {
 export class PspFormComponent implements OnInit{
   @Output() paymentMethodSelected = new EventEmitter<{ name: string; orderid: string | null; merchantid: string | null }>();
 
-  constructor(private router: Router){}
+  constructor(private paymentOptionsService: PaymentOptionsServiceService){}
   selectedRow: any = null;
   header: string = "Choose one payment method";
   cards: Card[] = [];
@@ -42,14 +44,40 @@ export class PspFormComponent implements OnInit{
       return;
     }
     this.selectedRow = card;
-    alert('chosen payment method : '+card.name);
+    alert('chosen payment method : ' + card.name);
+  
     const jsonString = this._paymentOptions
-    .replace(/'/g, '"')
-    .replace(/(\w+)=/g, '"$1":');
+      .replace(/'/g, '"')
+      .replace(/(\w+)=/g, '"$1":');
     const data = JSON.parse(jsonString);
-    this.paymentMethodSelected.emit({ name: card.name, orderid: data.orderId, merchantid: data.merchantId });
+
+    if (card.name === 'PayPal') {
+      this.paymentOptionsService
+        .getTransactionByMerchantOrderIdAndOrderId(data.merchantId, data.orderId)
+        .subscribe(
+          (transaction: TransactionDto) => {
+            const transactionDetails = {
+              orderId: transaction.orderId,
+              merchantId: transaction.merchantId,
+              amount: transaction.amount.toString(),
+              timestamp: transaction.timestamp
+            };
+
+            const queryParams = new URLSearchParams(transactionDetails).toString();
+            window.location.href = `http://localhost:4203?${queryParams}`;
+          },
+          (error: any) => {
+            console.error('Error fetching transaction details:', error);
+            alert('Failed to fetch transaction details.');
+          }
+        );
+    } else {
+      this.paymentMethodSelected.emit({ name: card.name, orderid: data.orderId, merchantid: data.merchantId });
+    }
+  
     this.selectedRow = null;
   }
+  
 
   private updateCards() {
     this.cards = []; 
