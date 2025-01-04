@@ -61,6 +61,7 @@ public class PaymentsService {
         Map<String, Object> purchaseUnit = new HashMap<>();
         purchaseUnit.put("description", "Order ID: " + orderId + ", Merchant ID: " + merchantId);
         purchaseUnit.put("amount", Map.of("currency_code", "USD", "value", amount));
+        purchaseUnit.put("reference_id", merchantId); // Embed merchantId here
 
         Map<String, Object> requestBody = Map.of("intent", "CAPTURE", "purchase_units", new Object[]{purchaseUnit});
 
@@ -72,49 +73,99 @@ public class PaymentsService {
 
     public Payment capturePayment(String paypalOrderId) {
         String accessToken = getAccessToken();
+        ResponseEntity<Map> response = executeCaptureRequest(paypalOrderId, accessToken);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + accessToken);
-        headers.add("Content-Type", "application/json");
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("Payment capture failed!");
+        }
 
+        Map<String, Object> responseBody = getResponseBody(response);
+        String merchantId = extractMerchantId(responseBody);
+        Double amount = extractCapturedAmount(responseBody);
+
+        return savePayment(paypalOrderId, merchantId, amount);
+    }
+
+    private ResponseEntity<Map> executeCaptureRequest(String paypalOrderId, String accessToken) {
+        HttpHeaders headers = createHeaders(accessToken);
         HttpEntity<Void> request = new HttpEntity<>(headers);
-        ResponseEntity<Map> response = restTemplate.exchange(
+        return restTemplate.exchange(
                 PAYPAL_CAPTURE_ORDER_URL,
                 HttpMethod.POST,
                 request,
                 Map.class,
                 paypalOrderId
         );
+    }
 
-        boolean isCaptured = response.getStatusCode().is2xxSuccessful();
-        if (isCaptured) {
-            Map<String, Object> responseBody = response.getBody();
-            assert responseBody != null;
+    private Map<String, Object> getResponseBody(ResponseEntity<Map> response) {
+        Map<String, Object> responseBody = response.getBody();
+        if (responseBody == null) {
+            throw new RuntimeException("Response body is null!");
+        }
+        return responseBody;
+    }
 
-            Map<String, Object> paymentSource = (Map<String, Object>) responseBody.get("payment_source");
-            String merchantId = (String) ((Map<String, Object>) paymentSource.get("paypal")).get("account_id");
+    private String extractMerchantId(Map<String, Object> responseBody) {
+        List<Map<String, Object>> purchaseUnits = getPurchaseUnits(responseBody);
+        Map<String, Object> firstPurchaseUnit = purchaseUnits.get(0);
 
-            List<Map<String, Object>> purchaseUnits = (List<Map<String, Object>>) responseBody.get("purchase_units");
-            Map<String, Object> payments = (Map<String, Object>) purchaseUnits.get(0).get("payments");
-            List<Map<String, Object>> captures = (List<Map<String, Object>>) payments.get("captures");
+        String paypalAccountId = (String) firstPurchaseUnit.get("reference_id");
+        if (paypalAccountId == null) {
+            throw new RuntimeException("Merchant ID is missing in purchase unit!");
+        }
+        return paypalAccountId;
+    }
 
-            if (captures != null && !captures.isEmpty()) {
-                Map<String, Object> capture = captures.get(0);
-                Double amount = Double.parseDouble((String) ((Map<String, Object>) capture.get("amount")).get("value"));
+    private Double extractCapturedAmount(Map<String, Object> responseBody) {
+        List<Map<String, Object>> purchaseUnits = getPurchaseUnits(responseBody);
+        Map<String, Object> firstPurchaseUnit = purchaseUnits.get(0);
 
-                Payment payment = new Payment();
-                payment.setMerchantId(merchantId);
-                payment.setAmount(amount);
-                payment.setOrderId(paypalOrderId);
-                payment.setStatus("COMPLETED");
-                payment.setTimestamp(LocalDateTime.now());
+        List<Map<String, Object>> captures = getCaptures(firstPurchaseUnit);
+        Map<String, Object> capture = captures.get(0);
 
-                paymentsRepository.save(payment);
-
-                return payment;
-            }
+        Map<String, Object> amountMap = (Map<String, Object>) capture.get("amount");
+        if (amountMap == null) {
+            throw new RuntimeException("Amount information is missing in capture!");
         }
 
-        throw new RuntimeException("Payment capture failed!");
+        return Double.parseDouble((String) amountMap.get("value"));
+    }
+
+    private List<Map<String, Object>> getPurchaseUnits(Map<String, Object> responseBody) {
+        List<Map<String, Object>> purchaseUnits = (List<Map<String, Object>>) responseBody.get("purchase_units");
+        if (purchaseUnits == null || purchaseUnits.isEmpty()) {
+            throw new RuntimeException("No purchase units found in response!");
+        }
+        return purchaseUnits;
+    }
+
+    private List<Map<String, Object>> getCaptures(Map<String, Object> purchaseUnit) {
+        Map<String, Object> payments = (Map<String, Object>) purchaseUnit.get("payments");
+        List<Map<String, Object>> captures = (payments != null) ? (List<Map<String, Object>>) payments.get("captures") : null;
+
+        if (captures == null || captures.isEmpty()) {
+            throw new RuntimeException("No captures found in payments!");
+        }
+        return captures;
+    }
+
+    private Payment savePayment(String paypalOrderId, String merchantId, Double amount) {
+        Payment payment = new Payment();
+        payment.setMerchantId(merchantId);
+        payment.setAmount(amount);
+        payment.setOrderId(paypalOrderId);
+        payment.setStatus("COMPLETED");
+        payment.setTimestamp(LocalDateTime.now());
+
+        paymentsRepository.save(payment);
+        return payment;
+    }
+
+    private HttpHeaders createHeaders(String accessToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Content-Type", "application/json");
+        return headers;
     }
 }

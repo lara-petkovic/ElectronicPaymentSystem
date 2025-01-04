@@ -52,7 +52,7 @@ public class ClientSubscriptionWebSocketHandler extends TextWebSocketHandler {
             System.out.println("Received subscription: " +  ", ID: " + address+subscription);
 
         } catch (Exception e) {
-            System.out.println("Parrsing error: " + e.getMessage());
+            System.out.println("Parsing error: " + e.getMessage());
             session.sendMessage(new TextMessage("Invalid format!"));
         }
     }

@@ -15,19 +15,25 @@ public class Payment {
 
     private String orderId;
     private String merchantId;
+    private String paypalAccountId;
     private Double amount;
     private String status;
     private LocalDateTime timestamp;
 
     public Payment() {}
 
-    public Payment(String orderId, String merchantId, Double amount, String status, LocalDateTime timestamp) {
+    public Payment(String orderId, String merchantId, String paypalAccountId, Double amount, String status, LocalDateTime timestamp) {
         this.orderId = orderId;
         this.merchantId = merchantId;
+        this.paypalAccountId = paypalAccountId;
         this.amount = amount;
         this.status = status;
         this.timestamp = timestamp;
     }
+
+    public String getPaypalAccountId() { return paypalAccountId; }
+
+    public void setPaypalAccountId(String paypalAccountId) { this.paypalAccountId = paypalAccountId; }
 
     public Long getId() {
         return id;
