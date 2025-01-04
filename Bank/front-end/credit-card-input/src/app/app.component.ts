@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { WebSocketService } from './websocket.service';
 import { Router } from '@angular/router';
+import { ImageService } from './image.service';
 
 
 @Component({
@@ -13,7 +14,7 @@ export class AppComponent implements OnInit, OnDestroy {
   message: string = '';
   messages: string[] = [];
 
-  constructor(private webSocketService: WebSocketService, private router: Router) {}
+  constructor(private webSocketService: WebSocketService, private router: Router, private imageService: ImageService) {}
 
   ngOnInit() {
     this.webSocketService.connect('ws://localhost:8052/creditCards');
@@ -24,11 +25,18 @@ export class AppComponent implements OnInit, OnDestroy {
   });
   }
 
-  processMessage(message: string) {
-    if (message.split(',').length === 2) {
+  processMessage(message: any) {
+    if (message.startsWith('qr:')) {
+      let src = `data:image/png;base64,${message.substring(3)}`;
+      this.imageService.setImage(src);
+      this.router.navigate(['qr-code']);
+    }
+    else if (message.split(',').length === 2) {
       this.router.navigate(['credit-card-input/' + message.split(',')[0] + '/' + message.split(',')[1]]);
     }
   }
+  
+  
 
   ngOnDestroy() {
   }

@@ -6,6 +6,9 @@ import com.example.bank.service.dto.PaymentRequestForAcquirerDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
+import java.util.Random;
+
 @Service
 public class PaymentRequestService {
     @Autowired
@@ -21,9 +24,29 @@ public class PaymentRequestService {
                 paymentRequestForAcquirerDto.FailedUrl,
                 paymentRequestForAcquirerDto.ErrorUrl
         );
+        newPaymentRequest.setId(generateRandomId());
         return repo.save(newPaymentRequest);
     }
-    public PaymentRequest getPaymentRequest(int id){
-        return repo.findById(id).orElse(null);
+    public PaymentRequest getPaymentRequest(String id){
+        for(PaymentRequest pr: repo.findAll()){
+            if(pr.getId().equals(id)){
+                return pr;
+            }
+        }
+        return null;
+    }
+    private String generateRandomId() {
+        Random random = new Random();
+
+        StringBuilder osnovniBroj = new StringBuilder();
+        for (int i = 0; i < 19; i++) {
+            osnovniBroj.append(random.nextInt(10));
+        }
+        String brojBezKontrole = osnovniBroj.toString();
+        BigInteger broj = new BigInteger(brojBezKontrole);
+        int ostatak = broj.mod(BigInteger.valueOf(97)).intValue();
+        int kontrolniBroj = (ostatak == 0) ? 0 : 97 - ostatak;
+
+        return brojBezKontrole + String.format("%02d", kontrolniBroj);
     }
 }

@@ -27,7 +27,7 @@ public class TransactionService {
                 .map(list -> list.get(list.size() - 1))
                 .orElse(null);
     }
-    public Transaction getTransactionByPaymentRequestId(int paymentRequestId){
+    public Transaction getTransactionByPaymentRequestId(String paymentRequestId){
         return repo.findAllByPaymentRequestId(paymentRequestId)
                 .filter(list -> !list.isEmpty())
                 .map(list -> list.get(list.size() - 1))

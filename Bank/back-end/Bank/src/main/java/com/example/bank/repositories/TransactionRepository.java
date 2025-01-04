@@ -10,6 +10,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     Optional<List<Transaction>> findAllByAcquirerOrderId(String acquirerOrderId);
     Optional<List<Transaction>> findAllByMerchantOrderId(String merchantOrderId);
     Optional<List<Transaction>> findAllByIssuerOrderId(String issuerOrderId);
-    Optional<List<Transaction>> findAllByPaymentRequestId(int paymentRequestId);
+    Optional<List<Transaction>> findAllByPaymentRequestId(String paymentRequestId);
 
 }

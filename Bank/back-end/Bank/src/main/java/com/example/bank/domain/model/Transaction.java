@@ -24,11 +24,11 @@ public class Transaction {
     @Column(name="status")
     private String status;
     @Column(name="payment_request_id")
-    private int paymentRequestId;
+    private String paymentRequestId;
 
     public Transaction(){}
 
-    public Transaction(double amount, String merchantOrderId, String merchantTimestamp, String acquirerOrderId, String acquirerTimestamp, String issuerOrderId, String issuerTimestamp, String status, int paymentRequestId) {
+    public Transaction(double amount, String merchantOrderId, String merchantTimestamp, String acquirerOrderId, String acquirerTimestamp, String issuerOrderId, String issuerTimestamp, String status, String paymentRequestId) {
         this.amount = amount;
         this.merchantOrderId = merchantOrderId;
         this.merchantTimestamp = merchantTimestamp;
@@ -39,7 +39,7 @@ public class Transaction {
         this.status = status;
         this.paymentRequestId = paymentRequestId;
     }
-    public Transaction(int id, double amount, String merchantOrderId, String merchantTimestamp, String acquirerOrderId, String acquirerTimestamp, String issuerOrderId, String issuerTimestamp, String status, int paymentRequestId) {
+    public Transaction(int id, double amount, String merchantOrderId, String merchantTimestamp, String acquirerOrderId, String acquirerTimestamp, String issuerOrderId, String issuerTimestamp, String status, String paymentRequestId) {
         this.id = id;
         this.amount = amount;
         this.merchantOrderId = merchantOrderId;
@@ -124,11 +124,11 @@ public class Transaction {
         this.status = status;
     }
 
-    public int getPaymentRequestId() {
+    public String getPaymentRequestId() {
         return paymentRequestId;
     }
 
-    public void setPaymentRequestId(int paymentRequestId) {
+    public void setPaymentRequestId(String paymentRequestId) {
         this.paymentRequestId = paymentRequestId;
     }
 }
