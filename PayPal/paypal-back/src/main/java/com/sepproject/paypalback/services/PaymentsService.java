@@ -14,10 +14,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class PaymentsService {
@@ -91,13 +88,31 @@ public class PaymentsService {
 
         boolean isCaptured = response.getStatusCode().is2xxSuccessful();
         if (isCaptured) {
-            Payment payment = new Payment();
-            payment.setOrderId(paypalOrderId);
-            payment.setStatus("COMPLETED");
-            payment.setTimestamp(LocalDateTime.now());
-            paymentsRepository.save(payment);
+            Map<String, Object> responseBody = response.getBody();
+            assert responseBody != null;
 
-            return payment;
+            Map<String, Object> paymentSource = (Map<String, Object>) responseBody.get("payment_source");
+            String merchantId = (String) ((Map<String, Object>) paymentSource.get("paypal")).get("account_id");
+
+            List<Map<String, Object>> purchaseUnits = (List<Map<String, Object>>) responseBody.get("purchase_units");
+            Map<String, Object> payments = (Map<String, Object>) purchaseUnits.get(0).get("payments");
+            List<Map<String, Object>> captures = (List<Map<String, Object>>) payments.get("captures");
+
+            if (captures != null && !captures.isEmpty()) {
+                Map<String, Object> capture = captures.get(0);
+                Double amount = Double.parseDouble((String) ((Map<String, Object>) capture.get("amount")).get("value"));
+
+                Payment payment = new Payment();
+                payment.setMerchantId(merchantId);
+                payment.setAmount(amount);
+                payment.setOrderId(paypalOrderId);
+                payment.setStatus("COMPLETED");
+                payment.setTimestamp(LocalDateTime.now());
+
+                paymentsRepository.save(payment);
+
+                return payment;
+            }
         }
 
         throw new RuntimeException("Payment capture failed!");

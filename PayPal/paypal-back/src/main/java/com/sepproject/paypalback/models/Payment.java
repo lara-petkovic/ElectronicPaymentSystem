@@ -18,7 +18,6 @@ public class Payment {
     private Double amount;
     private String status;
     private LocalDateTime timestamp;
-    private String paypalOrderId;
 
     public Payment() {}
 
@@ -28,14 +27,6 @@ public class Payment {
         this.amount = amount;
         this.status = status;
         this.timestamp = timestamp;
-    }
-
-    public String getPaypalOrderId() {
-        return paypalOrderId;
-    }
-
-    public void setPaypalOrderId(String paypalOrderId) {
-        this.paypalOrderId = paypalOrderId;
     }
 
     public Long getId() {
