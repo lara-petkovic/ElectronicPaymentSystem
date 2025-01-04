@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.biometric.BiometricManager
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,18 +15,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.Button
 import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import java.util.concurrent.Executor
+import androidx.biometric.BiometricPrompt
+import androidx.compose.ui.Modifier
 
 class PaymentActivity : AppCompatActivity() {
     lateinit var qrCodeResult: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         val qrCode = intent.getStringExtra("qrCodeResult") ?: "No QR code detected."
         qrCodeResult = qrCode
         val imeProdavca = extractValue(qrCodeResult, "N:", "|")
@@ -102,9 +104,33 @@ class PaymentActivity : AppCompatActivity() {
                     )
                     Button(
                         onClick = {
-                            PaymentService.pay(pozivNaBroj = modelIPozivNaBroj.substring(2), context)
-                            val intent = Intent(context, MainActivity::class.java)
-                            context.startActivity(intent)
+                            val executor: Executor = ContextCompat.getMainExecutor(context)
+                            val biometricPrompt = BiometricPrompt(this@PaymentActivity, executor, object : BiometricPrompt.AuthenticationCallback() {
+                                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                                    super.onAuthenticationSucceeded(result)
+                                    PaymentService.pay(pozivNaBroj = modelIPozivNaBroj.substring(2), context)
+                                    val intent = Intent(context, MainActivity::class.java)
+                                    context.startActivity(intent)
+                                }
+
+                                override fun onAuthenticationFailed() {
+                                    super.onAuthenticationFailed()
+                                }
+
+                                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                                    super.onAuthenticationError(errorCode, errString)
+                                }
+                            })
+
+                            val biometricPromptInfo = BiometricPrompt.PromptInfo.Builder()
+                                .setTitle("Fingerprint Authentication")
+                                .setSubtitle("Please scan your fingerprint to proceed with payment.")
+                                .setDeviceCredentialAllowed(true)
+                                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+                                .setNegativeButtonText("Cancel")
+                                .build()
+
+                            biometricPrompt.authenticate(biometricPromptInfo)
                         },
                         modifier = Modifier.fillMaxWidth()) {
                         BasicText(text="Izvrsi placanje")
