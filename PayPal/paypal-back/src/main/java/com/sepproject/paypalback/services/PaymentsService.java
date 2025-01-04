@@ -61,7 +61,7 @@ public class PaymentsService {
         Map<String, Object> purchaseUnit = new HashMap<>();
         purchaseUnit.put("description", "Order ID: " + orderId + ", Merchant ID: " + merchantId);
         purchaseUnit.put("amount", Map.of("currency_code", "USD", "value", amount));
-        purchaseUnit.put("reference_id", merchantId); // Embed merchantId here
+        purchaseUnit.put("reference_id", merchantId);
 
         Map<String, Object> requestBody = Map.of("intent", "CAPTURE", "purchase_units", new Object[]{purchaseUnit});
 
@@ -81,9 +81,10 @@ public class PaymentsService {
 
         Map<String, Object> responseBody = getResponseBody(response);
         String merchantId = extractMerchantId(responseBody);
+        String paypalAccountId = extractPaypalAccountId(responseBody);
         Double amount = extractCapturedAmount(responseBody);
 
-        return savePayment(paypalOrderId, merchantId, amount);
+        return savePayment(paypalOrderId, merchantId, paypalAccountId, amount);
     }
 
     private ResponseEntity<Map> executeCaptureRequest(String paypalOrderId, String accessToken) {
@@ -115,6 +116,22 @@ public class PaymentsService {
             throw new RuntimeException("Merchant ID is missing in purchase unit!");
         }
         return paypalAccountId;
+    }
+
+    private String extractPaypalAccountId(Map<String, Object> responseBody) {
+        Map<String, Object> paymentSource = (Map<String, Object>) responseBody.get("payment_source");
+        if (paymentSource != null) {
+            Map<String, Object> paypalDetails = (Map<String, Object>) paymentSource.get("paypal");
+            if (paypalDetails != null) {
+                String paypalAccountId = (String) paypalDetails.get("account_id");
+                if (paypalAccountId != null) {
+                    return paypalAccountId;
+                }
+            }
+        }
+
+        System.out.println("Warning: PayPal Account ID is missing in response.");
+        return "Unknown PayPal Account";
     }
 
     private Double extractCapturedAmount(Map<String, Object> responseBody) {
@@ -150,9 +167,10 @@ public class PaymentsService {
         return captures;
     }
 
-    private Payment savePayment(String paypalOrderId, String merchantId, Double amount) {
+    private Payment savePayment(String paypalOrderId, String merchantId, String paypalAccountId, Double amount) {
         Payment payment = new Payment();
         payment.setMerchantId(merchantId);
+        payment.setPaypalAccountId(paypalAccountId);
         payment.setAmount(amount);
         payment.setOrderId(paypalOrderId);
         payment.setStatus("COMPLETED");
