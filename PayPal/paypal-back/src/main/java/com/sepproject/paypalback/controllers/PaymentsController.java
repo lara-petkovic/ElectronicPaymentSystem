@@ -5,27 +5,33 @@ import com.sepproject.paypalback.models.Payment;
 import com.sepproject.paypalback.services.PaymentsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4203")
 @RequestMapping("/api/payments")
 public class PaymentsController {
 
     @Autowired
     private PaymentsService paymentsService;
 
-    @PostMapping
-    public ResponseEntity<?> createPayment(@RequestBody PaymentRequestDto request) {
-        Payment payment = paymentsService.processPayment(
+    @PostMapping("/create")
+    public ResponseEntity<?> createPaypalOrder(@RequestBody PaymentRequestDto request) {
+        String paypalOrderId = paymentsService.createPaypalOrder(
                 request.getOrderId(),
                 request.getMerchantId(),
-                request.getAmount(),
-                "COMPLETED"
+                request.getAmount()
         );
 
-        return ResponseEntity.status(201).body(payment);
+        return ResponseEntity.ok().body(Map.of("paypalOrderId", paypalOrderId));
+    }
+
+    @PostMapping("/capture")
+    public ResponseEntity<?> capturePayment(@RequestBody PaymentRequestDto request) {
+        Payment payment = paymentsService.capturePayment(request.getOrderId());
+
+        return ResponseEntity.ok().body(payment);
     }
 }

@@ -23,13 +23,19 @@ public class TradeWebSocketHandler extends TextWebSocketHandler {
     @Autowired
     private ClientService clientService;
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+    public void afterConnectionEstablished(WebSocketSession session) {
             sessions.add(session);
         }
-    public void broadcastMessage(String message) throws Exception{
+    public void broadcastMessage(String message) throws Exception {
+        List<WebSocketSession> closedSessions = new ArrayList<>();
         for (WebSocketSession session : sessions) {
-            session.sendMessage(new TextMessage(message));
+            if (session.isOpen()) {
+                session.sendMessage(new TextMessage(message));
+            } else {
+                closedSessions.add(session);
+            }
         }
+        sessions.removeAll(closedSessions);
     }
 
     @Override
