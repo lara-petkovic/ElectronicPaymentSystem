@@ -21,7 +21,6 @@ builder.Services.AddScoped<TransactionService>();
 builder.Services.AddScoped<SubscriptionService>();
 builder.Services.AddScoped<SubscriptionBackgroundService>();
 
-//builder.Services.AddControllers();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {

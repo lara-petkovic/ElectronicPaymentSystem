@@ -28,6 +28,7 @@ public static class AuthConfiguration
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,
                     ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero,
                     ValidIssuer = issuer,
                     ValidAudience = audience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
@@ -40,7 +41,8 @@ public static class AuthConfiguration
     {
         services.AddAuthorization(options =>
         {
-            options.AddPolicy("userPolicy", policy => policy.RequireRole("user"));
+            options.AddPolicy("UserPolicy", policy => policy.RequireRole("user"));
+            options.AddPolicy("AdminPolicy", policy => policy.RequireRole("admin"));
         });
     }
 }

@@ -54,13 +54,19 @@ namespace back_end.Data
             SeedData(modelBuilder);
         }
 
+        private static string HashedPassword(string password)
+        {
+            return BCrypt.Net.BCrypt.HashPassword(password);
+        }
+
         private static void SeedData(ModelBuilder modelBuilder)
         {
+
             modelBuilder.Entity<User>().HasData(
-                new User { Id = -1, Username = "larapetkovic", FirstName = "Lara", LastName = "Petkovic", Password = "password", Email = "lara@gmail.com", Role = "User" },
-                new User { Id = -2, Username = "jelisavetaletic", FirstName = "Jelisaveta", LastName = "Letic", Password = "password", Email = "jelly@hotmail.com", Role = "User" },
-                new User { Id = -3, Username = "aaa", FirstName = "aaa", LastName = "aaa", Password = "aaa", Email = "aaa@aaa.com", Role = "User" },
-                new User { Id = -4, Username = "admin", FirstName = "admin", LastName = "admin", Password = "admin", Email = "admin@gmail.com", Role = "Admin" }
+                new User { Id = -1, Username = "larapetkovic", FirstName = "Lara", LastName = "Petkovic", Password = HashedPassword("aaa"), Email = "lara@gmail.com", Role = "User" },
+                new User { Id = -2, Username = "jelisavetaletic", FirstName = "Jelisaveta", LastName = "Letic", Password = HashedPassword("aaa"), Email = "jelly@hotmail.com", Role = "User" },
+                new User { Id = -3, Username = "aaa", FirstName = "aaa", LastName = "aaa", Password = HashedPassword("aaa"), Email = "aaa@aaa.com", Role = "User" },
+                new User { Id = -4, Username = "admin", FirstName = "admin", LastName = "admin", Password = HashedPassword("admin"), Email = "admin@gmail.com", Role = "Admin" }
             );
 
             modelBuilder.Entity<Service>().HasData(

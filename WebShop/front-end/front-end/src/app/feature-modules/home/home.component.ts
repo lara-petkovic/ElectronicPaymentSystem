@@ -76,10 +76,6 @@ export class HomeComponent implements OnInit {
     this.authService.logout();
   }
 
-  login() {
-    this.router.navigate(['/login']);
-  }
-
   getServiceTypeLabel(type: string): string {
     return this.serviceTypeMapping[Number(type)] || 'Unknown';
   }

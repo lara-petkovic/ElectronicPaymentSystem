@@ -21,20 +21,27 @@ namespace back_end.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginRequest loginRequest)
         {
-            var user = await _userService.GetUsersAsync();
-            var validUser = user.FirstOrDefault(u => u.Username == loginRequest.Username && u.Password == loginRequest.Password);
+            var users = await _userService.GetUsersAsync();
+            var validUser = users.FirstOrDefault(u => u.Username == loginRequest.Username);
 
-            if (validUser == null)
+            if (validUser == null || !BCrypt.Net.BCrypt.Verify(loginRequest.Password, validUser.Password))
             {
                 return Unauthorized("Invalid credentials");
             }
 
             var tokenService = new TokenService(_configuration);
             var token = tokenService.GenerateToken(validUser, validUser.Id);
-            return Ok(token);
+
+            var response = new AuthenticationResponse
+            {
+                Id = validUser.Id,
+                AccessToken = token
+            };
+
+            return Ok(response);
         }
 
-        [Authorize]
+
         [HttpGet("loggedInUser")]
         public async Task<ActionResult<User>> GetCurrentUser()
         {
