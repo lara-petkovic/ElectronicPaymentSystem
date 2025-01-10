@@ -29,6 +29,8 @@ dependencies {
 
     implementation 'com.paypal.sdk:rest-api-sdk:1.14.0'
     runtimeOnly 'org.postgresql:postgresql'
+    implementation 'org.springframework.security:spring-security-web:6.0.0'
+    implementation 'org.springframework.security:spring-security-config:6.0.0'
 }
 
 tasks.named('test') {
