@@ -20,7 +20,7 @@ object PaymentService {
         val requestBody = RequestBody.create("application/json".toMediaTypeOrNull(), jsonBody)
 
         val request = Request.Builder()
-            .url("http://192.168.0.16:8052/api/payments/payWithQr")
+            .url("http://13.13.13.128:8052/api/payments/payWithQr")
             .post(requestBody)
             .build()
 

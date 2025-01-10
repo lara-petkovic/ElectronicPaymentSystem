@@ -26,7 +26,10 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   processMessage(message: any) {
-    if (message.startsWith('qr:')) {
+    if (message.length===0){
+      this.router.navigate([''])
+    }
+    else if (message.startsWith('qr:')) {
       let src = `data:image/png;base64,${message.substring(3)}`;
       this.imageService.setImage(src);
       this.router.navigate(['qr-code']);

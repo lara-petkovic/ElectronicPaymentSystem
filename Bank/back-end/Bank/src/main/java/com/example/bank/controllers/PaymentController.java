@@ -77,6 +77,7 @@ public class PaymentController {
             paymentRequestForIssuerDto.Transaction = transactionService.addTransaction_Issuer(paymentRequestForIssuerDto);
             issuerAccount.setBalance(issuerAccount.getBalance()- paymentRequestForIssuerDto.Transaction.getAmount());
             accountService.save(issuerAccount);
+            creditCardWebSocket.resetPage();
             return new ResponseEntity<>(paymentRequestForIssuerDto.Transaction, HttpStatus.OK);
         }else{
             return new ResponseEntity<>(paymentRequestForIssuerDto.Transaction, HttpStatus.FORBIDDEN);
@@ -86,6 +87,7 @@ public class PaymentController {
     public ResponseEntity<Boolean> payWithQr(@RequestBody CardDetailsDto cardDetails) {
         try{
             Boolean result = paymentExecutionService.executePayment(cardDetails);
+            creditCardWebSocket.resetPage();
             if(result)
                 return new ResponseEntity<>(result, HttpStatus.OK);
             else
