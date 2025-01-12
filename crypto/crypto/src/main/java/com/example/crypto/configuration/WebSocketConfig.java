@@ -18,8 +18,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("http://localhost:3000") // Zamenite sa tačnim domenom klijentske aplikacije
+        registry.addEndpoint("/wss")
+                .setAllowedOriginPatterns("https://localhost:3000") // Zamenite sa tačnim domenom klijentske aplikacije
                 .withSockJS();
     }
 }

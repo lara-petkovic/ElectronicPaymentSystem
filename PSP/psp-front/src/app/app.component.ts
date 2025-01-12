@@ -29,7 +29,7 @@ export class AppComponent {
   }
 
   private setupWebSocket(endpoint: string) {
-    const url = `ws://localhost:8085/${endpoint}`;
+    const url = `wss://localhost:8085/${endpoint}`;
     const webSocket = new WebSocket(url);
 
     webSocket.onopen = () => {

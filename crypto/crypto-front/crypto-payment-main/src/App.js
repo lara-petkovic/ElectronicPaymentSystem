@@ -18,7 +18,7 @@ function App() {
 
   // WebSocket connection setup
   useEffect(() => {
-    const socket = new SockJS("http://localhost:8088/ws");
+    const socket = new SockJS("https://localhost:8088/wss");
     const client = new Client({
       webSocketFactory: () => socket,
       debug: (str) => console.log(str),

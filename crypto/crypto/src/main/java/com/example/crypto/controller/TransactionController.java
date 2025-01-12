@@ -4,7 +4,6 @@ import com.example.crypto.dto.NewTransactionDto;
 import com.example.crypto.dto.TransactionStatusDto;
 import com.example.crypto.model.Transaction;
 import com.example.crypto.service.ITransactionService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.PostMapping;

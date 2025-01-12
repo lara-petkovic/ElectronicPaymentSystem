@@ -9,8 +9,8 @@ import { TransactionDto } from './transactiondto.model';
 })
 export class PaymentOptionsServiceService {
 
-  private paymentOptionApiUrl = 'http://localhost:8085/api/paymentoption';
-  private responseApiUrl = 'http://localhost:8085/api/response';
+  private paymentOptionApiUrl = 'https://localhost:8085/api/paymentoption';
+  private responseApiUrl = 'https://localhost:8085/api/response';
 
   constructor(private http: HttpClient) { }
 

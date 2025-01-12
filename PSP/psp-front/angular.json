@@ -60,14 +60,20 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "port": 4201
+            "port": 4201,
+            "ssl": true,
+            "sslCert": "client.crt",
+            "sslKey": "client.key"
           },
           "configurations": {
             "production": {
               "browserTarget": "sep-front:build:production"
             },
             "development": {
-              "browserTarget": "sep-front:build:development"
+              "browserTarget": "sep-front:build:development",
+              "sslCert": "client.crt",
+              "sslKey": "client.key",
+              "ssl": true
             }
           },
           "defaultConfiguration": "development"
