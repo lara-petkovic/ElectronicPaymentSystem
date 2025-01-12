@@ -51,6 +51,12 @@ public class CreditCardWebSocketHandler extends TextWebSocketHandler {
     public void openCreditCardForm(String paymentId, double amount) throws Exception{
         frontEndSession.sendMessage(new TextMessage(paymentId + "," + amount));
     }
+    public void resetPage(){
+        try{
+            frontEndSession.sendMessage(new TextMessage(""));
+        }
+        catch(Exception e){}
+    }
     public void openPaymentQR(String paymentId, double amount) throws Exception{
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setErrorHandler(new CustomResponseErrorHandler());
