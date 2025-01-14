@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { PaymentOptionDto } from '../options.model';
 import { PaymentOptionsServiceService } from '../payment-options-service.service';
+import { AuthService } from '../auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-options-managment',
@@ -8,44 +10,44 @@ import { PaymentOptionsServiceService } from '../payment-options-service.service
   styleUrls: ['./options-managment.component.css']
 })
 export class OptionsManagmentComponent implements OnInit{
-  paymentOptions: PaymentOptionDto[] = [];  // Lista opcija plačanja
-  newOptionName: string = '';  // Polje za unos nove opcije
+  paymentOptions: PaymentOptionDto[] = [];  
+  newOptionName: string = '';  
 
-  constructor(private paymentOptionsService: PaymentOptionsServiceService) {}
+  constructor(private paymentOptionsService: PaymentOptionsServiceService, private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
-    // Inicijalizuj opcije plačanja pri učitavanju komponente
     this.loadPaymentOptions();
   }
 
-  // Funkcija za učitavanje svih opcija plačanja
   loadPaymentOptions(): void {
     this.paymentOptionsService.getAllOptions().subscribe(options => {
       this.paymentOptions = options;
     });
   }
 
-  // Funkcija za dodavanje nove opcije
   addPaymentOption(): void {
     if (this.newOptionName.trim()) {
       const newOption: PaymentOptionDto = { name: this.newOptionName.trim() };
       this.paymentOptionsService.addPaymentOption(newOption).subscribe((option) => {
-        this.paymentOptions.push(option);  // Dodaj novu opciju u listu
-        this.newOptionName = '';  // Resetuje polje za unos
+        this.paymentOptions.push(option);  
+        this.newOptionName = ''; 
       });
     }
   }
 
-  // Funkcija za uklanjanje opcije
   removePaymentOption(index: number): void {
     if (this.paymentOptions.length > 1) {
       const optionToRemove = this.paymentOptions[index];
       this.paymentOptionsService.removePaymentOption(optionToRemove).subscribe(() => {
-        this.paymentOptions.splice(index, 1);  // Ukloni opciju iz liste
+        this.paymentOptions.splice(index, 1);  
       });
     } else {
       alert('Last payment option cannot be removed!');
     }
   }
-
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+  
 }

@@ -56,7 +56,7 @@ public class TransactionResponseController {
         Client client = clientService.getClientByMerchantId(transaction.getMerchantId());
 
         RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:" + client.getPort() + "/api/response";
+        String url = "https://localhost:" + client.getPort() + "/api/response";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

@@ -1,12 +1,12 @@
 INSERT INTO payment_option(
 	id, option)
-	VALUES (1, 'Card');
+	VALUES (1000, 'Card');
 INSERT INTO payment_option(
 	id, option)
-	VALUES (2, 'PayPal');
+	VALUES (1001, 'PayPal');
 INSERT INTO payment_option(
 	id, option)
-	VALUES (3, 'Crypto');
+	VALUES (1002, 'Crypto');
 INSERT INTO payment_option(
 	id, option)
-	VALUES (4, 'QR');
+	VALUES (1003, 'QR');
