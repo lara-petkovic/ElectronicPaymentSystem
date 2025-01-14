@@ -3,6 +3,8 @@ package com.example.sep.services;
 import com.example.sep.dtos.PaymentOptionDto;
 import com.example.sep.models.PaymentOption;
 import com.example.sep.repositories.PaymentOptionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,9 @@ import java.util.List;
 public class PaymentOptionService implements  IPaymentOptionService{
     @Autowired
     private PaymentOptionRepository paymentOptionRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(PaymentOptionService.class);
+
 
     public PaymentOptionService(PaymentOptionRepository paymentOptionRepository){
         this.paymentOptionRepository=paymentOptionRepository;
@@ -30,6 +35,7 @@ public class PaymentOptionService implements  IPaymentOptionService{
     public PaymentOption create(String name) {
         PaymentOption paymentOption=new PaymentOption();
         paymentOption.setOption(name);
+        logger.info("New payment option "+name+" added.");
         return paymentOptionRepository.save(paymentOption);
     }
 
@@ -38,6 +44,8 @@ public class PaymentOptionService implements  IPaymentOptionService{
         if(paymentOptionRepository.findAll().size()>=2) {
             PaymentOption paymentOption = paymentOptionRepository.getPaymentOptionByOption(name);
             paymentOptionRepository.delete(paymentOption);
+            logger.info("New payment option "+name+" removed.");
+
         }
     }
 

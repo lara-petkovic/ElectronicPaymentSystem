@@ -6,6 +6,8 @@ import com.example.sep.models.Client;
 import com.example.sep.models.Transaction;
 import com.example.sep.services.ClientService;
 import com.example.sep.services.TransactionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -16,6 +18,8 @@ public class TransactionResponseController {
     private final TransactionResponseHandler transactionResponseHandler;
     private final TransactionService transactionService;
     private final ClientService clientService;
+
+    private static final Logger logger = LoggerFactory.getLogger(TransactionResponseController.class);
 
     public TransactionResponseController(TransactionResponseHandler transactionResponseHandler, TransactionService transactionService, ClientService clientService) {
         this.transactionResponseHandler = transactionResponseHandler;
@@ -44,12 +48,17 @@ public class TransactionResponseController {
 
         if(transactionResponseDto.responseUrl.contains("success")) {
             status = "success";
+            logger.info("Success transaction "+transactionResponseDto.getOrderId());
         }
         if(transactionResponseDto.responseUrl.contains("fail")) {
             status = "fail";
+            logger.info("Failed transaction "+transactionResponseDto.getOrderId());
+
         }
         if(transactionResponseDto.responseUrl.contains("error")) {
             status = "error";
+            logger.info("Error during transaction "+transactionResponseDto.getOrderId());
+
         }
 
         Transaction transaction = transactionService.GetTransactionByOrderId(transactionResponseDto.orderId);
@@ -63,10 +72,8 @@ public class TransactionResponseController {
 
         String body = "{ \"MerchantOrderId\": \"" + transaction.getOrderId() + "\", \"Status\": \"" + status + "\" }";
 
-        // Set up the HTTP entity with headers and body
         HttpEntity<String> entity = new HttpEntity<>(body, headers);
 
-        // Send the POST request
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+        restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
     }
 }

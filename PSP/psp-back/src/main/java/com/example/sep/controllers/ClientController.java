@@ -6,6 +6,8 @@ import com.example.sep.dtos.PaymentOptionDto;
 import com.example.sep.models.PaymentOption;
 import com.example.sep.services.IClientService;
 import com.example.sep.services.PaymentOptionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ public class ClientController {
     @Autowired
     private IClientService clientService;
     private final ClientSubscriptionWebSocketHandler clientSubscriptionWebSocketHandler;
+    private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
 
     @Autowired
     public ClientController(ClientSubscriptionWebSocketHandler clientSubscriptionWebSocketHandler, PaymentOptionService paymentOptionService, IClientService clientService) {
@@ -38,6 +41,7 @@ public class ClientController {
         }
         message.append(paymentOptionList.get(paymentOptionList.size() - 1).getOption());
         clientSubscriptionWebSocketHandler.broadcastMessage(message.toString());
+        logger.info("New client registration request, port: "+newClient.getApiKey());
         return new ResponseEntity<>(newClient, HttpStatus.CREATED) ;
     }
     @GetMapping("/{port}")
@@ -51,6 +55,7 @@ public class ClientController {
         if(clientService.getClientByPort(port)==null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         clientService.RemoveOption(port, option.getName());
+        logger.info("Client on port "+port+" removed option "+option);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

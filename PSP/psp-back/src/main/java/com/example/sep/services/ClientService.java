@@ -1,5 +1,6 @@
 package com.example.sep.services;
 
+import com.example.sep.controllers.TransactionResponseController;
 import com.example.sep.dtos.ClientAuthenticationDataDto;
 import com.example.sep.dtos.ClientSubscriptionDto;
 import com.example.sep.dtos.NewTransactionDto;
@@ -9,6 +10,8 @@ import com.example.sep.models.PaymentOption;
 import com.example.sep.repositories.ClientRepository;
 import com.example.sep.repositories.PaymentOptionRepository;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -20,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,6 +34,7 @@ public class ClientService implements IClientService {
     private ClientRepository clientRepository;
     @Autowired
     private PaymentOptionRepository paymentOptionRepository;
+    private static final Logger logger = LoggerFactory.getLogger(ClientService.class);
 
     public ClientService(ClientRepository clientRepository, PaymentOptionRepository paymentOptionRepository){
         this.clientRepository=clientRepository;
@@ -37,17 +42,15 @@ public class ClientService implements IClientService {
     }
     @Override
     @Transactional
-
     public ClientAuthenticationDataDto create(String subscription, String address, String walletAddress) {
 
         Client client = new Client();
 
-        // Generiši Merchant ID i Merchant Pass
         String merchantId = generateRandomString();
         client.setMerchantId(merchantId);
         client.setMerchantPass(generateRandomString());
         client.setPort(address);
-        client = clientRepository.save(client); // `save` metoda obično radi merge za detached entitete
+        client = clientRepository.save(client);
 
 
 
@@ -56,7 +59,6 @@ public class ClientService implements IClientService {
 
         String[] options = subscription.split(",");
 
-        // Učitaj opcije i poveži ih sa Client entitetom
         for (String s : options) {
 
             if(s.equals("Card") || s.equals("QR")) {
@@ -74,7 +76,7 @@ public class ClientService implements IClientService {
             }
         }
 
-
+        logger.info("New client on port "+address+" with options "+ Arrays.toString(options));
         this.clientRepository.save(client);
         if(containsBank)
             SendCredentialsToBank(client);
@@ -113,7 +115,6 @@ public class ClientService implements IClientService {
 
         HttpEntity<String> entityBank = new HttpEntity<>(bodybank, headersbank);
 
-        // Send the POST request
         ResponseEntity<String> responseBank = restTemplateBank.exchange(urlBank, HttpMethod.POST, entityBank, String.class);
 
     }

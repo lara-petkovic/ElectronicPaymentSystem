@@ -8,6 +8,8 @@ import com.example.sep.models.Transaction;
 import com.example.sep.services.IClientService;
 import com.example.sep.services.ITransactionService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +22,8 @@ public class TransactionController {
     private IClientService clientService;
     @Autowired
     private ITransactionService transactionService;
+    private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
+
 
     @Autowired
     public TransactionController(TradeWebSocketHandler tradeWebSocketHandler, IClientService clientService, ITransactionService transactionService) {
@@ -40,7 +44,11 @@ public class TransactionController {
 
         ClientSubscriptionDto clientSubscriptionDto = clientService.getSubscription(transaction, clientPort);
         Client c = clientService.getClientByPort(clientPort);
+        if(c==null){
+            logger.warn("Invalid client");
+        }
         if(clientSubscriptionDto != null) {
+            logger.info("New transaction request for merchant with id: "+c.getMerchantId()+", amount: "+transaction.getAmount() );
             tradeWebSocketHandler.broadcastMessage(clientSubscriptionDto.toString());
             this.transactionService.SaveTransaction(new Transaction(transaction, c.getMerchantId()));
         }

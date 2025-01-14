@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LoginAttemptService {
 
     private static final int MAX_ATTEMPTS = 5;
-    private static final long LOCK_TIME_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+    private static final long LOCK_TIME_DURATION = 5 * 60 * 1000;
 
     private final Map<String, LoginAttempt> loginAttemptsCache = new ConcurrentHashMap<>();
 
@@ -17,7 +17,7 @@ public class LoginAttemptService {
         LoginAttempt attempt = loginAttemptsCache.getOrDefault(username, new LoginAttempt(0, System.currentTimeMillis(), false));
 
         if (attempt.isLocked() && System.currentTimeMillis() - attempt.getLastAttemptTime() < LOCK_TIME_DURATION) {
-            return; // Nalog je zaključan, ne radimo ništa
+            return;
         }
 
         attempt.setLastAttemptTime(System.currentTimeMillis());
