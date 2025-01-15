@@ -1,5 +1,8 @@
 package com.example.crypto.service;
 
+import com.example.crypto.controller.TransactionController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -12,6 +15,7 @@ import java.util.Map;
 public class CurrencyConversionService {
 
     private final WebClient webClient;
+    private static final Logger logger = LoggerFactory.getLogger(CurrencyConversionService.class);
 
     public CurrencyConversionService(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.baseUrl("https://api.coingecko.com/api/v3").build();
@@ -30,7 +34,7 @@ public class CurrencyConversionService {
 
         double ethPriceInEur = response.get("ethereum").get("eur");
 
-        // Konverzija iz EUR u Sepolia ETH
+        logger.info("Converted "+amount+" EUR to "+amount/ethPriceInEur+" ETH");
         return amount / ethPriceInEur;
     }
 }
