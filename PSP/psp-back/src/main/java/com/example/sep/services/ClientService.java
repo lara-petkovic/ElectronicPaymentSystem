@@ -71,7 +71,6 @@ public class ClientService implements IClientService {
             PaymentOption option = paymentOptionRepository.getPaymentOptionByOption(s);
 
             if (option != null) {
-                // Dodaj PaymentOption u Client
                 client.addPaymentOption(option);
             }
         }
