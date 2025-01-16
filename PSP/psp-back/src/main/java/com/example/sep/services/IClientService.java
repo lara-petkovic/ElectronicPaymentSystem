@@ -17,4 +17,5 @@ public interface IClientService {
     Client getClientByPort(String port);
     List<PaymentOptionDto> getOptionsForClient (String port);
     void RemoveOption(String port,String name);
+    void RemoveClient(String port);
 }

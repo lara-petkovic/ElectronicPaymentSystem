@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(path="api/transaction")
 
@@ -42,16 +44,21 @@ public class TransactionController {
         if(clientPort.length()>4)
             clientPort=clientPort.substring(0, 4);
 
-        ClientSubscriptionDto clientSubscriptionDto = clientService.getSubscription(transaction, clientPort);
-        Client c = clientService.getClientByPort(clientPort);
-        if(c==null){
-            logger.warn("Invalid client");
+        if(clientService.getClientByPort(clientPort)!=null) {
+            ClientSubscriptionDto clientSubscriptionDto = clientService.getSubscription(transaction, clientPort);
+            Client c = clientService.getClientByPort(clientPort);
+            if (c == null) {
+                logger.warn("Invalid client");
+            }
+            if (clientSubscriptionDto != null) {
+                logger.info("New transaction request for merchant with id: " + c.getMerchantId() + ", amount: " + transaction.getAmount());
+                tradeWebSocketHandler.broadcastMessage(clientSubscriptionDto.toString());
+                this.transactionService.SaveTransaction(new Transaction(transaction, c.getMerchantId()));
+            }
+            return transaction;
+        }else{
+            logger.warn("Client not found, port:"+clientPort);
+            return null;
         }
-        if(clientSubscriptionDto != null) {
-            logger.info("New transaction request for merchant with id: "+c.getMerchantId()+", amount: "+transaction.getAmount() );
-            tradeWebSocketHandler.broadcastMessage(clientSubscriptionDto.toString());
-            this.transactionService.SaveTransaction(new Transaction(transaction, c.getMerchantId()));
-        }
-        return  transaction;
     }
 }

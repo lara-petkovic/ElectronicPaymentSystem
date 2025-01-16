@@ -7,8 +7,10 @@ import com.example.sep.dtos.NewTransactionDto;
 import com.example.sep.dtos.PaymentOptionDto;
 import com.example.sep.models.Client;
 import com.example.sep.models.PaymentOption;
+import com.example.sep.models.Transaction;
 import com.example.sep.repositories.ClientRepository;
 import com.example.sep.repositories.PaymentOptionRepository;
+import com.example.sep.repositories.TransactionRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,8 @@ public class ClientService implements IClientService {
     private ClientRepository clientRepository;
     @Autowired
     private PaymentOptionRepository paymentOptionRepository;
+    @Autowired
+    private TransactionRepository transactionRepository;
     private static final Logger logger = LoggerFactory.getLogger(ClientService.class);
 
     public ClientService(ClientRepository clientRepository, PaymentOptionRepository paymentOptionRepository){
@@ -98,8 +102,7 @@ public class ClientService implements IClientService {
 
         HttpEntity<String> entity= new HttpEntity<>(bodybank, headersbank);
 
-        // Send the POST request
-        ResponseEntity<String> responseBank = restTemplateBank.exchange(urlBank, HttpMethod.POST, entity, String.class);
+        restTemplateBank.exchange(urlBank, HttpMethod.POST, entity, String.class);
     }
 
     private void SendCredentialsToBank(Client client){
@@ -114,7 +117,7 @@ public class ClientService implements IClientService {
 
         HttpEntity<String> entityBank = new HttpEntity<>(bodybank, headersbank);
 
-        ResponseEntity<String> responseBank = restTemplateBank.exchange(urlBank, HttpMethod.POST, entityBank, String.class);
+        restTemplateBank.exchange(urlBank, HttpMethod.POST, entityBank, String.class);
 
     }
     @Override
@@ -128,6 +131,7 @@ public class ClientService implements IClientService {
                     .collect(Collectors.joining(","));
             return new ClientSubscriptionDto(optionsString, client.getMerchantId(), newTransactionDto.getMerchantOrderId());
         }
+        logger.warn("Client not found, port: "+port);
         return null;
     }
 
@@ -154,6 +158,13 @@ public class ClientService implements IClientService {
         if(paymentOption!=null)
             client.removePaymentOption(paymentOption);
         clientRepository.save(client);
+    }
+
+    @Override
+    public void RemoveClient(String port) {
+        Client c=getClientByPort(port);
+        transactionRepository.deleteAll(transactionRepository.getTransactionsByMerchantId(c.getMerchantId()));
+        clientRepository.delete(c);
     }
 
     @Override

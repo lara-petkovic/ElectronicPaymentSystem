@@ -34,6 +34,9 @@ public class ClientController {
     }
     @PostMapping
     public ResponseEntity<NewClientDto> CreateClient(@RequestBody NewClientDto newClient) throws Exception {
+        if(clientService.getClientByPort(newClient.apiKey)!=null){
+
+        }
         List<PaymentOption> paymentOptionList = paymentOptionService.getAll();
         StringBuilder message= new StringBuilder(newClient.apiKey + ",");
         for(int i=0;i<paymentOptionList.size()-1;i++){

@@ -4,6 +4,7 @@ package com.example.sep;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -12,14 +13,16 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     private static final long EXPIRATION_TIME = 86400000;
-    String secretKey = "ThisIsA256BitKeyExampleForJWT123456789123456789SecretKey";
+    
+    @Value("${MY_MASTER_PASSWORD}")
+    private String secretKey;
 
 
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // 1 sat
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS256)
                 .compact();
     }
