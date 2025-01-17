@@ -26,7 +26,7 @@ public class BankApplication {
         SpringApplication.run(BankApplication.class, args);
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setErrorHandler(new CustomResponseErrorHandler());
-        String url = "https://pcc:8053/api/payments";
+        String url = "https://localhost:8053/api/payments";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -45,7 +45,7 @@ public class BankApplication {
     }
     @PostConstruct
     public void init(){
-        String trustStorePath = BankApplication.class.getClassLoader().getResource("keystoreBank.jks").getPath();
+        String trustStorePath = BankApplication.class.getClassLoader().getResource("keystoreBankAcquirer.jks").getPath();
         System.setProperty("javax.net.ssl.trustStore", trustStorePath);
         System.setProperty("javax.net.ssl.trustStorePassword", password);
     }
