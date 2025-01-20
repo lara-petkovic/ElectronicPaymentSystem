@@ -26,6 +26,7 @@ public class ClientController {
     private final ClientSubscriptionWebSocketHandler clientSubscriptionWebSocketHandler;
     private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
 
+
     @Autowired
     public ClientController(ClientSubscriptionWebSocketHandler clientSubscriptionWebSocketHandler, PaymentOptionService paymentOptionService, IClientService clientService) {
         this.clientSubscriptionWebSocketHandler = clientSubscriptionWebSocketHandler;
@@ -35,14 +36,14 @@ public class ClientController {
     @PostMapping
     public ResponseEntity<NewClientDto> CreateClient(@RequestBody NewClientDto newClient) throws Exception {
         if(clientService.getClientByPort(newClient.apiKey)!=null){
-
+            clientService.RemoveClient(newClient.apiKey);
         }
         List<PaymentOption> paymentOptionList = paymentOptionService.getAll();
         StringBuilder message= new StringBuilder(newClient.apiKey + ",");
         for(int i=0;i<paymentOptionList.size()-1;i++){
             message.append(paymentOptionList.get(i).getOption()).append(" ");
         }
-        message.append(paymentOptionList.get(paymentOptionList.size() - 1).getOption());
+        message.append(paymentOptionList.getLast().getOption());
         clientSubscriptionWebSocketHandler.broadcastMessage(message.toString());
         logger.info("New client registration request, port: "+newClient.getApiKey());
         return new ResponseEntity<>(newClient, HttpStatus.CREATED) ;

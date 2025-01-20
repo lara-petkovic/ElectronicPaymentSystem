@@ -1,5 +1,6 @@
 package com.example.sep.configuration;
 
+import com.example.sep.EncryptionUtil;
 import com.example.sep.models.Client;
 import com.example.sep.models.Transaction;
 import com.example.sep.repositories.TransactionRepository;
@@ -22,6 +23,8 @@ public class TradeWebSocketHandler extends TextWebSocketHandler {
     private TransactionRepository transactionRepository;
     @Autowired
     private ClientService clientService;
+    @Autowired
+    private EncryptionUtil encryptionUtil;
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
             sessions.add(session);
@@ -53,26 +56,23 @@ public class TradeWebSocketHandler extends TextWebSocketHandler {
             System.out.println("Received payment opotion: " + paymentOption + ", ID: " + orderid+merchantid);
 
             RestTemplate restTemplate = new RestTemplate();
-            String url = "http://localhost:8087/api/payments";
+            String url = "https://localhost:8087/api/payments";
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("Payment", paymentOption);
 
-            // Create the JSON body
             String body = "{ \"MerchantId\" : \"" + transaction.getMerchantId() + "\", " +
-                    "\"MerchantPassword\" : \"" + client.getMerchantPass() + "\", " +
+                    "\"MerchantPassword\" : \"" + encryptionUtil.decrypt(client.getMerchantPass()) + "\", " +
                     "\"Amount\" : \"" + transaction.getAmount() + "\", " +
                     "\"MerchantOrderId\" : \"" + transaction.getOrderId() + "\", " +
                     "\"MerchantTimestamp\" : \"" + transaction.getTimestamp() + "\", " +
-                    "\"SuccessUrl\" : \"http://localhost:4201/success\", " +
-                    "\"FailedUrl\" : \"http://localhost:4201/fail\", " +
-                    "\"ErrorUrl\" : \"http://localhost:4201/error\" }";
+                    "\"SuccessUrl\" : \"https://localhost:4201/success\", " +
+                    "\"FailedUrl\" : \"https://localhost:4201/fail\", " +
+                    "\"ErrorUrl\" : \"https://localhost:4201/error\" }";
 
-            // Set up the HTTP entity with headers and body
             HttpEntity<String> entity = new HttpEntity<>(body, headers);
 
-            // Send the POST request
             restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
 

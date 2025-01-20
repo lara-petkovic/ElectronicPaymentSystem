@@ -27,40 +27,12 @@ public class SecurityConfiguration {
     public SecurityConfiguration(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
- /*   @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        System.out.println("Configuring Security Filter Chain...");
-        http
-                .cors(withDefaults())
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(req ->
-                        req.requestMatchers(
-                                        "/v1/api/**",
-                                        "/v2/api-docs",
-                                        "/v3/api-docs",
-                                        "/v3/api-docs/**",
-                                        "/swagger-resources",
-                                        "/swagger-resources/**",
-                                        "/configuration/ui",
-                                        "/configuration/security",
-                                        "/swagger-ui/**",
-                                        "/webjars/**",
-                                        "/swagger-ui.html"
-                                ).permitAll()
-                                .anyRequest()
-                                .permitAll()
-                )
-                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS));
-        System.out.println("Configuring Success ...");
-        return http.build();
-    }
-*/
  @Bean
  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
      http
              .cors(cors -> cors.configurationSource(request -> {
                  var corsConfig = new org.springframework.web.cors.CorsConfiguration();
-                 corsConfig.setAllowedOrigins(List.of("https://localhost:8086", "http://localhost:8087", "https://localhost:4201")); // Dozvoljeni frontend domen
+                 corsConfig.setAllowedOrigins(List.of("https://localhost:8086", "https://localhost:8087", "https://localhost:4201")); // Dozvoljeni frontend domen
                  corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                  corsConfig.setAllowedHeaders(List.of("Authorization", "Content-Type"));
                  corsConfig.setExposedHeaders(List.of("Authorization"));
@@ -87,7 +59,8 @@ public class SecurityConfiguration {
                              "/webjars/**",
                              "/swagger-ui.html",
                              "/metrics",
-                             "/actuator/**"
+                             "/actuator/**",
+                             "/transactions", "/clients", "/responses"
                      ).permitAll()
                      .anyRequest().authenticated()
              )

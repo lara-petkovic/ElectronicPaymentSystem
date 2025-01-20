@@ -1,5 +1,7 @@
 package com.example.sep.services;
 
+import com.example.sep.EncryptionUtil;
+import com.example.sep.JwtTokenProvider;
 import com.example.sep.controllers.TransactionResponseController;
 import com.example.sep.dtos.ClientAuthenticationDataDto;
 import com.example.sep.dtos.ClientSubscriptionDto;
@@ -11,10 +13,13 @@ import com.example.sep.models.Transaction;
 import com.example.sep.repositories.ClientRepository;
 import com.example.sep.repositories.PaymentOptionRepository;
 import com.example.sep.repositories.TransactionRepository;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpEntity;
@@ -23,11 +28,11 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,28 +43,31 @@ public class ClientService implements IClientService {
     private PaymentOptionRepository paymentOptionRepository;
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    private EncryptionUtil encryptionUtil;
     private static final Logger logger = LoggerFactory.getLogger(ClientService.class);
 
-    public ClientService(ClientRepository clientRepository, PaymentOptionRepository paymentOptionRepository){
+    public ClientService(ClientRepository clientRepository, PaymentOptionRepository paymentOptionRepository, EncryptionUtil encryptionUtil){
         this.clientRepository=clientRepository;
         this.paymentOptionRepository=paymentOptionRepository;
+        this.encryptionUtil=encryptionUtil;
+
     }
     @Override
-    @Transactional
-    public ClientAuthenticationDataDto create(String subscription, String address, String walletAddress) {
+   // @Transactional
+    public ClientAuthenticationDataDto create(String subscription, String address, String walletAddress) throws Exception {
 
         Client client = new Client();
-
         String merchantId = generateRandomString();
         client.setMerchantId(merchantId);
-        client.setMerchantPass(generateRandomString());
+        String merchantPassword=generateRandomString();
+        client.setMerchantPass(encryptionUtil.encrypt(merchantPassword));
         client.setPort(address);
-        client = clientRepository.save(client);
 
 
 
-        Boolean containsBank=false;
-        Boolean containsCrypto=false;
+        boolean containsBank=false;
+        boolean containsCrypto=false;
 
         String[] options = subscription.split(",");
 
@@ -82,38 +90,38 @@ public class ClientService implements IClientService {
         logger.info("New client on port "+address+" with options "+ Arrays.toString(options));
         this.clientRepository.save(client);
         if(containsBank)
-            SendCredentialsToBank(client);
+            SendCredentialsToBank(client.getMerchantId(), merchantPassword);
         if(containsCrypto)
-            SendWalletCredentials(client, walletAddress);
-        return new ClientAuthenticationDataDto(client.getMerchantId(),client.getMerchantPass());
+            SendWalletCredentials(client.getMerchantId(), merchantPassword, walletAddress);
+        return new ClientAuthenticationDataDto(client.getMerchantId(),merchantPassword);
 
     }
 
-    private void SendWalletCredentials(Client client, String walletAddress){
+    private void SendWalletCredentials(String merchantId, String merchantPass, String walletAddress){
         RestTemplate restTemplateBank = new RestTemplate();
-        String urlBank = "http://localhost:8087/api/merchant";
+        String urlBank = "https://localhost:8087/api/merchant";
 
 
         HttpHeaders headersbank = new HttpHeaders();
         headersbank.setContentType(MediaType.APPLICATION_JSON);
 
 
-        String bodybank = "{ \"merchantId\" : \"" + client.getMerchantId() + "\", \"merchantPass\" : \"" + client.getMerchantPass() + "\", \"walletAddress\" : \"" + walletAddress +"\" }";
+        String bodybank = "{ \"merchantId\" : \"" + merchantId + "\", \"merchantPass\" : \"" + merchantPass + "\", \"walletAddress\" : \"" + walletAddress +"\" }";
 
         HttpEntity<String> entity= new HttpEntity<>(bodybank, headersbank);
 
         restTemplateBank.exchange(urlBank, HttpMethod.POST, entity, String.class);
     }
 
-    private void SendCredentialsToBank(Client client){
+    private void SendCredentialsToBank(String merchantId, String merchantPass){
 
         RestTemplate restTemplateBank = new RestTemplate();
-        String urlBank = "http://localhost:8087/api/accounts";
+        String urlBank = "https://localhost:8087/api/accounts";
 
         HttpHeaders headersbank = new HttpHeaders();
         headersbank.setContentType(MediaType.APPLICATION_JSON);
 
-        String bodybank = "{ \"MerchantId\" : \"" + client.getMerchantId() + "\", \"MerchantPassword\" : \"" + client.getMerchantPass() + "\", \"HolderName\" : \"" + "WS"+client.getMerchantId() +"\" }";
+        String bodybank = "{ \"MerchantId\" : \"" + merchantId + "\", \"MerchantPassword\" : \"" + merchantPass + "\", \"HolderName\" : \"" + "WS"+ merchantId +"\" }";
 
         HttpEntity<String> entityBank = new HttpEntity<>(bodybank, headersbank);
 
@@ -122,9 +130,8 @@ public class ClientService implements IClientService {
     }
     @Override
     public ClientSubscriptionDto getSubscription(NewTransactionDto newTransactionDto, String port) {
-        List<Client> clients=clientRepository.getClientsByPort(port);
-        if (!clients.isEmpty()) {
-            Client client = clients.get(clients.size() - 1);
+        Client client=getClientByPort(port);
+        if (client!=null) {
             Set<PaymentOption> options = client.getPaymentOptions();
             String optionsString = options.stream()
                     .map(PaymentOption::toString)
@@ -136,7 +143,10 @@ public class ClientService implements IClientService {
     }
 
     public Client getClientByPort(String port){
-        return clientRepository.getClientsByPort(port).get(clientRepository.getClientsByPort(port).size() - 1);
+        List<Client> clients =clientRepository.getClientsByPort(port);
+        if(!clients.isEmpty())
+            return clients.getLast();
+        return null;
     }
 
     @Override
@@ -183,5 +193,6 @@ public class ClientService implements IClientService {
         }
         return sb.toString();
     }
+
 
 }

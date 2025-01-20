@@ -12,9 +12,9 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(tradeWebSocketHandler(), "/transactions").setAllowedOrigins("*");
-        registry.addHandler(clientSubscriptionWebSocketHandler(), "/clients").setAllowedOrigins("*");
-        registry.addHandler(transactionResponseHandler(), "/responses").setAllowedOrigins("*");
+        registry.addHandler(tradeWebSocketHandler(), "/transactions").setAllowedOrigins("https://localhost:4201");
+        registry.addHandler(clientSubscriptionWebSocketHandler(), "/clients").setAllowedOrigins("https://localhost:4201");
+        registry.addHandler(transactionResponseHandler(), "/responses").setAllowedOrigins("https://localhost:4201");
     }
     @Bean
     public ClientSubscriptionWebSocketHandler clientSubscriptionWebSocketHandler() {
