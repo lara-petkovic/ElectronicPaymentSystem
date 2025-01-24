@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-login',
@@ -12,10 +13,21 @@ export class LoginComponent {
   password: string = '';
   errorMessage: string = '';
 
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private sanitizer: DomSanitizer
+  ) { }
 
-
+  sanitizeInput(input: string): string {
+    const sanitized = this.sanitizer.sanitize(1, input); 
+    return sanitized ?? ''; 
+  }
+  
   onLogin(): void {
+    this.username = this.sanitizeInput(this.username);
+    this.password = this.sanitizeInput(this.password);
+  
     this.authService.authenticate(this.username, this.password).subscribe({
       next: (response) => {
         const token = response.headers.get('authorization');
