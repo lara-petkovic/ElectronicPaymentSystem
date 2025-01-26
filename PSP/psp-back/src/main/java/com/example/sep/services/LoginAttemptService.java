@@ -46,6 +46,10 @@ public class LoginAttemptService {
         return true;
     }
 
+    public void resetAttempts(String username) {
+        loginAttemptsCache.remove(username);
+    }
+
     public void loginSucceeded(String username) {
         loginAttemptsCache.remove(username);
     }

@@ -3,6 +3,15 @@ package com.example.sep.dtos;
 public class RegisterRequest {
     private String username;
     private String password;
+    private String tfa;
+
+    public String getTfa() {
+        return tfa;
+    }
+
+    public void setTfa(String tfa) {
+        this.tfa = tfa;
+    }
 
     public String getUsername() {
         return username;

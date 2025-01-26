@@ -18,8 +18,7 @@ public class JwtTokenProvider {
 
     private static final long EXPIRATION_TIME = 86400000;
 
-    @Value("${SECRET_KEY}")
-    private String secretKey;
+    private String secretKey="SECRET_KEY=ThisIsA256BitKeyExampleForJWT123456789123456789SecretKey";
 
 
     public String generateToken(String username) {
@@ -53,22 +52,6 @@ public class JwtTokenProvider {
         }
     }
 
-    private static final String ALGORITHM = "AES";
 
-    public String encrypt(String plainText) throws Exception {
-        SecretKey secretKeySpec = new SecretKeySpec(secretKey.getBytes(), ALGORITHM);
-        Cipher cipher = Cipher.getInstance(ALGORITHM);
-        cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
-        byte[] encryptedBytes = cipher.doFinal(plainText.getBytes());
-        return Base64.getEncoder().encodeToString(encryptedBytes);
-    }
 
-    public String decrypt(String encryptedText) throws Exception {
-        SecretKey secretKeySpec = new SecretKeySpec(secretKey.getBytes(), ALGORITHM);
-        Cipher cipher = Cipher.getInstance(ALGORITHM);
-        cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
-        byte[] decodedBytes = Base64.getDecoder().decode(encryptedText);
-        byte[] decryptedBytes = cipher.doFinal(decodedBytes);
-        return new String(decryptedBytes);
-    }
 }

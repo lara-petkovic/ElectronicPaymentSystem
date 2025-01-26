@@ -3,19 +3,32 @@ package com.example.sep.models;
 
 import jakarta.persistence.*;
 
+
+import jakarta.persistence.*;
+
 @Entity
-@Table(name = "users")
+@Table(name="users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", unique = true, nullable = false)
     private Long id;
-    @Column(name = "username")
+
+    @Column(unique = true, nullable = false)
     private String username;
-    @Column(name = "password")
+
+    @Column(nullable = false)
     private String password;
 
-    public User(){}
+    @Column
+    private String twoFactorKey;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getUsername() {
         return username;
@@ -33,13 +46,11 @@ public class User {
         this.password = password;
     }
 
-    public Long getId() {
-        return id;
+    public String getTwoFactorKey() {
+        return twoFactorKey;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setTwoFactorKey(String twoFactorKey) {
+        this.twoFactorKey = twoFactorKey;
     }
 }
-
-

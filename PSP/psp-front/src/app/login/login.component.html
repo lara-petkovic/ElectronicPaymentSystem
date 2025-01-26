@@ -1,16 +1,37 @@
-<div class="login-container">
+
+  <div class="login-container">
     <h2>Login</h2>
+  
     <form (ngSubmit)="onLogin()">
-      <div class="form-group">
+      <div>
         <label for="username">Username</label>
-        <input type="text" id="username" [(ngModel)]="username" name="username" required class="form-control">
+        <input id="username" [(ngModel)]="username" name="username" type="text" required>
       </div>
-      <div class="form-group">
+  
+      <div>
         <label for="password">Password</label>
-        <input type="password" id="password" [(ngModel)]="password" name="password" required class="form-control">
+        <input id="password" [(ngModel)]="password" name="password" type="password" required>
       </div>
-      <button type="submit" class="btn btn-primary">Login</button>
-      <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+  
+      <div>
+        <label for="tfacode">2FA Code</label>
+        <input id="tfacode" [(ngModel)]="tfacode" name="tfacode" type="text" required>
+      </div>
+  
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+  
+      <button type="submit">Login</button>
     </form>
+  
+    <div>
+      <button (click)="generateQrCode()">Generate QR Code</button>
+    </div>
+  
+    <div *ngIf="showQrCode">
+      <h3>Scan QR Code for 2FA Setup</h3>
+      <img *ngIf="qrCodeUrl" [src]="qrCodeUrl" alt="QR Code">
+    </div>
   </div>
   

@@ -42,8 +42,9 @@ public class SecurityConfiguration {
              .csrf(csrf -> csrf.disable())
              .authorizeHttpRequests(auth -> auth
                      .requestMatchers(
-                             "/api/authenticate/login",
                              "/api/authenticate/register",
+                             "/api/authenticate/login",
+                             "/api/authenticate/generate-qr/*",
                              "api/subscription",
                              "api/transaction",
                              "api/response",
