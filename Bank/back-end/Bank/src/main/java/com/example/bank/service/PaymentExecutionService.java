@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 @Service
@@ -24,6 +25,8 @@ public class PaymentExecutionService {
     private TransactionService transactionService;
     @Autowired
     private PspNotificationService pspNotificationService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     public boolean executePayment(CardDetailsDto cardDetailsDto) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         PaymentRequest paymentRequest = paymentRequestService.getPaymentRequest(cardDetailsDto.PaymentRequestId);
@@ -38,7 +41,7 @@ public class PaymentExecutionService {
             return false;
         }
         if(merchantAccount!=null){
-            if(checkPanNumber(cardDetailsDto)){
+            if(checkIfPanNumberBelongsToAcquirersBank(cardDetailsDto)){
                 Account issuerAccount = accountService.getIssuerAccount(cardDetailsDto);
                 if(issuerAccount==null){
                     emitFailedEvent(transaction);
@@ -61,7 +64,7 @@ public class PaymentExecutionService {
                 //call issuers bank via pcc
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.setErrorHandler(new CustomResponseErrorHandler());
-                String url = "http://localhost:8053/api/payments";
+                String url = "http://localhost:8053/api/payments";//TODO:stavi https
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
@@ -118,7 +121,7 @@ public class PaymentExecutionService {
     public void emitFailedEvent(Transaction transaction){
         pspNotificationService.sendTransactionResult(transactionService.failTransaction(transaction));
     }
-    private boolean checkPanNumber(CardDetailsDto cardDetailsDto){
+    private boolean checkIfPanNumberBelongsToAcquirersBank(CardDetailsDto cardDetailsDto){
         String bankIdentifier = bankIdentifierService.getId();
         return cardDetailsDto.Pan.substring(0,4).equals(bankIdentifier);
     }

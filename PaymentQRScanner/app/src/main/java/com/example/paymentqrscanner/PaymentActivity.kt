@@ -21,7 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import java.util.concurrent.Executor
 import androidx.biometric.BiometricPrompt
+import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 
 class PaymentActivity : AppCompatActivity() {
     lateinit var qrCodeResult: String
@@ -43,7 +45,7 @@ class PaymentActivity : AppCompatActivity() {
             ) {
                 val context : Context = LocalContext.current
                 Column(Modifier.padding(4.dp).align(Alignment.Center)){
-                    BasicText(text = "Nalog za placanje", Modifier.padding(14.dp))
+                    Text(text = "Nalog za placanje", modifier = Modifier.padding(14.dp), color = Color(255,255,255))
                     TextField(
                         value = imeProdavca,
                         onValueChange = {},
@@ -100,7 +102,7 @@ class PaymentActivity : AppCompatActivity() {
                         onValueChange = {},
                         modifier = Modifier.fillMaxWidth().padding(4.dp),
                         enabled = false,
-                        label = { androidx.compose.material3.Text("Uneditable Field") }
+                        label = { androidx.compose.material3.Text("Svrha plaćanja") }
                     )
                     Button(
                         onClick = {

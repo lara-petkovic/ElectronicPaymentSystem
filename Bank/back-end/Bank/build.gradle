@@ -48,6 +48,8 @@ dependencies {
 
     // WebSocket API
     implementation 'jakarta.websocket:jakarta.websocket-api:2.1.0'
+
+    implementation 'org.springframework.security:spring-security-crypto'
 }
 
 

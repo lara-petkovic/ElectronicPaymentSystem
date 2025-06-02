@@ -4,6 +4,7 @@ import com.example.bank.domain.model.PaymentRequest;
 import com.example.bank.repositories.PaymentRequestRepository;
 import com.example.bank.service.dto.PaymentRequestForAcquirerDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -13,10 +14,12 @@ import java.util.Random;
 public class PaymentRequestService {
     @Autowired
     private PaymentRequestRepository repo;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     public PaymentRequest addPaymentRequest(PaymentRequestForAcquirerDto paymentRequestForAcquirerDto){
         PaymentRequest newPaymentRequest = new PaymentRequest(
                 paymentRequestForAcquirerDto.MerchantId,
-                paymentRequestForAcquirerDto.MerchantPassword,
+                passwordEncoder.encode(paymentRequestForAcquirerDto.MerchantPassword),
                 paymentRequestForAcquirerDto.Amount,
                 paymentRequestForAcquirerDto.MerchantOrderId,
                 paymentRequestForAcquirerDto.MerchantTimestamp,

@@ -4,12 +4,8 @@ agp = "8.6.0"
 androidxAppcompat = "1.6.1"
 core = "3.4.1"
 coreVersion = "3.5.0"
-<<<<<<< HEAD
-kotlin = "1.9.22"
-=======
-gson = "2.11.0"
 kotlin = "1.9.0"
->>>>>>> ea44a016eb134272a146bd10ca0bfc5e7d2557e4
+gson = "2.11.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
