@@ -26,7 +26,7 @@ public class BankApplication {
         SpringApplication.run(BankApplication.class, args);
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setErrorHandler(new CustomResponseErrorHandler());
-        String url = "https://localhost:8053/api/payments";
+        String url = "https://pcc:8053/api/payments";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
