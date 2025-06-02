@@ -23,7 +23,7 @@ public class GwRedirectController {
     @PostMapping
     public void redirect (@RequestBody NewTransactionDto newtransaction,@RequestHeader("Payment") String option) throws Exception{
         RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:"+paymentOptionService.getAddressByOption(option).getPort()+paymentOptionService.getAddressByOption(option).getAddress();
+        String url = "https://localhost:"+paymentOptionService.getAddressByOption(option).getPort()+paymentOptionService.getAddressByOption(option).getAddress();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(newtransaction.toString(), headers);

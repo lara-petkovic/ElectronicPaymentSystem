@@ -11,31 +11,20 @@ namespace back_end.Controllers
     public class PspSubscriptionController: ControllerBase
     {
         private readonly PspSubscriptionService _pspSubscriptionService;
-        private readonly MerchantCredentialsService _merchantCredentialsService;
         private readonly TransactionService _transactionService;
 
-        public PspSubscriptionController(PspSubscriptionService pspSubscriptionService, MerchantCredentialsService merchantCredentialsService, TransactionService transactionService)
+        public PspSubscriptionController(PspSubscriptionService pspSubscriptionService, TransactionService transactionService)
         {
             _pspSubscriptionService = pspSubscriptionService;
-            _merchantCredentialsService = merchantCredentialsService;
             _transactionService = transactionService;
         }
 
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost("subscribe")]
-        //[Authorize(Roles = "Admin")]
         public void CreateConfiguration()
         {
             this._pspSubscriptionService.CreateSubscription();
         }
-
-
-
-        //[HttpPost("credentials")]
-        //public async Task<IActionResult> CreateMerchantAuthCredentials([FromBody] MerchantCredentialsDto merchantCredentialsDto)
-        //{
-        //    await _merchantCredentialsService.SaveMerchantCredentialsAsync(merchantCredentialsDto.MerchantId, merchantCredentialsDto.MerchantPass);
-        //    return Ok("Merchant credentials saved successfully");
-        //}
 
         [HttpPost("transaction")]
         public async Task<IActionResult> ProcessTransaction([FromBody] Transaction newTransaction)
@@ -46,6 +35,7 @@ namespace back_end.Controllers
             return Ok("Transaction saved and processed successfully");
         }
 
+        [Authorize(Policy = "AdminPolicy")]
         [HttpGet("payment-options")]
         public async Task<IActionResult> GetPaymentOptions()
         {
@@ -53,6 +43,7 @@ namespace back_end.Controllers
             return Ok(paymentOptions);
         }
 
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPut("payment-option")]
         public async Task<IActionResult> RemovePaymentOption([FromBody] PaymentOptionDto option)
         {

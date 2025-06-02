@@ -1,9 +1,9 @@
 package com.example.bank.service.dto;
 
 public class PaymentResponseDto {
-    public Integer PaymentId;
+    public String PaymentId;
     public String PaymentUrl;
-    public PaymentResponseDto(Integer paymentId){
+    public PaymentResponseDto(String paymentId){
         PaymentId = paymentId;
         PaymentUrl = "http://localhost:4202/credit-card-input/"+paymentId.toString();
     }

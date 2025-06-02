@@ -1,0 +1,53 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #0a1f33;
+  font-family: 'Arial', sans-serif;
+}
+
+.checkout-container {
+  text-align: center;
+  margin-top: 10vh;
+  color: #e0eaf0;
+  padding: 20px;
+  background-color: #1f3a56;
+  border-radius: 12px;
+  width: 50%;
+  margin: 10vh auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.checkout-container h2 {
+  color: #16b99e;
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.checkout-container p {
+  margin: 10px 0;
+  color: #c8d4e3;
+  font-size: 18px;
+}
+
+.checkout-container #paypal-button-container {
+  display: flex;
+  justify-content: center; 
+  align-items: center;    
+  width: 65%;           
+  height: 100px;         
+  position: relative;     
+  margin-top: 50px;
+  margin-bottom: 50px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#paypal-button-container iframe {
+  display: block;         
+  margin-left: auto;       
+  margin-right: auto;      
+  width: 100% !important;  
+  height: auto !important; 
+  max-width: 400px; 
+}

@@ -4,7 +4,8 @@ import com.example.crypto.dto.NewTransactionDto;
 import com.example.crypto.dto.TransactionStatusDto;
 import com.example.crypto.model.Transaction;
 import com.example.crypto.service.ITransactionService;
-import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 public class TransactionController {
     @Autowired
     private ITransactionService transactionService;
+    private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
 
     public TransactionController(ITransactionService transactionService){
         this.transactionService=transactionService;
@@ -26,6 +28,7 @@ public class TransactionController {
     @PostMapping
     public ResponseEntity<Transaction> CreateTransaction(@RequestBody NewTransactionDto transaction) throws Exception {
         Transaction t=transactionService.create(transaction);
+        logger.info("New transaction for merchant: "+transaction.MerchantId+" , amount: "+transaction.Amount);
         return  new ResponseEntity<>(t, HttpStatus.CREATED);
     }
 
@@ -37,7 +40,7 @@ public class TransactionController {
         Transaction t=transactionService.getById(Long.parseLong(transactionStatusDto.getTransactionId()));
 
         RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:8087/api/response";
+        String url = "https://localhost:8087/api/response";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -47,6 +50,8 @@ public class TransactionController {
         HttpEntity<String> entity = new HttpEntity<>(body, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+        logger.info("Transaction" +transactionStatusDto.getTransactionId()+"  processed "+transactionStatusDto.getStatus());
+
         return ResponseEntity.ok("Transaction processed successfully");
     }
 }

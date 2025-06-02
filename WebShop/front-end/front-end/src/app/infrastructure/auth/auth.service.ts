@@ -54,7 +54,6 @@ export class AuthService {
       password: '',
       role: "USER"
     });
-    this.router.navigate(['/']).catch(error => console.error('Navigation error:', error));
   }
 
   subscribe(): void {

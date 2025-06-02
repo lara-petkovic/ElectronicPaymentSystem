@@ -7,9 +7,9 @@ public class CardDetailsDto {
     public String HolderName;
     public String ExpirationDate;
     public String SecurityCode;
-    public int PaymentRequestId;
+    public String PaymentRequestId;
     public CardDetailsDto(){}
-    public CardDetailsDto(String pan, String holderName, String expirationDate, String securityCode, int paymentRequestId) {
+    public CardDetailsDto(String pan, String holderName, String expirationDate, String securityCode, String paymentRequestId) {
         Pan = pan;
         HolderName = holderName;
         ExpirationDate = expirationDate;

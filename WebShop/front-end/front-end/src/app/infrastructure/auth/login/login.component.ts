@@ -29,25 +29,21 @@ export class LoginComponent {
       username: this.loginForm.value.username || "",
       password: this.loginForm.value.password || "",
     };
-
+  
     if (this.loginForm.valid) {
-      if(this.loginForm.value.username=="admin" && this.loginForm.value.password=="admin"){
+      if (this.loginForm.value.username == "admin" && this.loginForm.value.password == "admin") {
         this.router.navigate(['admin-home']);
-      }else{
+      } else {
         this.authService.login(login).subscribe({
           next: () => {
-            this.authService.user$.subscribe(user => {
-              this.user = user;
-              console.log(this.user);
-              this.router.navigate(['/']);
-            });
+            this.router.navigate(['/']);
           },
-          error: (error)=>{
-          console.error('Login failed:', error);
-          alert('Incorrect username or password or user is not verified!');
-        }
+          error: (error) => {
+            console.error('Login failed:', error);
+            alert('Incorrect username or password or user is not verified!');
+          }
         });
+      }
     }
-    }
-  }
+  }  
 }

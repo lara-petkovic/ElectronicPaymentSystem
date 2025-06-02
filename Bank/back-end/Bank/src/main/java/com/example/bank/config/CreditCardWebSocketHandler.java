@@ -6,13 +6,24 @@ import com.example.bank.domain.model.Transaction;
 import com.example.bank.service.*;
 import com.example.bank.service.dto.CardDetailsDto;
 import com.example.bank.service.dto.PaymentRequestForIssuerDto;
+import com.example.bank.service.dto.QRCodeInformationDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.GenericMessage;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Base64;
 
 public class CreditCardWebSocketHandler extends TextWebSocketHandler {
     private WebSocketSession frontEndSession;
@@ -23,9 +34,7 @@ public class CreditCardWebSocketHandler extends TextWebSocketHandler {
     @Autowired
     private BankIdentifierNumberService bankIdentifierService;
     @Autowired
-    private TransactionService transactionService;
-    @Autowired
-    private PspNotificationService pspNotificationService;
+    private PaymentExecutionService paymentExecutionService;
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         System.out.println("New WebSocket connection: " + session.getId());
@@ -37,92 +46,49 @@ public class CreditCardWebSocketHandler extends TextWebSocketHandler {
         System.out.println("Received message: " + message.getPayload());
         ObjectMapper objectMapper = new ObjectMapper();
         CardDetailsDto cardDetailsDto = objectMapper.readValue(message.getPayload(), CardDetailsDto.class);
-
-        PaymentRequest paymentRequest = paymentRequestService.getPaymentRequest(cardDetailsDto.PaymentRequestId);
-        Account merchantAccount = accountService.getMerchantAccount(paymentRequest);
-        Transaction transaction = transactionService.getTransactionByPaymentRequestId(paymentRequest.getId());
-        if(!cardDetailsDto.isValidExpirationDate()){
-            emitFailedEvent(transaction);
-        }
-        if(merchantAccount!=null){
-            if(checkPanNumber(cardDetailsDto)){
-                Account issuerAccount = accountService.getIssuerAccount(cardDetailsDto);
-                if(issuerAccount==null){
-                    emitFailedEvent(transaction);
-                    return;
-                }
-                if(issuerAccount.getBalance()>=paymentRequest.getAmount()){
-                    issuerAccount.setBalance(issuerAccount.getBalance()-paymentRequest.getAmount());
-                    merchantAccount.setBalance(merchantAccount.getBalance()+paymentRequest.getAmount());
-                    accountService.save(issuerAccount);
-                    accountService.save(merchantAccount);
-                    emitSuccessEvent(transaction);
-                }
-                else{
-                    emitFailedEvent(transaction);
-                }
-            }
-            else{
-                //call issuers bank via pcc
-                RestTemplate restTemplate = new RestTemplate();
-                restTemplate.setErrorHandler(new CustomResponseErrorHandler());
-                String url = "http://localhost:8053/api/payments";
-
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON);
-
-                PaymentRequestForIssuerDto issuerRequest = new PaymentRequestForIssuerDto(
-                        cardDetailsDto.Pan,
-                        cardDetailsDto.ExpirationDate,
-                        cardDetailsDto.HolderName,
-                        cardDetailsDto.SecurityCode,
-                        transaction
-                );
-
-                String body = objectMapper.writeValueAsString(issuerRequest);
-
-                HttpEntity<String> entity = new HttpEntity<>(body, headers);
-                try{
-                    ResponseEntity<Transaction> response = restTemplate.exchange(url, HttpMethod.POST, entity, Transaction.class);
-                    Transaction returnedTransaction = response.getBody();
-                    if(response.getStatusCode()==HttpStatus.OK){
-                        merchantAccount.setBalance(merchantAccount.getBalance()+paymentRequest.getAmount());
-                        accountService.save(merchantAccount);
-                        emitSuccessEvent(returnedTransaction);
-                    }
-                    else if(response.getStatusCode()==HttpStatus.FORBIDDEN || response.getStatusCode()==HttpStatus.NOT_FOUND){
-                        emitFailedEvent(returnedTransaction);
-                    }
-                    else{
-                        emitErrorEvent(returnedTransaction);
-                    }
-                }
-                catch(Exception e){
-                    emitErrorEvent(transaction);
-                }
-            }
-        }
-        else{
-            emitErrorEvent(transaction);
-        }
+        paymentExecutionService.executePayment(cardDetailsDto);
     }
-    public void emitErrorEvent(Transaction transaction){
-        pspNotificationService.sendTransactionResult(transactionService.errorTransaction(transaction));
-    }
-    public void emitSuccessEvent(Transaction transaction){
-        pspNotificationService.sendTransactionResult(transactionService.successTransaction(transaction));
-    }
-    public void emitFailedEvent(Transaction transaction){
-        pspNotificationService.sendTransactionResult(transactionService.failTransaction(transaction));
-    }
-    private boolean checkPanNumber(CardDetailsDto cardDetailsDto){
-        String bankIdentifier = bankIdentifierService.getId();
-        return cardDetailsDto.Pan.substring(0,4).equals(bankIdentifier);
-    }
-    public void openCreditCardForm(int paymentId, double amount) throws Exception{
+    public void openCreditCardForm(String paymentId, double amount) throws Exception{
         frontEndSession.sendMessage(new TextMessage(paymentId + "," + amount));
     }
+    public void resetPage(){
+        try{
+            frontEndSession.sendMessage(new TextMessage(""));
+        }
+        catch(Exception e){}
+    }
+    public void openPaymentQR(String paymentId, double amount) throws Exception{
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setErrorHandler(new CustomResponseErrorHandler());
+        String url = "https://nbs.rs/QRcode/api/qr/v1/gen?lang=sr_RS";
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        PaymentRequest pr = paymentRequestService.getPaymentRequest(paymentId);
+        Account ac = accountService.getMerchantAccount(pr);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        String json = objectMapper.writeValueAsString(new QRCodeInformationDto(ac.getNumber(), ac.getCardHolderName(), pr.getAmount(), pr.getId()));
+
+        HttpEntity<String> entity = new HttpEntity<>(json, headers);
+        try{
+            ResponseEntity<byte[]> response = restTemplate.exchange(url, HttpMethod.POST, entity, byte[].class);
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                byte[] imageBytes = response.getBody();
+                String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+                frontEndSession.sendMessage(new TextMessage("qr:"+base64Image));
+                System.out.println("qr:"+base64Image);
+            } else {
+                System.out.println("Failed to retrieve the image.");
+            }
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
+    }
 
 
 

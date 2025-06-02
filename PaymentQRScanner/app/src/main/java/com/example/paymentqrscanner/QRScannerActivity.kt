@@ -1,6 +1,7 @@
 package com.example.paymentqrscanner
 
 import android.app.Activity
+import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -23,33 +24,22 @@ fun QRScannerScreen() {
     val context = LocalContext.current
     val activity = context as? Activity
 
-    fun formatQRCodeData(data: String): String {
-        return data.replace("{", "")
-            .replace("}", "")
-            .replace("|", "\n")
-            .replace(",", "\n")
-            .replace(": ", ":\t")
-            .replace("K:", "Key:\t")
-            .replace("V:", "Version:\t")
-            .replace("C:", "Code:\t")
-            .replace("R:", "Reference:\t")
-            .replace("N:", "Name:\t")
-            .replace("A:", "Amount:\t")
-            .replace("P:", "Payee:\t")
-            .replace("D:", "Description:\t")
-            .trim()
-    }
-
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (activity != null) {
+        if (result.resultCode == Activity.RESULT_OK) {
             val intentResult = IntentIntegrator.parseActivityResult(
                 result.resultCode, result.data
             )
-            qrCodeResult = intentResult?.contents?.let { formatQRCodeData(it) } ?: "No QR code detected."
+            val qrCodeResult = intentResult?.contents ?: "No QR code detected."
+
+            val intent = Intent(context, PaymentActivity::class.java).apply {
+                putExtra("qrCodeResult", qrCodeResult)
+            }
+            context.startActivity(intent)
         }
     }
+
 
     Box(
         modifier = Modifier

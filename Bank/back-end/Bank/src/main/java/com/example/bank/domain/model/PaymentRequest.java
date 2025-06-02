@@ -5,9 +5,8 @@ import jakarta.persistence.*;
 @Entity
 public class PaymentRequest {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private String id;
     @Column(name = "merchant_id", nullable = false)
     private String merchantId;
     @Column(name = "merchant_password", nullable = false)
@@ -37,11 +36,11 @@ public class PaymentRequest {
         this.errorUrl = errorUrl;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

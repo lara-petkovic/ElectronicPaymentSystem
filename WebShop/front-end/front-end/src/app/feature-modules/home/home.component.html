@@ -2,7 +2,8 @@
   <body>
     <h1>Welcome to our telekom service!</h1>
     <h2 >Hello userId: {{userId}}</h2>
-    <a href="logout()">logout</a> <br>
+    <a [routerLink]="['/login']" (click)="logout()">logout</a>
+    <br>
     
     <br/>
     <br/>
