@@ -34,7 +34,7 @@ public class BankApplication {
     }
     @PostConstruct
     public void init(){
-        String trustStorePath = BankApplication.class.getClassLoader().getResource("keystoreBankAcquirer.jks").getPath();
+        String trustStorePath = BankApplication.class.getClassLoader().getResource("keystoreBank.jks").getPath();
         System.setProperty("javax.net.ssl.trustStore", trustStorePath);
         System.setProperty("javax.net.ssl.trustStorePassword", password);
     }

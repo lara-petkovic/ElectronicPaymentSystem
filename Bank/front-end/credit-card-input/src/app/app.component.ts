@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { WebSocketService } from './websocket.service';
 import { Router } from '@angular/router';
 import { ImageService } from './image.service';
+import { PaymentService } from './payment.service';
 
 
 @Component({
@@ -17,7 +18,7 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(private webSocketService: WebSocketService, private router: Router, private imageService: ImageService) {}
 
   ngOnInit() {
-    this.webSocketService.connect('ws://localhost:8052/creditCards');
+    this.webSocketService.connect('wss://localhost:8052/creditCards');
 
     this.webSocketService.getMessages().subscribe((message: string) => {
     console.log('Message received from WebSocket:', message);
@@ -38,9 +39,6 @@ export class AppComponent implements OnInit, OnDestroy {
       this.router.navigate(['credit-card-input/' + message.split(',')[0] + '/' + message.split(',')[1]]);
     }
   }
-  
-  
-
   ngOnDestroy() {
   }
 }

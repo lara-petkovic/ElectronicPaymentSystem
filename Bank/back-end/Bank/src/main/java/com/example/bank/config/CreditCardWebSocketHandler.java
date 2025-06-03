@@ -2,27 +2,20 @@ package com.example.bank.config;
 
 import com.example.bank.domain.model.Account;
 import com.example.bank.domain.model.PaymentRequest;
-import com.example.bank.domain.model.Transaction;
-import com.example.bank.service.*;
+import com.example.bank.service.AccountService;
+import com.example.bank.service.BankIdentifierNumberService;
+import com.example.bank.service.PaymentExecutionService;
+import com.example.bank.service.PaymentRequestService;
 import com.example.bank.service.dto.CardDetailsDto;
-import com.example.bank.service.dto.PaymentRequestForIssuerDto;
 import com.example.bank.service.dto.QRCodeInformationDto;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.support.GenericMessage;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Base64;
 
 public class CreditCardWebSocketHandler extends TextWebSocketHandler {
@@ -43,10 +36,14 @@ public class CreditCardWebSocketHandler extends TextWebSocketHandler {
     }
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        System.out.println("Received message: " + message.getPayload());
         ObjectMapper objectMapper = new ObjectMapper();
-        CardDetailsDto cardDetailsDto = objectMapper.readValue(message.getPayload(), CardDetailsDto.class);
-        paymentExecutionService.executePayment(cardDetailsDto);
+        try{
+            CardDetailsDto cardDetailsDto = objectMapper.readValue(message.getPayload(), CardDetailsDto.class);
+            paymentExecutionService.executePayment(cardDetailsDto);
+        }
+        catch (Exception e){
+            System.out.println("Invalid message from ws: "+message.getPayload());
+        }
     }
     public void openCreditCardForm(String paymentId, double amount) throws Exception{
         frontEndSession.sendMessage(new TextMessage(paymentId + "," + amount));

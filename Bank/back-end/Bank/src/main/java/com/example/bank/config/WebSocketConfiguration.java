@@ -12,7 +12,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 public class WebSocketConfiguration implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(creditCardWebSocketHandler(), "/creditCards").setAllowedOrigins("*");
+        registry.addHandler(creditCardWebSocketHandler(), "/creditCards").setAllowedOrigins("https://localhost:4202");
     }
     @Bean
     public CreditCardWebSocketHandler creditCardWebSocketHandler() {
