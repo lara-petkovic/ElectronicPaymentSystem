@@ -63,5 +63,6 @@ export class PspClientRegComponent {
     });
 
     alert(`Selected options: ${this.selectedOptions.join(', ')}\nWallet Address: ${sanitizedWalletAddress || 'N/A'}`);
+    this.selectedOptions=[];
   }
 }

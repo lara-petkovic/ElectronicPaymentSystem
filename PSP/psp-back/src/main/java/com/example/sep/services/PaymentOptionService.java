@@ -46,6 +46,8 @@ public class PaymentOptionService implements  IPaymentOptionService{
             paymentOptionRepository.delete(paymentOption);
             logger.info("New payment option "+name+" removed.");
 
+        }else{
+            logger.warn("Try to remove all payment options.");
         }
     }
 
