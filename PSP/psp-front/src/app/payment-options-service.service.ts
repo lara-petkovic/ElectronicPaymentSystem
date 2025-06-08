@@ -19,7 +19,7 @@ export class PaymentOptionsServiceService {
   private getAuthHeaders(): HttpHeaders {
     const token = this.authService.getToken(); 
     return new HttpHeaders({
-      Authorization: `Bearer ${token}`
+      Authorization: `${token}`
     });
   }
 

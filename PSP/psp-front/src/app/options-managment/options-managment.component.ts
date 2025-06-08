@@ -32,6 +32,7 @@ export class OptionsManagmentComponent implements OnInit{
         this.paymentOptions.push(option);  
         this.newOptionName = ''; 
       });
+      this.loadPaymentOptions();
     }
   }
 

@@ -7,15 +7,18 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
 import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
 
     private static final long EXPIRATION_TIME = 86400000;
-    
-    @Value("${MY_MASTER_PASSWORD}")
-    private String secretKey;
+
+    private String secretKey="SECRET_KEY=ThisIsA256BitKeyExampleForJWT123456789123456789SecretKey";
 
 
     public String generateToken(String username) {
@@ -48,4 +51,7 @@ public class JwtTokenProvider {
             return false;
         }
     }
+
+
+
 }

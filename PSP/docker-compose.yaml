@@ -7,16 +7,34 @@ services:
     ports:
       - 9091:9090
 
+  loki:
+    image: grafana/loki:2.9.0
+    container_name: loki-psp
+    ports:
+      - 3100:3100
+    volumes:
+      - ./loki/config/loki-config.yml:/etc/loki/loki-config.yml
+    command: -config.file=/etc/loki/loki-config.yml
+
+  promtail:
+    image: grafana/promtail:2.9.0
+    container_name: promtail-psp
+    volumes:
+      - /var/log:/var/log
+      - ./promtail/config/promtail-config.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
+    restart: unless-stopped
+
   grafana:
     image: grafana/grafana-oss:8.5.2
-    pull_policy: always
     container_name: grafana1
     restart: unless-stopped
     user: "root"
-    ports: 
+    ports:
       - 3000:3000
     links:
       - prometheus:prometheus
+      - loki:loki
     volumes:
       - ./grafana:/var/lib/grafana
     environment:
@@ -25,26 +43,11 @@ services:
       - GF_SERVER_DOMAIN=localhost
       - GF_LOG_MODE=console file
       - GF_LOG_FILTERS=alerting.notifier.slack:debug alertmanager:debug ngalert:debug
-      - sh
-      - -euc
-      - |
-        mkdir -p /etc/grafana/provisioning/datasources
-        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
-        apiVersion: 1
-        datasources:
-        - name: Loki
-          type: loki
-          access: proxy
-          orgId: 1
-          url: http://loki:3100
-          basicAuth: false
-          isDefault: true
-          version: 1
-          editable: false
-        EOF
-        /run.sh
+      - GF_PLUGINS_ENABLE_ALPHA=true
+    depends_on:
+      - loki
+
+volumes:
+  grafana:
   loki:
-    image: grafana/loki:2.9.0
-    ports:
-      - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml
+  prometheus:

@@ -1,5 +1,6 @@
 package com.example.sep.services;
 
+import com.example.sep.EncryptionUtil;
 import com.example.sep.models.Transaction;
 import com.example.sep.repositories.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,8 @@ import org.springframework.stereotype.Service;
 public class TransactionService implements ITransactionService {
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    private EncryptionUtil encryptionUtil;
     public TransactionService(TransactionRepository transactionRepository){
         this.transactionRepository=transactionRepository;
     }

@@ -1,4 +1,5 @@
 import { Component, Output, EventEmitter, Input } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-psp-client-reg',
@@ -26,6 +27,13 @@ export class PspClientRegComponent {
   hoverOption: string = '';
   walletAddress: string | null = null;
 
+  constructor(private sanitizer: DomSanitizer) {}
+
+  sanitizeInput(input: string): string {
+    const sanitized = this.sanitizer.sanitize(1, input);
+    return sanitized ?? ''; 
+  }
+
   toggleSelection(option: string) {
     const index = this.selectedOptions.indexOf(option);
     if (index > -1) {
@@ -44,12 +52,17 @@ export class PspClientRegComponent {
       return;
     }
 
+    const sanitizedWalletAddress = this.walletAddress 
+      ? this.sanitizeInput(this.walletAddress) 
+      : null;
+
     this.optionsSelected.emit({
       name: this.selectedOptions.join(','),
       clientId: null,
-      walletAddress: this.selectedOptions.includes('Crypto') ? this.walletAddress : null
+      walletAddress: this.selectedOptions.includes('Crypto') ? sanitizedWalletAddress : null
     });
 
-    alert(`Selected options: ${this.selectedOptions.join(', ')}\nWallet Address: ${this.walletAddress || 'N/A'}`);
+    alert(`Selected options: ${this.selectedOptions.join(', ')}\nWallet Address: ${sanitizedWalletAddress || 'N/A'}`);
+    this.selectedOptions=[];
   }
 }
