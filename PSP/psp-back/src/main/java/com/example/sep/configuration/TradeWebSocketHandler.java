@@ -63,7 +63,7 @@ public class TradeWebSocketHandler extends TextWebSocketHandler {
             headers.set("Payment", paymentOption);
 
             String body = "{ \"MerchantId\" : \"" + transaction.getMerchantId() + "\", " +
-                    "\"MerchantPassword\" : \"" + encryptionUtil.decrypt(client.getMerchantPass()) + "\", " +
+                    "\"MerchantPassword\" : \"" + client.getMerchantPass() + "\", " +//encryptionUtil.decrypt(client.getMerchantPass()) + "\", " +
                     "\"Amount\" : \"" + transaction.getAmount() + "\", " +
                     "\"MerchantOrderId\" : \"" + transaction.getOrderId() + "\", " +
                     "\"MerchantTimestamp\" : \"" + transaction.getTimestamp() + "\", " +
