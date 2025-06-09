@@ -83,7 +83,7 @@ public class TradeWebSocketHandler extends TextWebSocketHandler {
             // Build the JSON body
             Map<String, Object> bodyMap = new HashMap<>();
             bodyMap.put("MerchantId", transaction.getMerchantId());
-            bodyMap.put("MerchantPassword", client.getMerchantPass());
+            bodyMap.put("MerchantPassword", encryptionUtil.decrypt(client.getMerchantPass()));
             bodyMap.put("Amount", transaction.getAmount());
             bodyMap.put("MerchantOrderId", transaction.getOrderId());
             bodyMap.put("MerchantTimestamp", transaction.getTimestamp());

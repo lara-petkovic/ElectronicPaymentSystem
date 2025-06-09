@@ -23,9 +23,9 @@ public class AccountService {
         Optional<Account> accountOpt = repo.findByMerchantId(merchantId);
         if (accountOpt.isEmpty()) return false;
 
-        String hashedPassword = accountOpt.get().getMerchantPassword();
-        return passwordEncoder.matches(rawPassword, hashedPassword);
+        return passwordEncoder.matches(rawPassword, accountOpt.get().getMerchantPassword());
     }
+
     public Boolean registerNewMerchant(MerchantRegistrationDto dto) {
         try {
             String hashedPassword = passwordEncoder.encode(dto.MerchantPassword);

@@ -13,12 +13,15 @@ import com.example.sep.models.Transaction;
 import com.example.sep.repositories.ClientRepository;
 import com.example.sep.repositories.PaymentOptionRepository;
 import com.example.sep.repositories.TransactionRepository;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -27,10 +30,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.socket.TextMessage;
+import reactor.netty.http.client.HttpClient;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.SSLException;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -98,35 +105,80 @@ public class ClientService implements IClientService {
     }
 
     private void SendWalletCredentials(String merchantId, String merchantPass, String walletAddress){
-        RestTemplate restTemplateBank = new RestTemplate();
-        String urlBank = "https://localhost:8087/api/merchant";
+        HttpClient httpClient = HttpClient.create()
+                .secure(sslContextSpec -> {
+                            try {
+                                sslContextSpec
+                                        .sslContext(
+                                                SslContextBuilder.forClient()
+                                                        .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                                                        .build()
+                                        );
+                            } catch (SSLException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                );
 
+        WebClient webClient = WebClient.builder()
+                .baseUrl("https://api.coingecko.com/api/v3")
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .build();
+        try {
 
-        HttpHeaders headersbank = new HttpHeaders();
-        headersbank.setContentType(MediaType.APPLICATION_JSON);
+            String bodybank = "{ \"merchantId\" : \"" + merchantId + "\", \"merchantPass\" : \"" + merchantPass + "\", \"walletAddress\" : \"" + walletAddress +"\" }";
 
+            String response = webClient.post()
+                    .uri("https://localhost:8087/api/merchant")
+                    .header("Content-Type", "application/json")
+                    .bodyValue(bodybank)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
 
-        String bodybank = "{ \"merchantId\" : \"" + merchantId + "\", \"merchantPass\" : \"" + merchantPass + "\", \"walletAddress\" : \"" + walletAddress +"\" }";
+            System.out.println("Response: " + response);
 
-        HttpEntity<String> entity= new HttpEntity<>(bodybank, headersbank);
-
-        restTemplateBank.exchange(urlBank, HttpMethod.POST, entity, String.class);
+        } catch (Exception e) {
+            System.out.println("Parrsing error: " + e.getMessage());
+        }
     }
 
     private void SendCredentialsToBank(String merchantId, String merchantPass){
-
-        RestTemplate restTemplateBank = new RestTemplate();
         String urlBank = "https://localhost:8087/api/accounts";
-
-        HttpHeaders headersbank = new HttpHeaders();
-        headersbank.setContentType(MediaType.APPLICATION_JSON);
-
         String bodybank = "{ \"MerchantId\" : \"" + merchantId + "\", \"MerchantPassword\" : \"" + merchantPass + "\", \"HolderName\" : \"" + "WS"+ merchantId +"\" }";
+        HttpClient httpClient = HttpClient.create()
+                .secure(sslContextSpec -> {
+                            try {
+                                sslContextSpec
+                                        .sslContext(
+                                                SslContextBuilder.forClient()
+                                                        .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                                                        .build()
+                                        );
+                            } catch (SSLException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                );
 
-        HttpEntity<String> entityBank = new HttpEntity<>(bodybank, headersbank);
+        WebClient webClient = WebClient.builder()
+                .baseUrl("https://api.coingecko.com/api/v3")
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .build();
+        try {
+            String response = webClient.post()
+                    .uri(urlBank)
+                    .header("Content-Type", "application/json")
+                    .bodyValue(bodybank)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
 
-        restTemplateBank.exchange(urlBank, HttpMethod.POST, entityBank, String.class);
+            System.out.println("Response: " + response);
 
+        } catch (Exception e) {
+            System.out.println("Parrsing error: " + e.getMessage());
+        }
     }
     @Override
     public ClientSubscriptionDto getSubscription(NewTransactionDto newTransactionDto, String port) {
