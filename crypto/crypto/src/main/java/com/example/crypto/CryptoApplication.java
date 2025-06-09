@@ -16,7 +16,7 @@ public class CryptoApplication {
 
 	@PostConstruct
 	public void init(){
-		String trustStorePath = CryptoApplication.class.getClassLoader().getResource("keystore_crypto.jks").getPath();
+		String trustStorePath = CryptoApplication.class.getClassLoader().getResource("cryptoKeystore.jks").getPath();
 		System.setProperty("javax.net.ssl.trustStore", trustStorePath);
 		System.setProperty("javax.net.ssl.trustStorePassword", password);
 	}

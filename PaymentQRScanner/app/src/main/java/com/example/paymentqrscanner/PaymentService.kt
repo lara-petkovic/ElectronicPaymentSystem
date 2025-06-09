@@ -15,10 +15,11 @@ import java.util.Locale
 
 object PaymentService {
 
+    private val ip = "192.168.186.9"
     private fun getCustomOkHttpClient(context: Context): OkHttpClient {
         // Load your certificate from raw resource
         val certificateFactory = CertificateFactory.getInstance("X.509")
-        val inputStream = context.resources.openRawResource(R.raw.bank_acquirer)
+        val inputStream = context.resources.openRawResource(R.raw.bank)
         val certificate = certificateFactory.generateCertificate(inputStream)
         inputStream.close()
 
@@ -42,7 +43,7 @@ object PaymentService {
         // Disable hostname verification (for dev/testing only!)
         val hostnameVerifier = HostnameVerifier { hostname, session ->
             // Accept any hostname, or you can restrict to your IP:
-            hostname == "192.168.186.9"  // or simply: true
+            hostname == ip  // or simply: true
         }
 
         return OkHttpClient.Builder()
@@ -59,7 +60,7 @@ object PaymentService {
         val requestBody = RequestBody.create("application/json".toMediaTypeOrNull(), jsonBody)
 
         val request = Request.Builder()
-            .url("https://192.168.186.9:8052/api/payments/payWithQr")
+            .url("https://$ip:8052/api/payments/payWithQr")
             .post(requestBody)
             .build()
 

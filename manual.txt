@@ -1,0 +1,53 @@
+______________________________SSL_KOMANDE__________________________________________________
+
+kreiranje privatnog kljuca:
+	openssl genrsa -out private.key 2048
+
+kreiranje zahteva za sertifikat:
+	openssl req -new -key private.key -out request.csr -config san.cnf
+
+kreiranje sertifikata:
+	openssl x509 -req -in request.csr -CA myCA.pem -CAkey myCA.key -CAcreateserial -out certificate.crt -days 365 -extensions v3_req -extfile san.cnf
+
+kreiranje p12 keystore-a:
+	openssl pkcs12 -export -out keystore.p12 -inkey private.key -in certificate.crt -name "alias"
+
+kreiranje jks keystore-a:
+	keytool -importkeystore -srckeystore keystore.p12 -srcstoretype PKCS12 -destkeystore keystore.jks -deststoretype JKS
+
+dodavanje sertifikata u trusted:
+	keytool -import -trustcacerts -alias "alias" -file certificate.crt -keystore keystore.jks
+
+putanja za menjanje ip adrese: 
+	System32/drivers/etc/hosts
+
+______________________________SERTIFIKATI__________________________________________________
+
+bank.crt --banka backend
+psp.crt --psp backend
+pcc.crt
+bankFront.crt
+pspFront.crt
+gw1.crt --gateway ws-psp
+gw2.crt --gateway psp-bank
+crypto.crt --servis za kripto valute
+
+______________________________TRUSTED_CERTIFICATES__________________________________________________
+
+banka-backend trusted certs:
+	pcc,psp,gw2,bankFront
+
+psp-backend trusted certs:
+	bank,gw1,gw2,crypto,pspFront
+
+pcc trusted certs:
+	bank
+
+gw1 trusted certs:
+	psp
+
+gw2 trusted certs:
+	psp,bank,crypto
+
+crypto trusted certs:
+	psp,gw2

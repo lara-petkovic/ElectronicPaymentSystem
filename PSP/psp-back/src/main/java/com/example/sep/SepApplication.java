@@ -20,7 +20,7 @@ public class SepApplication {
 
 	@PostConstruct
 	public void init(){
-		String trustStorePath = SepApplication.class.getClassLoader().getResource("keystore.jks").getPath();
+		String trustStorePath = SepApplication.class.getClassLoader().getResource("pspKeystore.jks").getPath();
 		System.setProperty("javax.net.ssl.trustStore", trustStorePath);
 		System.setProperty("javax.net.ssl.trustStorePassword", password);
 	}

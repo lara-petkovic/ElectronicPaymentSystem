@@ -21,7 +21,7 @@ public class DemoApplication {
 
 	@PostConstruct
 	public void init(){
-		String trustStorePath = DemoApplication.class.getClassLoader().getResource("keystore_gw1.jks").getPath();
+		String trustStorePath = DemoApplication.class.getClassLoader().getResource("gw1Keystore.jks").getPath();
 		System.setProperty("javax.net.ssl.trustStore", trustStorePath);
 		System.setProperty("javax.net.ssl.trustStorePassword", password);
 	}

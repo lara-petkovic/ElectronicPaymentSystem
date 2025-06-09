@@ -15,7 +15,7 @@ public class PccApplication {
     }
     @PostConstruct
     public void init(){
-        String trustStorePath = PccApplication.class.getClassLoader().getResource("keystorePcc.jks").getPath();
+        String trustStorePath = PccApplication.class.getClassLoader().getResource("pccKeystore.jks").getPath();
         System.setProperty("javax.net.ssl.trustStore", trustStorePath);
         System.setProperty("javax.net.ssl.trustStorePassword", password);
     }

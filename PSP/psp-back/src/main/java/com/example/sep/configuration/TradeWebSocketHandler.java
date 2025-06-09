@@ -7,12 +7,19 @@ import com.example.sep.repositories.TransactionRepository;
 import com.example.sep.services.ClientService;
 import com.example.sep.services.TransactionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import reactor.netty.http.client.HttpClient;
+
+import javax.net.ssl.SSLException;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -43,6 +50,25 @@ public class TradeWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        HttpClient httpClient = HttpClient.create()
+                .secure(sslContextSpec -> {
+                            try {
+                                sslContextSpec
+                                        .sslContext(
+                                                SslContextBuilder.forClient()
+                                                        .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                                                        .build()
+                                        );
+                            } catch (SSLException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                );
+
+        WebClient webClient = WebClient.builder()
+                .baseUrl("https://api.coingecko.com/api/v3")
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .build();
         try {
             Map<String, Object> data = objectMapper.readValue(message.getPayload(), Map.class);
             String paymentOption = (String) data.get("name");
@@ -50,31 +76,32 @@ public class TradeWebSocketHandler extends TextWebSocketHandler {
             String merchantid = (String) data.get("merchantid");
 
             Client client = clientService.getClientByMerchantId(merchantid);
+            TransactionService transactionService = new TransactionService(this.transactionRepository);
+            Transaction transaction = transactionService.GetTransactionByMerchantIdAndMerchantOrderId(merchantid, orderid);
+            System.out.println("Received payment option: " + paymentOption + ", ID: " + orderid + merchantid);
 
-            TransactionService transactionService=new TransactionService(this.transactionRepository);
-            Transaction transaction=transactionService.GetTransactionByMerchantIdAndMerchantOrderId(merchantid,orderid);
-            System.out.println("Received payment opotion: " + paymentOption + ", ID: " + orderid+merchantid);
+            // Build the JSON body
+            Map<String, Object> bodyMap = new HashMap<>();
+            bodyMap.put("MerchantId", transaction.getMerchantId());
+            bodyMap.put("MerchantPassword", client.getMerchantPass());
+            bodyMap.put("Amount", transaction.getAmount());
+            bodyMap.put("MerchantOrderId", transaction.getOrderId());
+            bodyMap.put("MerchantTimestamp", transaction.getTimestamp());
+            bodyMap.put("SuccessUrl", "https://localhost:4201/success");
+            bodyMap.put("FailedUrl", "https://localhost:4201/fail");
+            bodyMap.put("ErrorUrl", "https://localhost:4201/error");
 
-            RestTemplate restTemplate = new RestTemplate();
-            String url = "https://localhost:8087/api/payments";
+            // Use WebClient with SSL disabled
+            String response = webClient.post()
+                    .uri("https://localhost:8087/api/payments")
+                    .header("Content-Type", "application/json")
+                    .header("Payment", paymentOption)
+                    .bodyValue(bodyMap)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block(); // Blocking call here only if you're not reactive
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("Payment", paymentOption);
-
-            String body = "{ \"MerchantId\" : \"" + transaction.getMerchantId() + "\", " +
-                    "\"MerchantPassword\" : \"" + client.getMerchantPass() + "\", " +//encryptionUtil.decrypt(client.getMerchantPass()) + "\", " +
-                    "\"Amount\" : \"" + transaction.getAmount() + "\", " +
-                    "\"MerchantOrderId\" : \"" + transaction.getOrderId() + "\", " +
-                    "\"MerchantTimestamp\" : \"" + transaction.getTimestamp() + "\", " +
-                    "\"SuccessUrl\" : \"https://localhost:4201/success\", " +
-                    "\"FailedUrl\" : \"https://localhost:4201/fail\", " +
-                    "\"ErrorUrl\" : \"https://localhost:4201/error\" }";
-
-            HttpEntity<String> entity = new HttpEntity<>(body, headers);
-
-            restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-
+            System.out.println("Response: " + response);
 
         } catch (Exception e) {
             System.out.println("Parrsing error: " + e.getMessage());

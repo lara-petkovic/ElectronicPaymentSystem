@@ -62,8 +62,8 @@
           "options": {
             "port": 4201,
             "ssl": true,
-            "sslCert": "client.crt",
-            "sslKey": "client.key"
+            "sslCert": "pspFront.crt",
+            "sslKey": "pspFrontPrivate.key"
           },
           "configurations": {
             "production": {
@@ -71,8 +71,8 @@
             },
             "development": {
               "browserTarget": "sep-front:build:development",
-              "sslCert": "client.crt",
-              "sslKey": "client.key",
+              "sslCert": "pspFront.crt",
+              "sslKey": "pspFrontPrivate.key",
               "ssl": true
             }
           },
