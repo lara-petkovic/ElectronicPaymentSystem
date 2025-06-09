@@ -48,6 +48,13 @@ dependencies {
 
     // WebSocket API
     implementation 'jakarta.websocket:jakarta.websocket-api:2.1.0'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // Reactor Netty HttpClient
+    implementation 'io.projectreactor.netty:reactor-netty-http'
+
+    // Netty Handler for SSL context
+    implementation 'io.netty:netty-handler'
 
     implementation 'org.springframework.security:spring-security-crypto'
 }

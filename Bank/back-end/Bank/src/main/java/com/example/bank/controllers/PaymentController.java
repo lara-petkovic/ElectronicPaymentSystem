@@ -76,7 +76,7 @@ public class PaymentController {
             }
             paymentRequestForIssuerDto.Transaction = transactionService.addTransaction_Issuer(paymentRequestForIssuerDto);
             issuerAccount.setBalance(issuerAccount.getBalance()- paymentRequestForIssuerDto.Transaction.getAmount());
-            accountService.save(issuerAccount);
+            accountService.update(issuerAccount);
             creditCardWebSocket.resetPage();
             return new ResponseEntity<>(paymentRequestForIssuerDto.Transaction, HttpStatus.OK);
         }else{

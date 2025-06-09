@@ -9,13 +9,18 @@ import com.example.bank.service.PaymentRequestService;
 import com.example.bank.service.dto.CardDetailsDto;
 import com.example.bank.service.dto.QRCodeInformationDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import reactor.netty.http.client.HttpClient;
 
+import javax.net.ssl.SSLException;
 import java.util.Base64;
 
 public class CreditCardWebSocketHandler extends TextWebSocketHandler {
@@ -55,34 +60,51 @@ public class CreditCardWebSocketHandler extends TextWebSocketHandler {
         catch(Exception e){}
     }
     public void openPaymentQR(String paymentId, double amount) throws Exception{
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setErrorHandler(new CustomResponseErrorHandler());
+        //restTemplate.setErrorHandler(new CustomResponseErrorHandler());
         String url = "https://nbs.rs/QRcode/api/qr/v1/gen?lang=sr_RS";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
 
         PaymentRequest pr = paymentRequestService.getPaymentRequest(paymentId);
         Account ac = accountService.getMerchantAccount(pr);
 
         ObjectMapper objectMapper = new ObjectMapper();
-
         String json = objectMapper.writeValueAsString(new QRCodeInformationDto(ac.getNumber(), ac.getCardHolderName(), pr.getAmount(), pr.getId()));
 
-        HttpEntity<String> entity = new HttpEntity<>(json, headers);
-        try{
-            ResponseEntity<byte[]> response = restTemplate.exchange(url, HttpMethod.POST, entity, byte[].class);
+        HttpClient httpClient = HttpClient.create()
+                .secure(sslContextSpec -> {
+                            try {
+                                sslContextSpec
+                                        .sslContext(
+                                                SslContextBuilder.forClient()
+                                                        .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                                                        .build()
+                                        );
+                            } catch (SSLException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                );
 
-            if (response.getStatusCode().is2xxSuccessful()) {
-                byte[] imageBytes = response.getBody();
+        WebClient webClient = WebClient.builder()
+                .baseUrl(url)
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .build();
+        try {
+            ResponseEntity<byte[]> responseEntity = webClient.post()
+                    .uri(url)
+                    .header("Content-Type", "application/json")
+                    .bodyValue(json)
+                    .retrieve()
+                    .toEntity(byte[].class)
+                    .block();
+
+            if (responseEntity.getStatusCode().is2xxSuccessful()) {
+                byte[] imageBytes = responseEntity.getBody();
                 String base64Image = Base64.getEncoder().encodeToString(imageBytes);
-                frontEndSession.sendMessage(new TextMessage("qr:"+base64Image));
-                System.out.println("qr:"+base64Image);
+                frontEndSession.sendMessage(new TextMessage("qr:" + base64Image));
             } else {
                 System.out.println("Failed to retrieve the image.");
             }
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
     }
