@@ -1,6 +1,8 @@
 package com.example.bank.domain.model;
 
+import com.example.bank.util.CryptoUtil;
 import jakarta.persistence.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity(name = "accounts")
 public class Account {
@@ -43,6 +45,12 @@ public class Account {
         this.cardHolderName = cardHolderName;
         this.securityCode = securityCode;
         this.balance = balance;
+    }
+    public void encrypt(PasswordEncoder enc){
+        if (getMerchantPassword()!=null) setMerchantPassword(enc.encode(getMerchantPassword()));
+        if (getPan() != null) setPan(CryptoUtil.encrypt(getPan()));
+        if (getSecurityCode() != null) setSecurityCode(CryptoUtil.encrypt(getSecurityCode()));
+        if (getExpirationDate() != null) setExpirationDate(CryptoUtil.encrypt(getExpirationDate()));
     }
 
     public int getId() {
@@ -131,5 +139,21 @@ public class Account {
 
     public void setBalance(Double balance) {
         this.balance = balance;
+    }
+
+    public String toString(){
+        return "{" +
+                "id = " + id + "\n" +
+                "pan = " + pan + "\n" +
+                "number = " + number + "\n" +
+                "merchantAccount = " + merchantAccount + "\n" +
+                "bankIdentifierCode = " + bankIdentifierCode + "\n" +
+                "merchantPassword = " + merchantPassword + "\n" +
+                "merchantId = " + merchantId + "\n" +
+                "expirationDate = " + expirationDate + "\n" +
+                "cardHolderName = " + cardHolderName + "\n" +
+                "securityCode = " + securityCode + "\n" +
+                "balance = " + balance + "\n" +
+                "}";
     }
 }
