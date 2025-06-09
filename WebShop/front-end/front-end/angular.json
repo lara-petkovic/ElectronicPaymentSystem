@@ -68,8 +68,8 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "ssl": true,
-            "sslKey": "certificates/ssl.key",
-            "sslCert": "certificates/ssl.crt"
+            "sslKey": "certificates/private_front.key",
+            "sslCert": "certificates/cert_front.crt"
           },
           "configurations": {
             "production": {
