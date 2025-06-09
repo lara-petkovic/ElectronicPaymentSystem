@@ -10,7 +10,7 @@ import { WebSocketService } from '../websocket.service';
   styleUrls: ['./credit-card.component.css']
 })
 export class CreditCardComponent {
-  paymentId: number | undefined;
+  paymentId: string | undefined;
   constructor(private webSocketService: WebSocketService, private route: ActivatedRoute, private paymentService: PaymentService, private router: Router) {}
 
   ngOnInit() {
@@ -18,7 +18,7 @@ export class CreditCardComponent {
       const id = params.get('paymentId');
       this.price = params.get('amount')!;
       if (id) {
-        this.paymentId = Number(id);
+        this.paymentId = id;
       }
     });
   }
@@ -34,7 +34,7 @@ export class CreditCardComponent {
     HolderName: '',
     ExpirationDate: '',
     SecurityCode: '',
-    PaymentRequestId: 0
+    PaymentRequestId: ''
   }
 
   formatExpiryDate(event: Event): void {

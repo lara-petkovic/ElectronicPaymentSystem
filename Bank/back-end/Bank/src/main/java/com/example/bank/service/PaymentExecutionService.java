@@ -50,8 +50,8 @@ public class PaymentExecutionService {
                 if(issuerAccount.getBalance()>=paymentRequest.getAmount()){
                     issuerAccount.setBalance(issuerAccount.getBalance()-paymentRequest.getAmount());
                     merchantAccount.setBalance(merchantAccount.getBalance()+paymentRequest.getAmount());
-                    accountService.save(issuerAccount);
-                    accountService.save(merchantAccount);
+                    accountService.update(issuerAccount);
+                    accountService.update(merchantAccount);
                     emitSuccessEvent(transaction);
                     return true;
                 }
@@ -64,7 +64,7 @@ public class PaymentExecutionService {
                 //call issuers bank via pcc
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.setErrorHandler(new CustomResponseErrorHandler());
-                String url = "http://localhost:8053/api/payments";//TODO:stavi https
+                String url = "https://localhost:8053/api/payments";
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
@@ -85,7 +85,7 @@ public class PaymentExecutionService {
                     Transaction returnedTransaction = response.getBody();
                     if(response.getStatusCode()==HttpStatus.OK){
                         merchantAccount.setBalance(merchantAccount.getBalance()+paymentRequest.getAmount());
-                        accountService.save(merchantAccount);
+                        accountService.update(merchantAccount);
                         emitSuccessEvent(returnedTransaction);
                         return true;
                     }

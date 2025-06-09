@@ -32,7 +32,7 @@ public class AccountService {
             Account merchantAccount = new Account(
                     0,
                     null,
-                    null,
+                    "170001064479900050",
                     true,
                     null,
                     hashedPassword,
@@ -48,11 +48,8 @@ public class AccountService {
         }
     }
     public Account getMerchantAccount(PaymentRequest request) {
-        Optional<Account> account = repo.findByMerchantIdAndMerchantPassword(
-                request.getMerchantId(),
-                request.getMerchantPassword()
-        );
-        return account.orElse(null);
+        Optional<Account> accountOpt = repo.findByMerchantId(request.getMerchantId());
+        return accountOpt.orElse(null);
     }
     public Account getIssuerAccount(CardDetailsDto dto) {
         return findByDecryptedCardInfo(dto.Pan, dto.SecurityCode, dto.HolderName, dto.ExpirationDate);
@@ -65,20 +62,26 @@ public class AccountService {
     private Account findByDecryptedCardInfo(String pan, String securityCode, String holder, String exp) {
         for (Account acc : repo.findAll()) {
             try {
-                if (CryptoUtil.decrypt(acc.getPan()).equals(pan) &&
-                        CryptoUtil.decrypt(acc.getSecurityCode()).equals(securityCode) &&
+                String panD = CryptoUtil.decrypt(acc.getPan());
+                String scD = CryptoUtil.decrypt(acc.getSecurityCode());
+                String edD = CryptoUtil.decrypt(acc.getExpirationDate());
+                if (panD.equals(pan) &&
+                        scD.equals(securityCode) &&
                         acc.getCardHolderName().equals(holder) &&
-                        CryptoUtil.decrypt(acc.getExpirationDate()).equals(exp)) {
+                        edD.equals(exp)) {
                     return acc;
                 }
             } catch (Exception ignored) {}
         }
         return null;
     }
-    public Account save(Account account) {
-        if (account.getPan() != null) account.setPan(CryptoUtil.encrypt(account.getPan()));
-        if (account.getSecurityCode() != null) account.setSecurityCode(CryptoUtil.encrypt(account.getSecurityCode()));
-        if (account.getExpirationDate() != null) account.setExpirationDate(CryptoUtil.encrypt(account.getExpirationDate()));
+//    public Account save(Account account) {
+//        if (account.getPan() != null) account.setPan(CryptoUtil.encrypt(account.getPan()));
+//        if (account.getSecurityCode() != null) account.setSecurityCode(CryptoUtil.encrypt(account.getSecurityCode()));
+//        if (account.getExpirationDate() != null) account.setExpirationDate(CryptoUtil.encrypt(account.getExpirationDate()));
+//        return repo.save(account);
+//    }
+    public Account update(Account account) {
         return repo.save(account);
     }
 

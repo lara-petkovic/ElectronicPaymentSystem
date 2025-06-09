@@ -15,7 +15,7 @@ public class PspNotificationService {
     private TransactionService transactionService;
     @Autowired
     private PaymentRequestService paymentRequestService;
-    private String gatewayUrl = "http://localhost:8087/api/response";
+    private String gatewayUrl = "https://localhost:8087/api/response";
     public void sendTransactionResult(Transaction transaction){
         PaymentRequest pr = paymentRequestService.getPaymentRequest(transaction.getPaymentRequestId());
         TransactionResultDto result = new TransactionResultDto();
