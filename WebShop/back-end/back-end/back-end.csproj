@@ -29,4 +29,10 @@
     <Folder Include="Migrations\" />
   </ItemGroup>
 
+<ItemGroup>
+    <None Update="keystore.pfx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
