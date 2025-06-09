@@ -48,6 +48,12 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.Configure(builder.Configuration.GetSection("Kestrel"));
+});
+
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
