@@ -42,7 +42,7 @@ public class TransactionService implements ITransactionService {
             return transaction;
         }else{
             RestTemplate restTemplate = new RestTemplate();
-            String url = "http://localhost:8087/api/response";
+            String url = "https://localhost:8087/api/response";
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
