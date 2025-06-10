@@ -19,7 +19,7 @@ namespace back_end.Controllers
             _transactionService = transactionService;
         }
 
-        [Authorize(Policy = "AdminPolicy")]
+        //[Authorize(Policy = "AdminPolicy")]
         [HttpPost("subscribe")]
         public void CreateConfiguration()
         {
@@ -43,7 +43,7 @@ namespace back_end.Controllers
             return Ok(paymentOptions);
         }
 
-        [Authorize(Policy = "AdminPolicy")]
+        //[Authorize(Policy = "AdminPolicy")]
         [HttpPut("payment-option")]
         public async Task<IActionResult> RemovePaymentOption([FromBody] PaymentOptionDto option)
         {
