@@ -8,7 +8,7 @@ namespace back_end.Services
     public class PspSubscriptionService
     {
         private static readonly HttpClient httpClient = new HttpClient();
-        private const string BaseUrl = "http://localhost:8086/api";
+        private const string BaseUrl = "https://localhost:8086/api";
 
         private static readonly string SubscriptionEndpoint = $"{BaseUrl}/subscription";
         private static readonly string PaymentOptionEndpoint = $"{BaseUrl}/subscription/5275";
