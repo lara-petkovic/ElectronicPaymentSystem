@@ -45,7 +45,7 @@ public class TransactionController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String body = "{ \"responseUrl\": \"" + transactionStatusDto.getStatus() + "\", \"orderId\": \"" + t.getMerchantOrderId() + "\" }";
+        String body = "{ \"responseUrl\": \"" + "https://localhost:4201/"+transactionStatusDto.getStatus() + "\", \"orderId\": \"" + t.getMerchantOrderId() + "\" }";
 
         HttpEntity<String> entity = new HttpEntity<>(body, headers);
 
