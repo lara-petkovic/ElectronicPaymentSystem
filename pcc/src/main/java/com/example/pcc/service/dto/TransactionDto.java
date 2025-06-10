@@ -10,10 +10,10 @@ public class TransactionDto {
     public String issuerOrderId;
     public String issuerTimestamp;
     public String status;
-    public int paymentRequestId;
+    public String paymentRequestId;
     public TransactionDto(){}
 
-    public TransactionDto(int id, double amount, String merchantOrderId, String merchantTimestamp, String acquirerOrderId, String acquirerTimestamp, String issuerOrderId, String issuerTimestamp, String status, int paymentRequestId) {
+    public TransactionDto(int id, double amount, String merchantOrderId, String merchantTimestamp, String acquirerOrderId, String acquirerTimestamp, String issuerOrderId, String issuerTimestamp, String status, String paymentRequestId) {
         this.id = id;
         this.amount = amount;
         this.merchantOrderId = merchantOrderId;
