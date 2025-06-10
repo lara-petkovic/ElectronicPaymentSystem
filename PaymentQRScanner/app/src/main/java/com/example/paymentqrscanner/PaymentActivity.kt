@@ -21,13 +21,17 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import java.util.concurrent.Executor
 import androidx.biometric.BiometricPrompt
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
 class PaymentActivity : AppCompatActivity() {
     lateinit var qrCodeResult: String
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val qrCode = intent.getStringExtra("qrCodeResult") ?: "No QR code detected."
@@ -38,7 +42,9 @@ class PaymentActivity : AppCompatActivity() {
         val valutaIIznos = extractValue(qrCodeResult, "I:", "|")
         val sifraPlacanja = extractValue(qrCodeResult, "SF:", "|")
         val svhraPlacanja = extractValue(qrCodeResult, "S:", "|")
+
         setContent {
+            var acquirer = remember{ mutableStateOf(true) }
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -110,7 +116,7 @@ class PaymentActivity : AppCompatActivity() {
                             val biometricPrompt = BiometricPrompt(this@PaymentActivity, executor, object : BiometricPrompt.AuthenticationCallback() {
                                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                                     super.onAuthenticationSucceeded(result)
-                                    PaymentService.pay(pozivNaBroj = modelIPozivNaBroj.substring(2), context)
+                                    PaymentService.pay(acquirer.value, pozivNaBroj = modelIPozivNaBroj.substring(2), context)
                                     val intent = Intent(context, MainActivity::class.java)
                                     context.startActivity(intent)
                                 }
@@ -136,6 +142,10 @@ class PaymentActivity : AppCompatActivity() {
                         },
                         modifier = Modifier.fillMaxWidth()) {
                         BasicText(text="Izvrsi placanje")
+                    }
+                    Row(modifier = Modifier.fillMaxWidth()){
+                        Checkbox(checked = acquirer.value, onCheckedChange = {value-> acquirer.value = value})
+                        Text(text = "Acquirer")
                     }
                 }
             }

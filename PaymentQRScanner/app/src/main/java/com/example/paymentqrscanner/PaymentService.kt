@@ -52,8 +52,8 @@ object PaymentService {
             .build()
     }
 
-    fun pay(pozivNaBroj: String, context: Context) {
-        val cardDetails = CardDetails()
+    fun pay(acqAcc:Boolean, pozivNaBroj: String, context: Context) {
+        val cardDetails = CardDetails(acqAcc)
         cardDetails.PaymentRequestId = pozivNaBroj
         val jsonBody = cardDetails.getJsonString()
         val client = getCustomOkHttpClient(context)

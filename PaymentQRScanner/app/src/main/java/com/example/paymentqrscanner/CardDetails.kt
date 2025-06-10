@@ -2,13 +2,17 @@ package com.example.paymentqrscanner
 
 import com.google.gson.annotations.Expose
 
-data class CardDetails (
-    val Pan: String = "2345678901234560",
-    val HolderName : String = "Dusan Sudjic",
-    val ExpirationDate: String = "11/26",
-    val SecurityCode: String = "456",
-    var PaymentRequestId: String = "",
-){
+class CardDetails
+{
+    var Pan: String = ""
+    val HolderName : String = "Dusan Sudjic"
+    val ExpirationDate: String = "11/26"
+    val SecurityCode: String = "456"
+    var PaymentRequestId: String = ""
+    constructor(acqAcc:Boolean){
+        Pan = if(acqAcc) "2345678901234560" else "6666666666666664"
+    }
+
     fun getJsonString(): String {
         return """
             {
