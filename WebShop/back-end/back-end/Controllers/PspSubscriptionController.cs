@@ -35,7 +35,7 @@ namespace back_end.Controllers
             return Ok("Transaction saved and processed successfully");
         }
 
-        [Authorize(Policy = "AdminPolicy")]
+        //[Authorize(Policy = "AdminPolicy")]
         [HttpGet("payment-options")]
         public async Task<IActionResult> GetPaymentOptions()
         {
