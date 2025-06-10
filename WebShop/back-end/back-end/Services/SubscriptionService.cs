@@ -124,7 +124,7 @@ namespace back_end.Services
                         Encoding.UTF8, "application/json");
 
 
-                    string url = "http://localhost:8086/api/transaction";
+                    string url = "https://localhost:8086/api/transaction";
                     try
                     {
                         httpClient.DefaultRequestHeaders.Add("Port", "5275");
