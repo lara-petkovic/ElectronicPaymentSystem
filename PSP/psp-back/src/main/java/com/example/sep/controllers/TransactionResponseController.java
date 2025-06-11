@@ -6,11 +6,21 @@ import com.example.sep.models.Client;
 import com.example.sep.models.Transaction;
 import com.example.sep.services.ClientService;
 import com.example.sep.services.TransactionService;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.socket.TextMessage;
+import reactor.netty.http.client.HttpClient;
+
+import javax.net.ssl.SSLException;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path="api/response")
@@ -63,17 +73,57 @@ public class TransactionResponseController {
 
         Transaction transaction = transactionService.GetTransactionByOrderId(transactionResponseDto.orderId);
         Client client = clientService.getClientByMerchantId(transaction.getMerchantId());
+        notifyWebShop(client,transaction,status);
 
-        RestTemplate restTemplate = new RestTemplate();
-        String url = "https://localhost:" + client.getPort() + "/api/response";
+//        RestTemplate restTemplate = new RestTemplate();
+//        String url = "https://localhost:" + client.getPort() + "/api/response";
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+//
+//        String body = "{ \"MerchantOrderId\": \"" + transaction.getOrderId() + "\", \"Status\": \"" + status + "\" }";
+//
+//        HttpEntity<String> entity = new HttpEntity<>(body, headers);
+//
+//        restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+    }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
+    private void notifyWebShop(Client client, Transaction transaction, String status){
         String body = "{ \"MerchantOrderId\": \"" + transaction.getOrderId() + "\", \"Status\": \"" + status + "\" }";
+        String url = "https://localhost:" + client.getPort() + "/api/response";
+        HttpClient httpClient = HttpClient.create()
+                .secure(sslContextSpec -> {
+                            try {
+                                sslContextSpec
+                                        .sslContext(
+                                                SslContextBuilder.forClient()
+                                                        .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                                                        .build()
+                                        );
+                            } catch (SSLException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                );
 
-        HttpEntity<String> entity = new HttpEntity<>(body, headers);
+        WebClient webClient = WebClient.builder()
+                .baseUrl("https://api.coingecko.com/api/v3")
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .build();
+        try {
 
-        restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+            String response = webClient.post()
+                    .uri(url)
+                    .header("Content-Type", "application/json")
+                    .bodyValue(body)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block(); // Blocking call here only if you're not reactive
+
+            System.out.println("Response: " + response);
+
+        } catch (Exception e) {
+            System.out.println("Error notifying web shop: " + e);
+        }
     }
 }
