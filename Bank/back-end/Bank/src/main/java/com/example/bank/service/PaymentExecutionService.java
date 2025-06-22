@@ -8,6 +8,8 @@ import com.example.bank.service.dto.CardDetailsDto;
 import com.example.bank.service.dto.PaymentRequestForIssuerDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +29,7 @@ public class PaymentExecutionService {
     private PspNotificationService pspNotificationService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    private static final Logger logger = LoggerFactory.getLogger(PaymentExecutionService.class);
     public boolean executePayment(CardDetailsDto cardDetailsDto) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         PaymentRequest paymentRequest = paymentRequestService.getPaymentRequest(cardDetailsDto.PaymentRequestId);
@@ -110,15 +113,19 @@ public class PaymentExecutionService {
         }
     }
     public void emitAlreadyPaidEvent(Transaction transaction){
+        logger.error("Transaction with id "+transaction.getId()+" already paid");
         pspNotificationService.sendTransactionResult(transaction);
     }
     public void emitErrorEvent(Transaction transaction){
+        logger.error("Error in transaction with id "+transaction.getId());
         pspNotificationService.sendTransactionResult(transactionService.errorTransaction(transaction));
     }
     public void emitSuccessEvent(Transaction transaction){
+        logger.error("Successful transaction with id "+transaction.getId());
         pspNotificationService.sendTransactionResult(transactionService.successTransaction(transaction));
     }
     public void emitFailedEvent(Transaction transaction){
+        logger.error("Failed transaction with id "+transaction.getId());
         pspNotificationService.sendTransactionResult(transactionService.failTransaction(transaction));
     }
     private boolean checkIfPanNumberBelongsToAcquirersBank(CardDetailsDto cardDetailsDto){

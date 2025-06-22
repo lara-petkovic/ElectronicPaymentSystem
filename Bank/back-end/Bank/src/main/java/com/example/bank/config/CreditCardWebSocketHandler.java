@@ -11,6 +11,8 @@ import com.example.bank.service.dto.QRCodeInformationDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -33,33 +35,40 @@ public class CreditCardWebSocketHandler extends TextWebSocketHandler {
     private BankIdentifierNumberService bankIdentifierService;
     @Autowired
     private PaymentExecutionService paymentExecutionService;
+    private static final Logger logger = LoggerFactory.getLogger(CreditCardWebSocketHandler.class);
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         System.out.println("New WebSocket connection: " + session.getId());
+        logger.info("New WebSocket connection: " + session.getId());
         frontEndSession = session;
         frontEndSession.sendMessage(new TextMessage("Welcome to the Credit Card WebSocket!"));
     }
+
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        try{
+        try {
             CardDetailsDto cardDetailsDto = objectMapper.readValue(message.getPayload(), CardDetailsDto.class);
             paymentExecutionService.executePayment(cardDetailsDto);
-        }
-        catch (Exception e){
-            System.out.println("Invalid message from ws: "+message.getPayload());
+        } catch (Exception e) {
+            System.out.println("Invalid message from ws: " + message.getPayload());
+            logger.error("Invalid message from ws: " + message.getPayload());
         }
     }
-    public void openCreditCardForm(String paymentId, double amount) throws Exception{
+
+    public void openCreditCardForm(String paymentId, double amount) throws Exception {
         frontEndSession.sendMessage(new TextMessage(paymentId + "," + amount));
     }
-    public void resetPage(){
-        try{
+
+    public void resetPage() {
+        try {
             frontEndSession.sendMessage(new TextMessage(""));
+        } catch (Exception e) {
         }
-        catch(Exception e){}
     }
-    public void openPaymentQR(String paymentId, double amount) throws Exception{
+
+    public void openPaymentQR(String paymentId, double amount) throws Exception {
         //restTemplate.setErrorHandler(new CustomResponseErrorHandler());
         String url = "https://nbs.rs/QRcode/api/qr/v1/gen?lang=sr_RS";
 
@@ -108,60 +117,4 @@ public class CreditCardWebSocketHandler extends TextWebSocketHandler {
             System.out.println(e);
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    @Override
-//    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-//        try {
-//            Map<String, Object> data = objectMapper.readValue(message.getPayload(), Map.class);
-//            String paymentOption = (String) data.get("name");
-//            Integer orderid = (Integer) data.get("orderid");
-//            String merchantid = (String) data.get("merchantid");
-//
-//            TransactionService transactionService=new TransactionService(this.transactionRepository);
-//            Transaction transaction=transactionService.GetTransactionByMerchantIdAndMerchantOrderId(merchantid,orderid);
-//            System.out.println("Received payment opotion: " + paymentOption + ", ID: " + orderid+merchantid);
-//
-//            RestTemplate restTemplate = new RestTemplate();
-//            String url = "http://localhost:8086/api/payments";
-//
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.setContentType(MediaType.APPLICATION_JSON);
-//            headers.set("Payment", paymentOption);
-//
-//            // Create the JSON body
-//            String body = "{ \"MerchantId\" : \"" + transaction.getMerchantId() + "\", " +
-//                    "\"MerchantPassword\" : \"" + transaction.getMerchantPass() + "\", " +
-//                    "\"Amount\" : \"" + transaction.getAmount() + "\", " +
-//                    "\"MerchantOrderId\" : \"" + transaction.getOrderId() + "\", " +
-//                    "\"MerchantTimestamp\" : \"" + transaction.getTimestamp() + "\", " +
-//                    "\"SuccessUrl\" : \"http://localhost:4201/success\", " +
-//                    "\"FailedUrl\" : \"http://localhost:4201/fail\", " +
-//                    "\"Error\" : \"http://localhost:4201/error\" }";
-//
-//            // Set up the HTTP entity with headers and body
-//            HttpEntity<String> entity = new HttpEntity<>(body, headers);
-//
-//            // Send the POST request
-//            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-//
-//
-//        } catch (Exception e) {
-//            System.out.println("Parrsing error: " + e.getMessage());
-//            session.sendMessage(new TextMessage("Invalid format!"));
-//        }
-//    }
-
 }
