@@ -63,8 +63,8 @@
           "options": {
             "port": 4203,
             "ssl": true,
-            "sslCert": "client_front.crt",
-            "sslKey": "client_front.key",
+            "sslCert": "paypalFront.crt",
+            "sslKey": "paypalFrontPrivate.key",
             "buildTarget": "paypal-front:build"
           },
           "configurations": {
@@ -74,8 +74,8 @@
             "development": {
               "buildTarget": "paypal-front:build:development",
               "ssl": true,
-              "sslCert": "client_front.crt",
-              "sslKey": "client_front.key"
+              "sslCert": "paypalFront.crt",
+              "sslKey": "paypalFrontPrivate.key"
             }
           },
           "defaultConfiguration": "development"

@@ -79,7 +79,7 @@ The system is designed to be loosely coupled and pluggable, ensuring easy integr
 ### **PayPal**
 | **Component**    | **Configuration**     | **Details**                                                             |
 |------------------|-----------------------|-------------------------------------------------------------------------|
-| **Backend**      | Spring Boot API       | **Port**: `http://localhost:8088`                                       |
+| **Backend**      | Spring Boot API       | **Port**: `http://localhost:8089`                                       |
 |                  |                       | **Database**: PostgreSQL                                                |
 |                  | **Database Config**   | **Host**: `localhost`                                                   |
 |                  |                       | **Database**: `paypal`                                                  |

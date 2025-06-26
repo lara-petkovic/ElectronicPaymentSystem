@@ -2,17 +2,21 @@ package com.sepproject.paypalback.services;
 
 import com.sepproject.paypalback.models.Payment;
 import com.sepproject.paypalback.repositories.PaymentsRepository;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
 
+import javax.net.ssl.SSLException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -28,61 +32,168 @@ public class PaymentsService {
     @Autowired
     private PaymentsRepository paymentsRepository;
 
+    private final RestTemplate restTemplate = new RestTemplate();
+
     private static final String PAYPAL_API_BASE_URL = "https://api.sandbox.paypal.com";
     private static final String PAYPAL_CREATE_ORDER_URL = PAYPAL_API_BASE_URL + "/v2/checkout/orders";
     private static final String PAYPAL_CAPTURE_ORDER_URL = PAYPAL_API_BASE_URL + "/v2/checkout/orders/{orderId}/capture";
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final WebClient webClient;
+
+    public PaymentsService() {
+        this.webClient = createUnsafeWebClient();
+    }
+
+    private WebClient createUnsafeWebClient() {
+        try {
+            HttpClient httpClient = HttpClient.create()
+                    .secure(sslContextSpec -> {
+                        try {
+                            sslContextSpec.sslContext(
+                                    SslContextBuilder.forClient()
+                                            .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                                            .build()
+                            );
+                        } catch (SSLException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+
+            return WebClient.builder()
+                    .clientConnector(new ReactorClientHttpConnector(httpClient))
+                    .build();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create WebClient", e);
+        }
+    }
+//
+//    private String getAccessToken() {
+//        String authUrl = PAYPAL_API_BASE_URL + "/v1/oauth2/token";
+//
+//        String credentials = Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.add("Authorization", "Basic " + credentials);
+//        headers.add("Content-Type", "application/x-www-form-urlencoded");
+//
+//        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+//        body.add("grant_type", "client_credentials");
+//
+//        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+//        ResponseEntity<Map> response = restTemplate.exchange(authUrl, HttpMethod.POST, request, Map.class);
+//
+//        return (String) Objects.requireNonNull(response.getBody()).get("access_token");
+//    }
 
     private String getAccessToken() {
-        String authUrl = PAYPAL_API_BASE_URL + "/v1/oauth2/token";
-
         String credentials = Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Basic " + credentials);
-        headers.add("Content-Type", "application/x-www-form-urlencoded");
 
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("grant_type", "client_credentials");
+        Map response = webClient.post()
+                .uri(PAYPAL_API_BASE_URL + "/v1/oauth2/token")
+                .header("Authorization", "Basic " + credentials)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(BodyInserters.fromFormData("grant_type", "client_credentials"))
+                .retrieve()
+                .bodyToMono(Map.class)
+                .block();
 
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
-        ResponseEntity<Map> response = restTemplate.exchange(authUrl, HttpMethod.POST, request, Map.class);
-
-        return (String) Objects.requireNonNull(response.getBody()).get("access_token");
+        return (String) Objects.requireNonNull(response).get("access_token");
     }
 
     public String createPaypalOrder(String orderId, String merchantId, Double amount) {
-        String accessToken = getAccessToken();
+        if (orderId == null || orderId.isBlank()) {
+            throw new IllegalArgumentException("Order ID cannot be null or empty");
+        }
+        if (merchantId == null || merchantId.isBlank()) {
+            throw new IllegalArgumentException("Merchant ID cannot be null or empty");
+        }
+        if (amount == null) {
+            throw new IllegalArgumentException("Amount cannot be null");
+        }
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount must be greater than 0");
+        }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + accessToken);
-        headers.add("Content-Type", "application/json");
+        try {
+            String accessToken = getAccessToken();
+            if (accessToken == null || accessToken.isBlank()) {
+                throw new RuntimeException("Failed to obtain valid PayPal access token");
+            }
 
-        Map<String, Object> purchaseUnit = new HashMap<>();
-        purchaseUnit.put("description", "Order ID: " + orderId + ", Merchant ID: " + merchantId);
-        purchaseUnit.put("amount", Map.of("currency_code", "USD", "value", amount));
-        purchaseUnit.put("reference_id", merchantId);
+            Map<String, Object> amountMap = new HashMap<>();
+            amountMap.put("currency_code", "USD");
+            amountMap.put("value", String.format("%.2f", amount));
 
-        Map<String, Object> requestBody = Map.of("intent", "CAPTURE", "purchase_units", new Object[]{purchaseUnit});
+            Map<String, Object> purchaseUnit = new HashMap<>();
+            purchaseUnit.put("description", "Order ID: " + orderId);
+            purchaseUnit.put("amount", amountMap);
+            purchaseUnit.put("reference_id", merchantId);
 
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
-        ResponseEntity<Map> response = restTemplate.postForEntity(PAYPAL_CREATE_ORDER_URL, request, Map.class);
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("intent", "CAPTURE");
+            requestBody.put("purchase_units", Collections.singletonList(purchaseUnit));
 
-        return (String) Objects.requireNonNull(response.getBody()).get("id");
+            // Make the API call
+            Map response = webClient.post()
+                    .uri(PAYPAL_CREATE_ORDER_URL)
+                    .header("Authorization", "Bearer " + accessToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(requestBody)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, clientResponse ->
+                            clientResponse.bodyToMono(String.class)
+                                    .map(body -> new RuntimeException("PayPal API error: " + body))
+                    )
+                    .bodyToMono(Map.class)
+                    .block();
+
+            if (response == null || response.get("id") == null) {
+                throw new RuntimeException("Invalid response from PayPal API - missing order ID");
+            }
+
+            return (String) response.get("id");
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create PayPal order: " + e.getMessage(), e);
+        }
     }
+
+//    public String createPaypalOrder(String orderId, String merchantId, Double amount) {
+//        String accessToken = getAccessToken();
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.add("Authorization", "Bearer " + accessToken);
+//        headers.add("Content-Type", "application/json");
+//
+//        Map<String, Object> purchaseUnit = new HashMap<>();
+//        purchaseUnit.put("description", "Order ID: " + orderId + ", Merchant ID: " + merchantId);
+//        purchaseUnit.put("amount", Map.of("currency_code", "USD", "value", amount));
+//        purchaseUnit.put("reference_id", merchantId);
+//
+//        Map<String, Object> requestBody = Map.of("intent", "CAPTURE", "purchase_units", new Object[]{purchaseUnit});
+//
+//        HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
+//        ResponseEntity<Map> response = restTemplate.postForEntity(PAYPAL_CREATE_ORDER_URL, request, Map.class);
+//
+//        return (String) Objects.requireNonNull(response.getBody()).get("id");
+//    }
 
     public Payment capturePayment(String paypalOrderId) {
         String accessToken = getAccessToken();
-        ResponseEntity<Map> response = executeCaptureRequest(paypalOrderId, accessToken);
 
-        if (!response.getStatusCode().is2xxSuccessful()) {
+        Map response = webClient.post()
+                .uri(PAYPAL_CAPTURE_ORDER_URL, paypalOrderId)
+                .header("Authorization", "Bearer " + accessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(Map.class)
+                .block();
+
+        if (response == null) {
             throw new RuntimeException("Payment capture failed!");
         }
 
-        Map<String, Object> responseBody = getResponseBody(response);
-        String merchantId = extractMerchantId(responseBody);
-        String paypalAccountId = extractPaypalAccountId(responseBody);
-        Double amount = extractCapturedAmount(responseBody);
+        String merchantId = extractMerchantId(response);
+        String paypalAccountId = extractPaypalAccountId(response);
+        Double amount = extractCapturedAmount(response);
 
         return savePayment(paypalOrderId, merchantId, paypalAccountId, amount);
     }

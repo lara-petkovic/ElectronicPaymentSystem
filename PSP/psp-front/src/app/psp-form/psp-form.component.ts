@@ -51,29 +51,29 @@ export class PspFormComponent implements OnInit{
       .replace(/(\w+)=/g, '"$1":');
     const data = JSON.parse(jsonString);
 
-    if (card.name === 'PayPal') {
-      this.paymentOptionsService
-        .getTransactionByMerchantOrderIdAndOrderId(data.merchantId, data.orderId)
-        .subscribe(
-          (transaction: TransactionDto) => {
-            const transactionDetails = {
-              orderId: transaction.orderId,
-              merchantId: transaction.merchantId,
-              amount: transaction.amount.toString(),
-              timestamp: transaction.timestamp
-            };
+    // if (card.name === 'PayPal') {
+    //   this.paymentOptionsService
+    //     .getTransactionByMerchantOrderIdAndOrderId(data.merchantId, data.orderId)
+    //     .subscribe(
+    //       (transaction: TransactionDto) => {
+    //         const transactionDetails = {
+    //           orderId: transaction.orderId,
+    //           merchantId: transaction.merchantId,
+    //           amount: transaction.amount.toString(),
+    //           timestamp: transaction.timestamp
+    //         };
 
-            const queryParams = new URLSearchParams(transactionDetails).toString();
-            window.location.href = `http://localhost:4203?${queryParams}`;
-          },
-          (error: any) => {
-            console.error('Error fetching transaction details:', error);
-            alert('Failed to fetch transaction details.');
-          }
-        );
-    } else {
+    //         const queryParams = new URLSearchParams(transactionDetails).toString();
+    //         window.location.href = `https://localhost:4203?${queryParams}`;
+    //       },
+    //       (error: any) => {
+    //         console.error('Error fetching transaction details:', error);
+    //         alert('Failed to fetch transaction details.');
+    //       }
+    //     );
+    // } else {
       this.paymentMethodSelected.emit({ name: card.name, orderid: data.orderId, merchantid: data.merchantId });
-    }
+    //}
   
     this.selectedRow = null;
   }

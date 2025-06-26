@@ -1,7 +1,9 @@
-import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { Component, Inject, Input, OnInit, PLATFORM_ID } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { environment } from '../../../enviroment';
+import { PaymentRequestDto } from '../../models/PaymentRequestDto';
 
 @Component({
   selector: 'app-checkout',
@@ -11,91 +13,99 @@ import { environment } from '../../../enviroment';
   styleUrls: ['./checkout.component.scss']
 })
 export class CheckoutComponent implements OnInit {
-  transactionDetails: any;
+  @Input() transactionDetails: PaymentRequestDto | null = null;
   isBrowser: boolean;
 
-  constructor(private http: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) {
+  error: string | null = null;
+  loading: boolean = true;
+
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private route: ActivatedRoute
+  ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
   ngOnInit() {
-    if (this.isBrowser) {
-      const queryParams = new URLSearchParams(window.location.search);
-      const orderId = queryParams.get('orderId');
-      const merchantId = queryParams.get('merchantId');
-      const amount = queryParams.get('amount');
-      const timestamp = queryParams.get('timestamp');
-
-      if (orderId && merchantId && amount && timestamp) {
-        this.transactionDetails = { orderId, merchantId, amount, timestamp };
+    this.route.queryParams.subscribe(params => {
+      if (params['orderId'] && params['amount']) {
+        this.transactionDetails = {
+          orderId: params['orderId'],
+          merchantId: params['merchantId'] ?? '',
+          amount: +params['amount']
+        };
+        this.loading = false;
         this.loadPayPalButton();
       } else {
-        console.error('Transaction details not found in query parameters!');
+        this.handleError('Missing payment parameters');
       }
-    }
+    });
+  }
+
+  handleError(message: string) {
+    this.error = message;
+    this.loading = false;
+    console.error(message);
   }
 
   loadPayPalButton() {
-    if (!this.isBrowser) return;
-  
+    if (!this.isBrowser || !this.transactionDetails) return;
+
     const paypal = (window as any).paypal;
-  
-    if (paypal && this.transactionDetails) {
+
+    if (!paypal) {
+      this.handleError('PayPal SDK not loaded!');
+      return;
+    }
+
+    setTimeout(() => {
+      const container = document.getElementById('paypal-button-container');
+      if (!container) {
+        this.handleError('PayPal button container not found in DOM.');
+        return;
+      }
+
       paypal.Buttons({
-        createOrder: async (data: any, actions: any) => {
+        createOrder: async () => {
           try {
             const response = await fetch(`${environment.apiBaseUrl}/api/payments/create`, {
               method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                orderId: this.transactionDetails.orderId,
-                merchantId: this.transactionDetails.merchantId,
-                amount: this.transactionDetails.amount,
-              }),
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(this.transactionDetails),
             });
-  
-            if (!response.ok) {
-              throw new Error('Failed to create order');
-            }
-  
+
+            if (!response.ok) throw new Error('Failed to create order');
             const result = await response.json();
             return result.paypalOrderId;
           } catch (error) {
-            console.error('Error creating PayPal order:', error);
+            this.handleError('Error creating PayPal order.');
             throw error;
           }
         },
-        onApprove: async (data: any, actions: any) => {
+        onApprove: async (data: any) => {
           try {
-            const response = await this.http.post(
-              `${environment.apiBaseUrl}/api/payments/capture`,
-              { orderId: data.orderID }
-            ).toPromise();
-  
-            console.log('Payment successful:', response);
-  
+            // await this.http.post(`${environment.apiBaseUrl}/api/payments/capture`, {
+            //   orderId: data.orderID
+            // }).toPromise();
+
             const queryParams = new URLSearchParams({
-              orderId: this.transactionDetails.orderId,
-              merchantId: this.transactionDetails.merchantId,
-              amount: this.transactionDetails.amount,
-              timestamp: this.transactionDetails.timestamp,
+              orderId: this.transactionDetails!.orderId,
+              merchantId: this.transactionDetails!.merchantId ?? '',
+              amount: this.transactionDetails!.amount.toString(),
+              timeStamp: new Date().toISOString()
             }).toString();
-  
+
             window.location.href = `/success?${queryParams}`;
           } catch (error) {
-            console.error('Error capturing payment:', error);
-            alert('Payment capture failed. Please try again.');
+            this.handleError('Payment capture failed. Please try again.');
           }
         },
         onError: (err: any) => {
-          console.error('Error during PayPal payment:', err);
-          alert('An error occurred. Please try again.');
-        },
+          this.handleError('An error occurred. Please try again.');
+          console.error('PayPal error:', err);
+        }
       }).render('#paypal-button-container');
-    } else {
-      console.error('PayPal SDK not loaded or transaction details missing!');
-    }
+    }, 0);
   }
-}  
+}

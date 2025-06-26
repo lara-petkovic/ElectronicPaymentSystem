@@ -31,6 +31,8 @@ pspFront.crt
 gw1.crt --gateway ws-psp
 gw2.crt --gateway psp-bank
 crypto.crt --servis za kripto valute
+paypal.crt --paypal backend
+paypalFront.crt --paypal frontend
 
 ______________________________TRUSTED_CERTIFICATES__________________________________________________
 
@@ -38,7 +40,7 @@ banka-backend trusted certs:
 	pcc,psp,gw2,bankFront
 
 psp-backend trusted certs:
-	bank,gw1,gw2,crypto,pspFront
+	bank,gw1,gw2,crypto,pspFront,paypal
 
 pcc trusted certs:
 	bank
@@ -47,7 +49,10 @@ gw1 trusted certs:
 	psp
 
 gw2 trusted certs:
-	psp,bank,crypto
+	psp,bank,crypto,paypal
 
 crypto trusted certs:
 	psp,gw2
+	
+paypal-backed trusted certs:
+	psp,gw2,paypalFront

@@ -1,6 +1,9 @@
 package com.sepproject.paypalback.controllers;
 
+import com.sepproject.paypalback.dtos.NewTransactionDto;
+import com.sepproject.paypalback.dtos.PayPalCheckoutRequest;
 import com.sepproject.paypalback.dtos.PaymentRequestDto;
+import com.sepproject.paypalback.mappers.PaymentRequestMapper;
 import com.sepproject.paypalback.models.Payment;
 import com.sepproject.paypalback.services.PaymentsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +13,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4203")
+@CrossOrigin(origins = "https://localhost:4203")
 @RequestMapping("/api/payments")
 public class PaymentsController {
 
     @Autowired
     private PaymentsService paymentsService;
+
+    @Autowired
+    private PaymentRequestMapper requestMapper;
 
     @PostMapping("/create")
     public ResponseEntity<?> createPaypalOrder(@RequestBody PaymentRequestDto request) {
@@ -29,9 +35,12 @@ public class PaymentsController {
     }
 
     @PostMapping("/capture")
-    public ResponseEntity<?> capturePayment(@RequestBody PaymentRequestDto request) {
-        Payment payment = paymentsService.capturePayment(request.getOrderId());
-
-        return ResponseEntity.ok().body(payment);
+    public ResponseEntity<?> capturePayment(@RequestParam String orderId) {
+        try {
+            Payment payment = paymentsService.capturePayment(orderId);
+            return ResponseEntity.ok(payment);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Failed to capture payment");
+        }
     }
 }

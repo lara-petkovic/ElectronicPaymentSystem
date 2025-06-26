@@ -1,15 +1,27 @@
-<html>
-    <div *ngIf="transactionDetails; else emptyCart" class="checkout-container">
-        <h2>Order Details:</h2>
-        <p><strong>Order ID:</strong> {{ transactionDetails.orderId }}</p>
-        <p><strong>Merchant ID:</strong> {{ transactionDetails.merchantId }}</p>
-        <p><strong>Amount:</strong> ${{ transactionDetails.amount }}</p>
-        <p><strong>Timestamp:</strong> {{ transactionDetails.timestamp }}</p>
-      
+<div *ngIf="!loading; else loadingIndicator" class="checkout-container">
+    <div *ngIf="!error; else errorMessage">
+        <h2>Complete Your Payment</h2>
+        <div class="transaction-details">
+            <p><strong>Order ID:</strong> {{ transactionDetails?.orderId }}</p>
+            <p><strong>Amount:</strong> ${{ transactionDetails?.amount }}</p>
+        </div>
+        
         <div id="paypal-button-container"></div>
     </div>
-      
-    <ng-template #emptyCart>
-        <h2>No transaction details found!</h2>
+    
+    <ng-template #errorMessage>
+        <div class="alert alert-danger">
+            {{ error }}
+            <a routerLink="/" class="btn btn-primary mt-3">Return to Home</a>
+        </div>
     </ng-template>
-</html>
+</div>
+
+<ng-template #loadingIndicator>
+    <div class="loading-spinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>Loading payment details...</p>
+    </div>
+</ng-template>

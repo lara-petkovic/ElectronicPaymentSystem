@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.SSLException;
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -70,8 +72,6 @@ public class ClientService implements IClientService {
         String merchantPassword=generateRandomString();
         client.setMerchantPass(encryptionUtil.encrypt(merchantPassword));
         client.setPort(address);
-
-
 
         boolean containsBank=false;
         boolean containsCrypto=false;
@@ -139,7 +139,7 @@ public class ClientService implements IClientService {
             System.out.println("Response: " + response);
 
         } catch (Exception e) {
-            System.out.println("Parrsing error: " + e.getMessage());
+            System.out.println("Parsing error: " + e.getMessage());
         }
     }
 
@@ -177,9 +177,48 @@ public class ClientService implements IClientService {
             System.out.println("Response: " + response);
 
         } catch (Exception e) {
-            System.out.println("Parrsing error: " + e.getMessage());
+            System.out.println("Parsing error: " + e.getMessage());
         }
     }
+
+    private void SendCredentialsToPayPal(String merchantId, String merchantPass) {
+        HttpClient httpClient = HttpClient.create()
+                .secure(sslContextSpec -> {
+                    try {
+                        sslContextSpec
+                                .sslContext(
+                                        SslContextBuilder.forClient()
+                                                .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                                                .build()
+                                );
+                    } catch (SSLException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
+        WebClient webClient = WebClient.builder()
+                .baseUrl("https://localhost:8088")
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .build();
+
+        try {
+            String body = "{ \"merchantId\" : \"" + merchantId + "\", \"merchantPassword\" : \"" + merchantPass + "\" }";
+
+            String response = webClient.post()
+                    .uri("/api/merchants")
+                    .header("Content-Type", "application/json")
+                    .bodyValue(body)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+
+            logger.info("PayPal registration response: " + response);
+
+        } catch (Exception e) {
+            logger.error("Error sending credentials to PayPal: " + e.getMessage());
+        }
+    }
+
     @Override
     public ClientSubscriptionDto getSubscription(NewTransactionDto newTransactionDto, String port) {
         Client client=getClientByPort(port);

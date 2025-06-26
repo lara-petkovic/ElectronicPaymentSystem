@@ -104,7 +104,7 @@ public class TradeWebSocketHandler extends TextWebSocketHandler {
             System.out.println("Response: " + response);
 
         } catch (Exception e) {
-            System.out.println("Parrsing error: " + e.getMessage());
+            System.out.println("Parsing error: " + e.getMessage());
             session.sendMessage(new TextMessage("Invalid format!"));
         }
     }
