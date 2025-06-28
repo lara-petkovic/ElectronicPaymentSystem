@@ -1,9 +1,9 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { Component, Inject, Input, OnInit, PLATFORM_ID } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { environment } from '../../../enviroment';
 import { PaymentRequestDto } from '../../models/PaymentRequestDto';
+import { TransactionStateService } from '../../transaction-state.service';
 import { PaymentService } from '../payment.service';
 
 @Component({
@@ -22,26 +22,21 @@ export class CheckoutComponent implements OnInit {
 
   constructor(
     private paymentService: PaymentService,
-    @Inject(PLATFORM_ID) private platformId: Object,
-    private route: ActivatedRoute
+    private transactionStateService: TransactionStateService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      if (params['orderId'] && params['amount']) {
-        this.transactionDetails = {
-          orderId: params['orderId'],
-          merchantId: params['merchantId'] ?? '',
-          amount: +params['amount']
-        };
-        this.loading = false;
-        this.loadPayPalButton();
-      } else {
-        this.handleError('Missing payment parameters');
-      }
-    });
+    const dto = this.transactionStateService.getTransaction();
+    if (dto) {
+      this.transactionDetails = dto;
+      this.loading = false;
+      this.loadPayPalButton();
+    } else {
+      this.handleError('Missing payment data.');
+    }
   }
 
   handleError(message: string) {
@@ -112,11 +107,9 @@ export class CheckoutComponent implements OnInit {
     this.paymentService.capturePayment(orderId).subscribe({
       next: (response) => {
         console.log('Payment captured:', response);
-        // handle success, e.g., show confirmation
       },
       error: (error) => {
         console.error('Capture failed:', error);
-        // handle error, e.g., show error message
       },
     });
   }

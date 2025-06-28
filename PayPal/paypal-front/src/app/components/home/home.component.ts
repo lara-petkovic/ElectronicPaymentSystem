@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Client, IMessage, StompSubscription } from '@stomp/stompjs';
 import { Router } from '@angular/router';
+import { Client, IMessage, StompSubscription } from '@stomp/stompjs';
 import { PaymentRequestDto } from '../../models/PaymentRequestDto';
+import { TransactionStateService } from '../../transaction-state.service';
 import { CheckoutComponent } from '../checkout/checkout.component';
 
 @Component({
@@ -17,8 +18,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   private stompClient!: Client;
   private subscription!: StompSubscription;
   notifications: string[] = [];
-  
-  constructor(private router: Router) {}
+
+  constructor(
+    private router: Router,
+    private transactionStateService: TransactionStateService
+  ) { }
 
   ngOnInit(): void {
     this.connect();
@@ -57,32 +61,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  sendMessage(): void {
-    const messageInput = document.getElementById('message') as HTMLInputElement;
-    const message = messageInput.value;
-
-    if (this.stompClient && this.stompClient.connected) {
-      this.stompClient.publish({
-        destination: '/app/sendMessage',
-        body: message
-      });
-      console.log('Message sent:', message);
-      messageInput.value = '';
-    } else {
-      console.error('WebSocket connection is not established.');
-    }
-  }
-
   private showNotification(dto: PaymentRequestDto): void {
     console.log('Received notification DTO:', dto);
-    this.notifications.push(`Order ${dto.orderId} - Amount: $${dto.amount}`);
-    //this.transactionDto = dto;
-    this.router.navigate(['/checkout'], {
-      queryParams: {
-        orderId: dto.orderId,
-        merchantId: dto.merchantId,
-        amount: dto.amount.toString()
-      }
-    });
+    this.transactionStateService.setTransaction(dto);
+    this.router.navigate(['/checkout']);
   }
 }
