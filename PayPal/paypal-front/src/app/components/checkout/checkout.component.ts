@@ -4,6 +4,7 @@ import { Component, Inject, Input, OnInit, PLATFORM_ID } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '../../../enviroment';
 import { PaymentRequestDto } from '../../models/PaymentRequestDto';
+import { PaymentService } from '../payment.service';
 
 @Component({
   selector: 'app-checkout',
@@ -20,7 +21,7 @@ export class CheckoutComponent implements OnInit {
   loading: boolean = true;
 
   constructor(
-    private http: HttpClient,
+    private paymentService: PaymentService,
     @Inject(PLATFORM_ID) private platformId: Object,
     private route: ActivatedRoute
   ) {
@@ -85,15 +86,13 @@ export class CheckoutComponent implements OnInit {
         },
         onApprove: async (data: any) => {
           try {
-            // await this.http.post(`${environment.apiBaseUrl}/api/payments/capture`, {
-            //   orderId: data.orderID
-            // }).toPromise();
+            this.onCapture(data.orderID);
 
             const queryParams = new URLSearchParams({
               orderId: this.transactionDetails!.orderId,
               merchantId: this.transactionDetails!.merchantId ?? '',
               amount: this.transactionDetails!.amount.toString(),
-              timeStamp: new Date().toISOString()
+              timestamp: new Date().toISOString()
             }).toString();
 
             window.location.href = `/success?${queryParams}`;
@@ -107,5 +106,18 @@ export class CheckoutComponent implements OnInit {
         }
       }).render('#paypal-button-container');
     }, 0);
+  }
+
+  private onCapture(orderId: string): void {
+    this.paymentService.capturePayment(orderId).subscribe({
+      next: (response) => {
+        console.log('Payment captured:', response);
+        // handle success, e.g., show confirmation
+      },
+      error: (error) => {
+        console.error('Capture failed:', error);
+        // handle error, e.g., show error message
+      },
+    });
   }
 }

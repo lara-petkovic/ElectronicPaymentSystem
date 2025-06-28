@@ -1,9 +1,12 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-success',
   templateUrl: './success.component.html',
+  imports: [CommonModule],
+  standalone: true,
   styleUrls: ['./success.component.scss']
 })
 export class SuccessComponent implements OnInit {

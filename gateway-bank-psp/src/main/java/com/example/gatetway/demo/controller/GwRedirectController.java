@@ -21,7 +21,7 @@ public class GwRedirectController {
 
 
     @PostMapping
-    public void redirect (@RequestBody NewTransactionDto newtransaction, @RequestHeader("Payment") String option) throws Exception{
+    public void redirect (@RequestBody NewTransactionDto newtransaction, @RequestHeader("Payment") String option) {
         RestTemplate restTemplate = new RestTemplate();
         String url = "https://localhost:" + paymentOptionService.getAddressByOption(option).getPort() + paymentOptionService.getAddressByOption(option).getAddress();
         HttpHeaders headers = new HttpHeaders();

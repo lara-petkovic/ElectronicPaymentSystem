@@ -4,7 +4,7 @@
         <p><b>Order ID:</b> {{ transactionDetails.orderId }}</p>
         <p><b>Merchant ID:</b> {{ transactionDetails.merchantId }}</p>
         <p><b>Amount Paid:</b> {{ transactionDetails.amount }} USD</p>
-        <p><b>Timestamp:</b> {{ transactionDetails.timestamp }}</p>
-        <a href="https://localhost:4200" class="btn">Go to Home</a>
-    </div> 
+        <p><b>Timestamp:</b> {{ transactionDetails.timestamp | date: 'short' }}</p>
+        <a href="https://localhost:4203" class="btn">Go to Home</a>
+    </div>
 </html>
