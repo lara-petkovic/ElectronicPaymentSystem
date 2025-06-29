@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -66,23 +64,6 @@ public class PaymentsService {
             throw new RuntimeException("Failed to create WebClient", e);
         }
     }
-//
-//    private String getAccessToken() {
-//        String authUrl = PAYPAL_API_BASE_URL + "/v1/oauth2/token";
-//
-//        String credentials = Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add("Authorization", "Basic " + credentials);
-//        headers.add("Content-Type", "application/x-www-form-urlencoded");
-//
-//        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-//        body.add("grant_type", "client_credentials");
-//
-//        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
-//        ResponseEntity<Map> response = restTemplate.exchange(authUrl, HttpMethod.POST, request, Map.class);
-//
-//        return (String) Objects.requireNonNull(response.getBody()).get("access_token");
-//    }
 
     private String getAccessToken() {
         String credentials = Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
@@ -155,26 +136,6 @@ public class PaymentsService {
             throw new RuntimeException("Failed to create PayPal order: " + e.getMessage(), e);
         }
     }
-
-//    public String createPaypalOrder(String orderId, String merchantId, Double amount) {
-//        String accessToken = getAccessToken();
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add("Authorization", "Bearer " + accessToken);
-//        headers.add("Content-Type", "application/json");
-//
-//        Map<String, Object> purchaseUnit = new HashMap<>();
-//        purchaseUnit.put("description", "Order ID: " + orderId + ", Merchant ID: " + merchantId);
-//        purchaseUnit.put("amount", Map.of("currency_code", "USD", "value", amount));
-//        purchaseUnit.put("reference_id", merchantId);
-//
-//        Map<String, Object> requestBody = Map.of("intent", "CAPTURE", "purchase_units", new Object[]{purchaseUnit});
-//
-//        HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
-//        ResponseEntity<Map> response = restTemplate.postForEntity(PAYPAL_CREATE_ORDER_URL, request, Map.class);
-//
-//        return (String) Objects.requireNonNull(response.getBody()).get("id");
-//    }
 
     public Payment capturePayment(String paypalOrderId) {
         String accessToken = getAccessToken();

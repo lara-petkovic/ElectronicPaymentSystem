@@ -1,7 +1,5 @@
 package com.sepproject.paypalback.controllers;
 
-import com.sepproject.paypalback.dtos.NewTransactionDto;
-import com.sepproject.paypalback.dtos.PayPalCheckoutRequest;
 import com.sepproject.paypalback.dtos.PaymentRequestDto;
 import com.sepproject.paypalback.mappers.PaymentRequestMapper;
 import com.sepproject.paypalback.models.Payment;

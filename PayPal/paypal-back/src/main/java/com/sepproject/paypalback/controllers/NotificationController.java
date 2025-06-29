@@ -1,6 +1,5 @@
 package com.sepproject.paypalback.controllers;
 
-import com.sepproject.paypalback.dtos.NewTransactionDto;
 import com.sepproject.paypalback.dtos.PaymentRequestDto;
 import com.sepproject.paypalback.models.TransactionRequestFromPsp;
 import com.sepproject.paypalback.services.NotificationService;
