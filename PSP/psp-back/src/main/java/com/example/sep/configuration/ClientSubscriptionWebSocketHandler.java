@@ -57,7 +57,8 @@ public class ClientSubscriptionWebSocketHandler extends TextWebSocketHandler {
             String address = (String) data.get("clientId");
             String subscription = (String) data.get("name");
             String walletAddress = (String) data.get("walletAddress");
-            createClient(subscription,address, walletAddress);
+            String paypalClientId = (String) data.get("paypalClientId");
+            createClient(subscription,address, walletAddress, paypalClientId);
 
             System.out.println("Received subscription: " +  ", ID: " + address+subscription);
 
@@ -67,8 +68,8 @@ public class ClientSubscriptionWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private void createClient(String subscription, String address, String walletAddress) throws Exception {
+    private void createClient(String subscription, String address, String walletAddress, String paypalClientId) throws Exception {
         //ClientService clientService = new ClientService(clientRepository, paymentOptionRepository, new EncryptionUtil());
-        clientService.create(subscription, address, walletAddress);
+        clientService.create(subscription, address, walletAddress, paypalClientId);
     }
 }

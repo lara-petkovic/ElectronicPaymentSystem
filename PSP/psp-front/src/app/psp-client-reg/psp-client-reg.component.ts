@@ -7,7 +7,7 @@ import { DomSanitizer } from '@angular/platform-browser';
   styleUrls: ['./psp-client-reg.component.css']
 })
 export class PspClientRegComponent {
-  @Output() optionsSelected = new EventEmitter<{ name: string; clientId: string | null; walletAddress: string | null }>();
+  @Output() optionsSelected = new EventEmitter<{ name: string; clientId: string | null; walletAddress: string | null, paypalClientId: string | null }>();
 
   options: { name: string }[] = [];
   @Input()
@@ -26,6 +26,7 @@ export class PspClientRegComponent {
   selectedOptions: string[] = [];
   hoverOption: string = '';
   walletAddress: string | null = null;
+  paypalString: string | null = null;
 
   constructor(private sanitizer: DomSanitizer) {}
 
@@ -41,6 +42,9 @@ export class PspClientRegComponent {
       if (option === 'Crypto') {
         this.walletAddress = null; 
       }
+      if (option === 'PayPal') {
+        this.paypalString = null;
+      }
     } else {
       this.selectedOptions.push(option);
     }
@@ -51,18 +55,25 @@ export class PspClientRegComponent {
       alert('Please enter a wallet address for Crypto.');
       return;
     }
-
+    if (this.selectedOptions.includes('PayPal') && !this.paypalString) {
+      alert('Please enter a PayPal string.');
+      return;
+    }
     const sanitizedWalletAddress = this.walletAddress 
       ? this.sanitizeInput(this.walletAddress) 
       : null;
-
+    const sanitizedPaypalString = this.paypalString
+      ? this.sanitizeInput(this.paypalString)
+      : null;
     this.optionsSelected.emit({
       name: this.selectedOptions.join(','),
       clientId: null,
-      walletAddress: this.selectedOptions.includes('Crypto') ? sanitizedWalletAddress : null
+      walletAddress: this.selectedOptions.includes('Crypto') ? sanitizedWalletAddress : null,
+      paypalClientId: this.selectedOptions.includes('PayPal') ? sanitizedPaypalString : null
     });
-
-    alert(`Selected options: ${this.selectedOptions.join(', ')}\nWallet Address: ${sanitizedWalletAddress || 'N/A'}`);
+    alert(`Selected options: ${this.selectedOptions.join(', ')}\nWallet Address: ${sanitizedWalletAddress || 'N/A'}\nPayPal String: ${sanitizedPaypalString || 'N/A'}`);
     this.selectedOptions=[];
+    this.walletAddress=null;
+    this.paypalString=null;
   }
 }

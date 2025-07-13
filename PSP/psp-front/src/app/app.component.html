@@ -1,17 +1,18 @@
-
-
 <div [ngClass]="{ 'hidden': !showClientReg }">
-<app-psp-client-reg   [optionsP]="optionsP"
-(optionsSelected)="handleOptionSelected($event)"></app-psp-client-reg>
+    <app-psp-client-reg
+        [optionsP]="optionsP"
+        (optionsSelected)="handleOptionSelected($event)">
+    </app-psp-client-reg>
 </div>
 
 <div [ngClass]="{ 'hidden': !showPaymentForm }">
-<app-psp-form   [paymentOptions]="paymentOptions"
-(paymentMethodSelected)="sendPaymentMethod($event)"></app-psp-form>
+    <app-psp-form
+        [paymentOptions]="paymentOptions"
+        (paymentMethodSelected)="sendPaymentMethod($event)">
+    </app-psp-form>
 </div>
 
 <router-outlet></router-outlet>
 <br>
 <br>
 <br>
-

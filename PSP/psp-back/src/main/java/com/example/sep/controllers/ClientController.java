@@ -30,8 +30,8 @@ public class ClientController {
     @Autowired
     public ClientController(ClientSubscriptionWebSocketHandler clientSubscriptionWebSocketHandler, PaymentOptionService paymentOptionService, IClientService clientService) {
         this.clientSubscriptionWebSocketHandler = clientSubscriptionWebSocketHandler;
-        this.paymentOptionService=paymentOptionService;
-        this.clientService=clientService;
+        this.paymentOptionService = paymentOptionService;
+        this.clientService = clientService;
     }
     @PostMapping
     public ResponseEntity<NewClientDto> CreateClient(@RequestBody NewClientDto newClient) throws Exception {

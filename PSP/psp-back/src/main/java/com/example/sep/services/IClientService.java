@@ -11,7 +11,7 @@ import java.util.List;
 
 @Service
 public interface IClientService {
-    ClientAuthenticationDataDto create(String subscription, String address, String walletAddress) throws Exception;
+    ClientAuthenticationDataDto create(String subscription, String address, String walletAddress, String paypalClientId) throws Exception;
     ClientSubscriptionDto getSubscription(NewTransactionDto newTransactionDto, String poirt);
     Client getClientByMerchantId(String merchantId);
     Client getClientByPort(String port);

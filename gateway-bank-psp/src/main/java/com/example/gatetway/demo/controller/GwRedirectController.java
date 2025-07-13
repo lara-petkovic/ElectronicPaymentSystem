@@ -15,10 +15,9 @@ public class GwRedirectController {
     @Autowired
     private PaymentOptionService paymentOptionService;
 
-    public GwRedirectController(PaymentOptionService paymentOptionService){
+    public GwRedirectController(PaymentOptionService paymentOptionService) {
         this.paymentOptionService = paymentOptionService;
     }
-
 
     @PostMapping
     public void redirect (@RequestBody NewTransactionDto newtransaction, @RequestHeader("Payment") String option) {

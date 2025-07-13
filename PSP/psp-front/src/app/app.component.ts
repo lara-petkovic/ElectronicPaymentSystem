@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'] // Ovdje ispravite putanju ako je potrebno
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent {
   title = 'psp-front';
@@ -113,7 +113,7 @@ export class AppComponent {
     this.router.navigate(['home']);
   }
 
-  handleOptionSelected(option: { name: string; clientId: string | null; walletAddress?: string | null }) {
+  handleOptionSelected(option: { name: string; clientId: string | null; walletAddress?: string | null, paypalClientId?: string | null }) {
     option.clientId = this.clientId;
   
     if (option.name.includes('Crypto')) {
@@ -123,6 +123,13 @@ export class AppComponent {
       }
     } else {
       option.walletAddress = null; 
+    }
+
+    if(option.name.includes('PayPal')) {
+      if (!option.paypalClientId) {
+        console.error('PayPal client ID is required for PayPal.');
+        return;
+      }
     }
   
     const message = JSON.stringify(option);

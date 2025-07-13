@@ -17,7 +17,7 @@
   
   .options-table tr {
     cursor: pointer;
-    background-color: lightblue; /* Beli redovi kao podrazumevana boja */
+    background-color: lightblue;
     transition: background-color 0.3s, transform 0.2s;
   }
   
@@ -26,7 +26,7 @@
   }
   
   .options-table tr.selected {
-    background-color: blue; /* Plava boja za selektovane redove */
+    background-color: blue;
   }
   
   .options-table td, .options-table th {
@@ -66,15 +66,15 @@
   
   .wallet-input label {
     font-size: 1.2em;
-    color: white; /* Bela boja za tekst */
+    color: white;
     margin-bottom: 10px;
   }
   
   .wallet-input input {
-    width: 400px; /* Veća širina za input */
-    height: 40px; /* Veća visina za input */
-    font-size: 1.1em; /* Veći font */
-    border: 2px solid #007BFF; /* Svetlo plava boja za okvir */
+    width: 400px;
+    height: 40px;
+    font-size: 1.1em;
+    border: 2px solid #007BFF;
     border-radius: 5px;
     padding: 5px 10px;
     outline: none;
@@ -82,9 +82,9 @@
   }
   
   .wallet-input input:focus {
-    box-shadow: 0 0 10px rgba(0, 123, 255, 0.7); /* Svetlo plava senka */
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.7);
   }
   
   .wallet-input input::placeholder {
-    color: #B0DFFB; /* Svetlo plava boja za placeholder */
+    color: #B0DFFB;
   }
