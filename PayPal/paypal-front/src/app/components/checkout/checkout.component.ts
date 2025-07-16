@@ -1,5 +1,5 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { Component, Inject, Input, OnInit, PLATFORM_ID } from '@angular/core';
 import { environment } from '../../../enviroment';
 import { PaymentRequestDto } from '../../models/PaymentRequestDto';
@@ -19,11 +19,13 @@ export class CheckoutComponent implements OnInit {
 
   error: string | null = null;
   loading: boolean = true;
+  private paypalScriptLoaded = false;
 
   constructor(
     private paymentService: PaymentService,
     private transactionStateService: TransactionStateService,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private http: HttpClient
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
@@ -33,7 +35,7 @@ export class CheckoutComponent implements OnInit {
     if (dto) {
       this.transactionDetails = dto;
       this.loading = false;
-      this.loadPayPalButton();
+      this.fetchAndLoadPayPalButton();
     } else {
       this.handleError('Missing payment data.');
     }
@@ -43,6 +45,36 @@ export class CheckoutComponent implements OnInit {
     this.error = message;
     this.loading = false;
     console.error(message);
+  }
+
+  fetchAndLoadPayPalButton() {
+    if (!this.isBrowser || !this.transactionDetails?.merchantId) return;
+    this.http.get(`${environment.apiBaseUrl}/api/notification/${this.transactionDetails.merchantId}/paypal-client-id`, { responseType: 'text' })
+      .subscribe({
+        next: (clientId: string) => {
+          this.loadPayPalScript(clientId);
+        },
+        error: () => {
+          this.handleError('Failed to fetch PayPal client ID.');
+        }
+      });
+  }
+
+  loadPayPalScript(clientId: string) {
+    if (this.paypalScriptLoaded) {
+      this.loadPayPalButton();
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}`;
+    script.onload = () => {
+      this.paypalScriptLoaded = true;
+      this.loadPayPalButton();
+    };
+    script.onerror = () => {
+      this.handleError('Failed to load PayPal SDK script.');
+    };
+    document.body.appendChild(script);
   }
 
   loadPayPalButton() {

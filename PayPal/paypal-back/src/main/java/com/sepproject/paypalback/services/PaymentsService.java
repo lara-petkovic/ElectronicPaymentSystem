@@ -1,6 +1,9 @@
 package com.sepproject.paypalback.services;
 
+import com.sepproject.paypalback.models.Merchant;
 import com.sepproject.paypalback.models.Payment;
+import com.sepproject.paypalback.models.PaypalMerchant;
+import com.sepproject.paypalback.repositories.MerchantRepository;
 import com.sepproject.paypalback.repositories.PaymentsRepository;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
@@ -21,11 +24,11 @@ import java.util.*;
 @Service
 public class PaymentsService {
 
-    @Value("${paypal.client-id}")
-    private String clientId;
+    @Autowired
+    private IMerchantService merchantService;
 
-    @Value("${paypal.client-secret}")
-    private String clientSecret;
+    @Autowired
+    private IPaypalMerchantService paypalMerchantService;
 
     @Autowired
     private PaymentsRepository paymentsRepository;
@@ -65,11 +68,16 @@ public class PaymentsService {
         }
     }
 
-    private String getAccessToken() {
+    private String getAccessToken(String merchantId) {
+        PaypalMerchant paypalMerchant = paypalMerchantService.getByPaypalMerchantId(merchantId);
+
+        String clientId = paypalMerchant.getPaypalClientId();
+        String clientSecret = paypalMerchant.getPaypalClientSecret();
+
         String credentials = Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
 
         Map response = webClient.post()
-                .uri(PAYPAL_API_BASE_URL + "/v1/oauth2/token")
+                .uri("https://api.sandbox.paypal.com/v1/oauth2/token")
                 .header("Authorization", "Basic " + credentials)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(BodyInserters.fromFormData("grant_type", "client_credentials"))
@@ -81,67 +89,38 @@ public class PaymentsService {
     }
 
     public String createPaypalOrder(String orderId, String merchantId, Double amount) {
-        if (orderId == null || orderId.isBlank()) {
-            throw new IllegalArgumentException("Order ID cannot be null or empty");
-        }
-        if (merchantId == null || merchantId.isBlank()) {
-            throw new IllegalArgumentException("Merchant ID cannot be null or empty");
-        }
-        if (amount == null) {
-            throw new IllegalArgumentException("Amount cannot be null");
-        }
-        if (amount <= 0) {
-            throw new IllegalArgumentException("Amount must be greater than 0");
-        }
+        String accessToken = getAccessToken(merchantId);
 
-        try {
-            String accessToken = getAccessToken();
-            if (accessToken == null || accessToken.isBlank()) {
-                throw new RuntimeException("Failed to obtain valid PayPal access token");
-            }
+        Map<String, Object> amountMap = new HashMap<>();
+        amountMap.put("currency_code", "USD");
+        amountMap.put("value", String.format("%.2f", amount));
 
-            Map<String, Object> amountMap = new HashMap<>();
-            amountMap.put("currency_code", "USD");
-            amountMap.put("value", String.format("%.2f", amount));
+        Map<String, Object> purchaseUnit = new HashMap<>();
+        purchaseUnit.put("description", "Order ID: " + orderId);
+        purchaseUnit.put("amount", amountMap);
+        purchaseUnit.put("reference_id", merchantId);
 
-            Map<String, Object> purchaseUnit = new HashMap<>();
-            purchaseUnit.put("description", "Order ID: " + orderId);
-            purchaseUnit.put("amount", amountMap);
-            purchaseUnit.put("reference_id", merchantId);
-
-            Map<String, Object> requestBody = new HashMap<>();
-            requestBody.put("intent", "CAPTURE");
-            requestBody.put("purchase_units", Collections.singletonList(purchaseUnit));
-
-            // Make the API call
-            Map response = webClient.post()
-                    .uri(PAYPAL_CREATE_ORDER_URL)
-                    .header("Authorization", "Bearer " + accessToken)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(requestBody)
-                    .retrieve()
-                    .onStatus(HttpStatusCode::isError, clientResponse ->
-                            clientResponse.bodyToMono(String.class)
-                                    .map(body -> new RuntimeException("PayPal API error: " + body))
-                    )
-                    .bodyToMono(Map.class)
-                    .block();
-
-            if (response == null || response.get("id") == null) {
-                throw new RuntimeException("Invalid response from PayPal API - missing order ID");
-            }
-
-            return (String) response.get("id");
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create PayPal order: " + e.getMessage(), e);
-        }
-    }
-
-    public Payment capturePayment(String paypalOrderId) {
-        String accessToken = getAccessToken();
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("intent", "CAPTURE");
+        requestBody.put("purchase_units", Collections.singletonList(purchaseUnit));
 
         Map response = webClient.post()
-                .uri(PAYPAL_CAPTURE_ORDER_URL, paypalOrderId)
+                .uri("https://api.sandbox.paypal.com/v2/checkout/orders")
+                .header("Authorization", "Bearer " + accessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .retrieve()
+                .bodyToMono(Map.class)
+                .block();
+
+        return (String) Objects.requireNonNull(response).get("id");
+    }
+
+    public Payment capturePayment(String paypalOrderId, String merchantId) {
+        String accessToken = getAccessToken(merchantId);
+
+        Map response = webClient.post()
+                .uri("https://api.sandbox.paypal.com/v2/checkout/orders/{orderId}/capture", paypalOrderId)
                 .header("Authorization", "Bearer " + accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()
@@ -152,42 +131,10 @@ public class PaymentsService {
             throw new RuntimeException("Payment capture failed!");
         }
 
-        String merchantId = extractMerchantId(response);
         String paypalAccountId = extractPaypalAccountId(response);
         Double amount = extractCapturedAmount(response);
 
         return savePayment(paypalOrderId, merchantId, paypalAccountId, amount);
-    }
-
-    private ResponseEntity<Map> executeCaptureRequest(String paypalOrderId, String accessToken) {
-        HttpHeaders headers = createHeaders(accessToken);
-        HttpEntity<Void> request = new HttpEntity<>(headers);
-        return restTemplate.exchange(
-                PAYPAL_CAPTURE_ORDER_URL,
-                HttpMethod.POST,
-                request,
-                Map.class,
-                paypalOrderId
-        );
-    }
-
-    private Map<String, Object> getResponseBody(ResponseEntity<Map> response) {
-        Map<String, Object> responseBody = response.getBody();
-        if (responseBody == null) {
-            throw new RuntimeException("Response body is null!");
-        }
-        return responseBody;
-    }
-
-    private String extractMerchantId(Map<String, Object> responseBody) {
-        List<Map<String, Object>> purchaseUnits = getPurchaseUnits(responseBody);
-        Map<String, Object> firstPurchaseUnit = purchaseUnits.get(0);
-
-        String paypalAccountId = (String) firstPurchaseUnit.get("reference_id");
-        if (paypalAccountId == null) {
-            throw new RuntimeException("Merchant ID is missing in purchase unit!");
-        }
-        return paypalAccountId;
     }
 
     private String extractPaypalAccountId(Map<String, Object> responseBody) {
@@ -250,12 +197,5 @@ public class PaymentsService {
 
         paymentsRepository.save(payment);
         return payment;
-    }
-
-    private HttpHeaders createHeaders(String accessToken) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + accessToken);
-        headers.add("Content-Type", "application/json");
-        return headers;
     }
 }

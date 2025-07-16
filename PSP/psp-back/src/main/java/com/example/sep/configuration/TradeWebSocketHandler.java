@@ -108,5 +108,4 @@ public class TradeWebSocketHandler extends TextWebSocketHandler {
             session.sendMessage(new TextMessage("Invalid format!"));
         }
     }
-
 }

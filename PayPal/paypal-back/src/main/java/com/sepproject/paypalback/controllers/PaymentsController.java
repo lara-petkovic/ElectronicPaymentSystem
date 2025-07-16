@@ -2,7 +2,6 @@ package com.sepproject.paypalback.controllers;
 
 import com.sepproject.paypalback.dtos.PaymentRequestDto;
 import com.sepproject.paypalback.mappers.PaymentRequestMapper;
-import com.sepproject.paypalback.models.Payment;
 import com.sepproject.paypalback.services.PaymentsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -32,13 +31,13 @@ public class PaymentsController {
         return ResponseEntity.ok().body(Map.of("paypalOrderId", paypalOrderId));
     }
 
-    @PostMapping("/capture")
-    public ResponseEntity<?> capturePayment(@RequestParam String orderId) {
-        try {
-            Payment payment = paymentsService.capturePayment(orderId);
-            return ResponseEntity.ok(payment);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Failed to capture payment");
-        }
-    }
+//    @PostMapping("/capture")
+//    public ResponseEntity<?> capturePayment(@RequestParam String orderId) {
+//        try {
+//            Payment payment = paymentsService.capturePayment(orderId);
+//            return ResponseEntity.ok(payment);
+//        } catch (Exception e) {
+//            return ResponseEntity.internalServerError().body("Failed to capture payment");
+//        }
+//    }
 }
