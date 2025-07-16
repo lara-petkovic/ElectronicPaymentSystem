@@ -136,7 +136,8 @@ export class CheckoutComponent implements OnInit {
                     console.error('Failed to send payment feedback to backend.');
                   }
                 });
-
+                // Notify backend about status
+                this.notifyBackend('success', data.orderID);
                 const queryParams = new URLSearchParams({
                   orderId: this.transactionDetails!.orderId,
                   merchantId: this.transactionDetails!.merchantId ?? '',
@@ -145,11 +146,13 @@ export class CheckoutComponent implements OnInit {
                 }).toString();
                 window.location.href = `/success?${queryParams}`;
               },
-              error: () => {
+              error: (error) => {
+                this.notifyBackend('fail', error.message);
                 this.handleError('Failed to capture payment on backend.');
               }
             });
-          } catch (error) {
+          } catch (error: any) {
+            this.notifyBackend('fail', error.message);
             this.handleError('Payment capture failed. Please try again.');
           }
         },
@@ -159,6 +162,23 @@ export class CheckoutComponent implements OnInit {
         }
       }).render('#paypal-button-container');
     }, 0);
+  }
+
+  notifyBackend(status: string, details: string) {
+    const orderId = this.transactionDetails?.orderId ?? '';
+    this.http.post(`${environment.apiBaseUrl}/api/notification/status`, null, {
+      params: {
+        status,
+        orderId
+      }
+    }).subscribe({
+      next: () => {
+        console.log('Backend notified successfully');
+      },
+      error: (error) => {
+        console.error('Error notifying backend: ', error);
+      }
+    });
   }
 
   private onCapture(orderId: string): void {
