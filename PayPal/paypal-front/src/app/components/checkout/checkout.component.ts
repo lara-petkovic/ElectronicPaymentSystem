@@ -113,16 +113,42 @@ export class CheckoutComponent implements OnInit {
         },
         onApprove: async (data: any) => {
           try {
-            this.onCapture(data.orderID);
+            // Call backend to capture the payment
+            this.http.post(`${environment.apiBaseUrl}/api/payments/capture`, null, {
+              params: {
+                orderId: data.orderID,
+                merchantId: this.transactionDetails!.merchantId ?? ''
+              }
+            }).subscribe({
+              next: () => {
+                // Send feedback to backend
+                this.http.post(`${environment.apiBaseUrl}/api/notification/pay`, {
+                  MerchantOrderId: this.transactionDetails!.orderId,
+                  MerchantId: this.transactionDetails!.merchantId,
+                  Amount: this.transactionDetails!.amount
+                }).subscribe({
+                  next: () => {
+                    // Feedback sent successfully
+                    console.log('Payment feedback sent to backend.');
+                  },
+                  error: () => {
+                    // Handle feedback error
+                    console.error('Failed to send payment feedback to backend.');
+                  }
+                });
 
-            const queryParams = new URLSearchParams({
-              orderId: this.transactionDetails!.orderId,
-              merchantId: this.transactionDetails!.merchantId ?? '',
-              amount: this.transactionDetails!.amount.toString(),
-              timestamp: new Date().toISOString()
-            }).toString();
-
-            window.location.href = `/success?${queryParams}`;
+                const queryParams = new URLSearchParams({
+                  orderId: this.transactionDetails!.orderId,
+                  merchantId: this.transactionDetails!.merchantId ?? '',
+                  amount: this.transactionDetails!.amount.toString(),
+                  timestamp: new Date().toISOString()
+                }).toString();
+                window.location.href = `/success?${queryParams}`;
+              },
+              error: () => {
+                this.handleError('Failed to capture payment on backend.');
+              }
+            });
           } catch (error) {
             this.handleError('Payment capture failed. Please try again.');
           }
