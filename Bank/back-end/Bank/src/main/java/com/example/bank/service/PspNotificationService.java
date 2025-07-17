@@ -4,10 +4,15 @@ import com.example.bank.domain.model.PaymentRequest;
 import com.example.bank.domain.model.Transaction;
 import com.example.bank.service.dto.TransactionResultDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
+
+import javax.net.ssl.SSLException;
 
 @Service
 public class PspNotificationService {
@@ -25,20 +30,38 @@ public class PspNotificationService {
             case "FAILED": {result.responseUrl = pr.getFailedUrl(); break;}
             default: {result.responseUrl = pr.getErrorUrl(); break;}
         }
-
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        try{
+        try {
             ObjectMapper objectMapper = new ObjectMapper();
             String body = objectMapper.writeValueAsString(result);
+            HttpClient httpClient = HttpClient.create()
+                    .secure(sslContextSpec -> {
+                                try {
+                                    sslContextSpec
+                                            .sslContext(
+                                                    SslContextBuilder.forClient()
+                                                            .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                                                            .build()
+                                            );
+                                } catch (SSLException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                    );
 
-            HttpEntity<String> entity = new HttpEntity<>(body, headers);
-            restTemplate.exchange(gatewayUrl, HttpMethod.POST, entity, Object.class);
-        }
-        catch(Exception e){
-            //nista
+            WebClient webClient = WebClient.builder()
+                    .baseUrl("https://api.coingecko.com/api/v3")
+                    .clientConnector(new ReactorClientHttpConnector(httpClient))
+                    .build();
+            Transaction response = webClient.post()
+                    .uri(gatewayUrl)
+                    .header("Content-Type", "application/json")
+                    .bodyValue(body)
+                    .retrieve()
+                    .bodyToMono(Transaction.class)
+                    .block(); // Blocking call here only if you're not reactive
+            System.out.println("Response: " + response);
+        } catch (Exception e) {
+            System.out.println("Error reaching psp: " + e);
         }
     }
 }

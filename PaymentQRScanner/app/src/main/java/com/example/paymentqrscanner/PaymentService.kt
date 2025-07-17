@@ -15,7 +15,7 @@ import java.util.Locale
 
 object PaymentService {
 
-    private val ip = "192.168.125.9"
+    private val ip = "192.168.87.9"
     private fun getCustomOkHttpClient(context: Context): OkHttpClient {
         // Load your certificate from raw resource
         val certificateFactory = CertificateFactory.getInstance("X.509")

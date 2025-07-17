@@ -1,6 +1,5 @@
 package com.example.bank.service;
 
-import com.example.bank.config.CustomResponseErrorHandler;
 import com.example.bank.domain.model.Account;
 import com.example.bank.domain.model.PaymentRequest;
 import com.example.bank.domain.model.Transaction;
@@ -8,13 +7,22 @@ import com.example.bank.service.dto.CardDetailsDto;
 import com.example.bank.service.dto.PaymentRequestForIssuerDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.netty.http.client.HttpClient;
+
+import javax.net.ssl.SSLException;
+import java.util.Objects;
+
 @Service
 public class PaymentExecutionService {
     @Autowired
@@ -65,12 +73,7 @@ public class PaymentExecutionService {
             }
             else{
                 //call issuers bank via pcc
-                RestTemplate restTemplate = new RestTemplate();
-                restTemplate.setErrorHandler(new CustomResponseErrorHandler());
                 String url = "https://pcc:8053/api/payments";
-
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON);
 
                 PaymentRequestForIssuerDto issuerRequest = new PaymentRequestForIssuerDto(
                         cardDetailsDto.Pan,
@@ -79,29 +82,57 @@ public class PaymentExecutionService {
                         cardDetailsDto.SecurityCode,
                         transaction
                 );
-
                 String body = objectMapper.writeValueAsString(issuerRequest);
+                HttpClient httpClient = HttpClient.create()
+                        .secure(sslContextSpec -> {
+                                    try {
+                                        sslContextSpec
+                                                .sslContext(
+                                                        SslContextBuilder.forClient()
+                                                                .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                                                                .build()
+                                                );
+                                    } catch (SSLException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
+                        );
 
-                HttpEntity<String> entity = new HttpEntity<>(body, headers);
-                try{
-                    ResponseEntity<Transaction> response = restTemplate.exchange(url, HttpMethod.POST, entity, Transaction.class);
-                    Transaction returnedTransaction = response.getBody();
-                    if(response.getStatusCode()==HttpStatus.OK){
-                        merchantAccount.setBalance(merchantAccount.getBalance()+paymentRequest.getAmount());
+                WebClient webClient = WebClient.builder()
+                        .baseUrl("https://api.coingecko.com/api/v3")
+                        .clientConnector(new ReactorClientHttpConnector(httpClient))
+                        .build();
+                try {
+                    Transaction response = webClient.post()
+                            .uri(url)
+                            .header("Content-Type", "application/json")
+                            .bodyValue(body)
+                            .retrieve()
+                            .bodyToMono(Transaction.class)
+                            .block(); // Blocking call here only if you're not reactive
+                    System.out.println("Response: " + response);
+                    if(response!=null && Objects.equals(response.getStatus(), "ISSUER_PAID")) {
+                        merchantAccount.setBalance(merchantAccount.getBalance() + paymentRequest.getAmount());
                         accountService.update(merchantAccount);
-                        emitSuccessEvent(returnedTransaction);
+                        emitSuccessEvent(response);
                         return true;
                     }
-                    else if(response.getStatusCode()==HttpStatus.FORBIDDEN || response.getStatusCode()==HttpStatus.NOT_FOUND){
-                        emitFailedEvent(returnedTransaction);
+                    else {
+                        emitFailedEvent(response);
                         return false;
+                    }
+                } catch (WebClientResponseException e) {
+                    if(e.getStatusCode()== HttpStatusCode.valueOf(404) || e.getStatusCode()== HttpStatusCode.valueOf(403)){
+                        emitFailedEvent(transaction);
                     }
                     else{
-                        emitErrorEvent(returnedTransaction);
-                        return false;
+                        System.out.println("Error reaching pcc: " + e);
+                        emitErrorEvent(transaction);
                     }
+                    return false;
                 }
-                catch(Exception e){
+                catch (Exception e){
+                    System.out.println("Error reaching pcc: " + e);
                     emitErrorEvent(transaction);
                     return false;
                 }
@@ -121,7 +152,7 @@ public class PaymentExecutionService {
         pspNotificationService.sendTransactionResult(transactionService.errorTransaction(transaction));
     }
     public void emitSuccessEvent(Transaction transaction){
-        logger.error("Successful transaction with id "+transaction.getId());
+        logger.info("Successful transaction with id "+transaction.getId());
         pspNotificationService.sendTransactionResult(transactionService.successTransaction(transaction));
     }
     public void emitFailedEvent(Transaction transaction){
