@@ -10,11 +10,11 @@ public class Merchant {
     @Column(name = "id", unique = true, nullable = false)
     private Long id;
 
-    @Column
+    @Column(length = 512)
     private String merchantId;
-    @Column
+    @Column(length = 512)
     private String merchantPass;
-    @Column
+    @Column(length = 512)
     private String paypalClientId;
 
     public Merchant() { }

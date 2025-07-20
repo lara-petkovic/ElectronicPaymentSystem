@@ -10,10 +10,17 @@ import com.sepproject.paypalback.services.IMerchantService;
 import com.sepproject.paypalback.services.IPaypalMerchantService;
 import com.sepproject.paypalback.services.ITransactionService;
 import com.sepproject.paypalback.services.NotificationService;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
+
+import javax.net.ssl.SSLException;
 
 @RestController
 @RequestMapping("/api/notification")
@@ -46,11 +53,11 @@ public class NotificationController {
         if(m != null) {
             PaypalMerchant paypalMerchant = new PaypalMerchant(
                     m.getMerchantId(),
-                    m.getMerchantPass(),
-                    m.getPaypalClientId().split("/////")[0],
-                    m.getPaypalClientId().split("/////")[1]
+                    merchant.getMerchantPass(),
+                    merchant.getPaypalClientId().split("/////")[0],
+                    merchant.getPaypalClientId().split("/////")[1]
             );
-            PaypalMerchant pm = paypalMerchantService.create(paypalMerchant);
+            paypalMerchantService.create(paypalMerchant);
             return new ResponseEntity<>(m, HttpStatus.CREATED);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -75,20 +82,40 @@ public class NotificationController {
 
     @PostMapping("/status")
     public ResponseEntity<String> handleTransactionStatus(@RequestParam String status, @RequestParam Long orderId) {
+        try {
+            String body = "{ \"responseUrl\": \"" + "https://localhost:4201/" + status + "\", \"orderId\": \"" + orderId + "\" }";
 
-        RestTemplate restTemplate = new RestTemplate();
-        String url = "https://localhost:8087/api/response";
+            HttpClient httpClient = HttpClient.create()
+                    .secure(sslContextSpec -> {
+                        try {
+                            sslContextSpec.sslContext(
+                                    SslContextBuilder.forClient()
+                                            .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                                            .build()
+                            );
+                        } catch (SSLException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+            WebClient webClient = WebClient.builder()
+                    .baseUrl("https://localhost:8087")
+                    .clientConnector(new ReactorClientHttpConnector(httpClient))
+                    .build();
 
-        String body = "{ \"responseUrl\": \"" + "https://localhost:4201/" + status + "\", \"orderId\": \"" + orderId + "\" }";
+            String response = webClient.post()
+                    .uri("/api/response")
+                    .header("Content-Type", "application/json")
+                    .bodyValue(body)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
 
-        HttpEntity<String> entity = new HttpEntity<>(body, headers);
-
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-        //logger.info("Transaction" +transactionStatusDto.getTransactionId()+"  processed "+transactionStatusDto.getStatus());
-
-        return ResponseEntity.ok("Transaction processed successfully");
+            System.out.println("Response: " + response);
+            return ResponseEntity.ok("Transaction processed successfully");
+        } catch (Exception e) {
+            System.out.println("Error reaching PSP: " + e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+        }
     }
 }

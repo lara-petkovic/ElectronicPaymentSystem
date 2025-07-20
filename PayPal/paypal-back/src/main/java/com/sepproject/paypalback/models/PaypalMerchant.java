@@ -10,13 +10,13 @@ public class PaypalMerchant {
     @Column(name = "id", unique = true, nullable = false)
     private Long id;
 
-    @Column
+    @Column(length = 512)
     private String merchantId;
-    @Column
+    @Column(length = 512)
     private String merchantPass;
-    @Column
+    @Column(length = 512)
     private String paypalClientId;
-    @Column
+    @Column(length = 512)
     private String paypalClientSecret; // Format: "clientId/////clientSecret"
 
     public PaypalMerchant() { }
